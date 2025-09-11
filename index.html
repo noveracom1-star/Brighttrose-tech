@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Brightrose Tech — Learn Future-Ready Digital Skills</title>
+  <meta name="description" content="Mobile-friendly bootcamps designed to launch your digital career quickly. Learn from your phone, build portfolio projects, and get job-ready fast." />
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#0f1724; /* deep midnight */
+      --glass: rgba(255,255,255,0.06);
+      --card:#ffffff;
+      --accent-1:#0ea5a4; /* teal */
+      --accent-2:#2563eb; /* bright blue */
+      --muted: rgba(255,255,255,0.75);
+      --glass-2: rgba(255,255,255,0.03);
+      --max-width:1200px;
+      --radius:16px;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    /* Reset */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:linear-gradient(180deg, #071028 0%, #071833 35%, #07102a 100%); color:var(--muted); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden;
+    }
+
+    /* Page container */
+    .wrap{max-width:var(--max-width);margin:0 auto;padding:28px;position:relative}
+
+    /* Topbar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent-2),var(--accent-1));display:grid;place-items:center;box-shadow:0 6px 18px rgba(6,8,25,0.6);font-weight:800;color:white}
+    .brand h1{font-size:18px;margin:0;color:white;letter-spacing:0.2px}
+    .brand p{margin:0;font-size:12px;color:rgba(255,255,255,0.68)}
+
+    /* Nav */
+    nav{display:flex;gap:18px;align-items:center}
+    nav a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 12px;border-radius:10px}
+    nav a:hover{background:var(--glass);color:white}
+    .cta{background:linear-gradient(90deg,var(--accent-2),var(--accent-1));padding:10px 14px;border-radius:12px;color:white;font-weight:700;box-shadow:0 6px 20px rgba(14,165,164,0.12)}
+
+    /* Hamburger for mobile */
+    .hamburger{display:none;background:transparent;border:0;color:var(--muted);font-size:20px}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;padding:48px 8px}
+    .hero-left{padding-right:8px}
+    .eyebrow{display:inline-block;padding:6px 10px;background:linear-gradient(90deg, rgba(37,99,235,0.12), rgba(14,165,164,0.08));color:var(--accent-2);border-radius:999px;font-weight:700;font-size:13px}
+    .headline{font-size:40px;line-height:1.02;color:white;margin:16px 0;font-weight:800}
+    .sub{color:rgba(255,255,255,0.75);font-size:16px;margin-bottom:20px}
+    .actions{display:flex;gap:12px}
+    .pill{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:12px 14px;border-radius:12px;color:var(--muted);font-weight:600}
+
+    /* Feature badges */
+    .badges{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .badge{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(6px);font-weight:600}
+
+    /* Right hero card */
+    .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));padding:18px;border-radius:18px;box-shadow:0 12px 40px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .course-list{display:flex;flex-direction:column;gap:10px}
+    .course{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent)}
+    .course .icon{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:white;font-weight:800}
+    .course .meta{font-weight:700;color:white}
+    .course small{color:rgba(255,255,255,0.6)}
+
+    /* Decorative animated wave */
+    .wave{position:absolute;right:-100px;top:80px;opacity:0.18;transform:rotate(12deg)}
+
+    /* Sections */
+    section{padding:48px 0}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+    /* Cards */
+    .card{background:linear-gradient(180deg,var(--glass),var(--glass-2));padding:20px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(8px);box-shadow:0 8px 30px rgba(2,6,23,0.45)}
+    .card h3{margin:8px 0 6px;color:white}
+    .card p{margin:0;color:rgba(255,255,255,0.7)}
+
+    /* Courses list */
+    .courses{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .course-card{display:flex;gap:14px;align-items:center}
+
+    /* Testimonials slider */
+    .slider{position:relative;overflow:hidden;border-radius:14px}
+    .slides{display:flex;gap:12px;transition:transform 700ms cubic-bezier(.2,.9,.3,1)}
+    .slide{min-width:100%;padding:28px}
+
+    /* Timeline */
+    .timeline{position:relative;padding-left:28px}
+    .timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent-2),var(--accent-1));border-radius:6px}
+    .titem{position:relative;padding:18px 12px;margin-bottom:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:10px}
+    .titem::before{content:'';position:absolute;left:-18px;top:22px;width:14px;height:14px;border-radius:3px;background:white}
+
+    /* Footer */
+    footer{padding:28px 0;border-top:1px solid rgba(255,255,255,0.03);color:rgba(255,255,255,0.6)}
+
+    /* Floating Whatsapp */
+    .float-whatsapp{position:fixed;right:18px;bottom:18px;background:linear-gradient(135deg,var(--accent-2),var(--accent-1));padding:14px;border-radius:999px;color:white;box-shadow:0 10px 30px rgba(2,6,23,0.4);z-index:1000}
+
+    /* Drawer */
+    .drawer{position:fixed;top:0;left:0;bottom:0;width:320px;background:linear-gradient(180deg,#04102a,#071231);transform:translateX(-110%);transition:transform 420ms cubic-bezier(.2,.9,.3,1);z-index:10001;padding:24px}
+    .drawer.open{transform:translateX(0)}
+    .drawer .close{color:var(--muted);font-size:18px;border:0;background:none}
+
+    /* Scroll progress */
+    #progress{position:fixed;left:0;top:0;height:4px;background:linear-gradient(90deg,var(--accent-2),var(--accent-1));width:0%;z-index:9999;border-radius:0 8px 8px 0}
+
+    /* Responsive */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;}
+      nav{display:none}
+      .hamburger{display:block}
+      .wrap{padding:16px}
+      .grid{grid-template-columns:1fr}
+      .courses{grid-template-columns:1fr}
+    }
+
+    /* Animations */
+    @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+    .logo{animation:floaty 4s ease-in-out infinite}
+    .heartbeat{animation:heartbeat 2s infinite}
+    @keyframes heartbeat{0%{transform:scale(1)}30%{transform:scale(1.04)}60%{transform:scale(0.98)}100%{transform:scale(1)}}
+
+    /* Reveal animations */
+    .reveal{opacity:0;transform:translateY(20px);transition:all 700ms cubic-bezier(.2,.9,.3,1)}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* Tiny helpers */
+    .muted{color:rgba(255,255,255,0.6)}
+    .row{display:flex;gap:12px;align-items:center}
+  </style>
+</head>
+<body>
+  <div id="progress"></div>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="logo">BR</div>
+        <div>
+          <div style="font-weight:800;color:white">Brightrose Tech</div>
+          <div style="font-size:12px;color:var(--muted)">Future-ready skills — mobile-first</div>
+        </div>
+      </div>
+      <button class="close" id="closeDrawer"><i class="fa fa-times"></i></button>
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:8px">
+      <a href="#programs">Programs</a>
+      <a href="#features">What You’ll Learn</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact" class="cta">Contact Us</a>
+    </nav>
+
+    <div style="margin-top:26px">
+      <h4 style="margin:0 0 8px 0;color:white">Get started</h4>
+      <p class="muted" style="margin:0 0 12px">Join a bootcamp and launch your digital career.</p>
+      <button class="cta" id="drawerJoin">Join Now</button>
+    </div>
+  </div>
+
+  <header class="wrap topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden>BR</div>
+      <div>
+        <h1>Brightrose Tech</h1>
+        <p>Learn future-ready digital skills</p>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#programs">Programs</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#contact" class="cta">Join Now</a>
+    </nav>
+
+    <button class="hamburger" id="openDrawer" aria-label="Open menu"><i class="fa fa-bars"></i></button>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-left">
+        <div class="eyebrow">Mobile-first • Job-ready</div>
+        <h2 class="headline">Learn future-ready digital skills — fast. Build portfolio projects from your phone.</h2>
+        <p class="sub">Brightrose Tech delivers accessible, affordable and practical bootcamps you can complete from your phone. Start with a one-week starter course or go deep into Tech Support, AI prompting, or Freelancing.</p>
+
+        <div class="actions">
+          <a class="cta" href="#programs">Explore Bootcamps</a>
+          <button class="pill" id="watchDemo"><i class="fa fa-play"></i> Watch demo</button>
+        </div>
+
+        <div class="badges">
+          <div class="badge"><i class="fa fa-phone"></i> Learn on mobile</div>
+          <div class="badge"><i class="fa fa-briefcase"></i> Job-ready projects</div>
+          <div class="badge"><i class="fa fa-users"></i> Cohort support</div>
+        </div>
+
+        <!-- Quick stats -->
+        <div style="display:flex;gap:12px;margin-top:20px;align-items:center">
+          <div class="card" style="padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px">
+            <div style="background:linear-gradient(135deg,var(--accent-2),var(--accent-1));padding:10px;border-radius:10px;color:white;font-weight:800">95%</div>
+            <div style="font-size:14px"><strong style="color:white">Job readiness</strong><div class="muted">after 6 weeks on avg*</div></div>
+          </div>
+
+          <div class="card" style="padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px">
+            <div style="background:linear-gradient(135deg,#34d399,#60a5fa);padding:10px;border-radius:10px;color:white;font-weight:800">+50</div>
+            <div style="font-size:14px"><strong style="color:white">Projects</strong><div class="muted">complete & shareable</div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <aside class="hero-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Upcoming cohort</div>
+            <div style="font-weight:800;color:white">Remote Work Mastery — July 14, 2025</div>
+          </div>
+          <div class="row"><button class="pill">Enroll</button></div>
+        </div>
+
+        <div class="course-list">
+          <div class="course">
+            <div class="icon">1W</div>
+            <div>
+              <div class="meta">Starter Bootcamp <small>• 1 Week • Mobile</small></div>
+              <div class="muted">Digital basics & certification</div>
+            </div>
+          </div>
+
+          <div class="course">
+            <div class="icon">2W</div>
+            <div>
+              <div class="meta">Digital Sales <small>• 2 Weeks • Mobile</small></div>
+              <div class="muted">Sell via WhatsApp & Instagram</div>
+            </div>
+          </div>
+
+          <div class="course">
+            <div class="icon">4W</div>
+            <div>
+              <div class="meta">Tech Support (M365) <small>• 4 Weeks • Mobile + PC</small></div>
+              <div class="muted">Entry-level tech job skills</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <div class="muted">Learn via WhatsApp • Live mentorship • Certification</div>
+          <button class="cta">Join Cohort</button>
+        </div>
+      </aside>
+
+      <!-- decorative svg -->
+      <svg class="wave" width="420" height="220" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 80 C150 10 350 150 600 80 L600 200 L0 200Z" fill="#0ea5a4" opacity="0.08"></path>
+      </svg>
+    </section>
+
+    <!-- Programs -->
+    <section id="programs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h3 style="margin:0;color:white">Bootcamps & Micro-courses</h3>
+        <div class="muted">Mobile-friendly, cohort-based, and project-focused</div>
+      </div>
+
+      <div class="grid">
+        <div class="card reveal">
+          <h3>Starter Bootcamp — 1 Week</h3>
+          <p>Start here if you want to learn the fundamentals and get a completion certificate. Perfect for absolute beginners.</p>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="pill">Free intro</button>
+            <button class="cta">Enroll</button>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <h3>Remote Work Mastery — 2 Weeks</h3>
+          <p>Learn remote work best practices and how to land phone-first remote jobs.</p>
+        </div>
+
+        <div class="card reveal">
+          <h3>Tech Support (M365) — 4 Weeks</h3>
+          <p>Industry-aligned entry-level technical support skills, MS 365 basics and ticket handling.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features / What you'll learn -->
+    <section id="features">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h3 style="margin:0;color:white">What You’ll Learn</h3>
+        <div class="muted">Practical skills you can apply immediately</div>
+      </div>
+
+      <div class="courses">
+        <div class="course-card card reveal">
+          <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));display:grid;place-items:center;color:white;font-weight:800">💻</div>
+          <div>
+            <h4 style="margin:0;color:white">Intro to AI & Prompting — 1 Week</h4>
+            <p class="muted">How to use ChatGPT effectively, build prompts and integrate AI into workflows.</p>
+          </div>
+        </div>
+
+        <div class="course-card card reveal">
+          <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:grid;place-items:center;color:white;font-weight:800">📲</div>
+          <div>
+            <h4 style="margin:0;color:white">Digital Sales — 2 Weeks</h4>
+            <p class="muted">Sell using WhatsApp and Instagram: product pages, messaging funnels and closing techniques.</p>
+          </div>
+        </div>
+
+        <div class="course-card card reveal">
+          <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:grid;place-items:center;color:white;font-weight:800">🌍</div>
+          <div>
+            <h4 style="margin:0;color:white">Freelancing & Portfolio — 2 Weeks</h4>
+            <p class="muted">How to land first clients, create a portfolio and start earning online.</p>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <h4 style="margin:0;color:white">Learn via WhatsApp — 5 Days</h4>
+          <p class="muted">Micro-learning delivered through WhatsApp: accessible lessons, short assignments and feedback.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h3 style="margin:0;color:white">Student Testimonials</h3>
+        <div class="muted">Real students, real outcomes</div>
+      </div>
+
+      <div class="slider card reveal" style="padding:0;overflow:visible">
+        <div class="slides" id="slides">
+          <div class="slide" style="background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);">
+            <div style="padding:20px">
+              <p style="font-weight:700;color:white;margin:0 0 8px">"I landed my first remote job after the Remote Work Mastery course."</p>
+              <p class="muted">— Aisha M., Lagos</p>
+            </div>
+          </div>
+
+          <div class="slide" style="background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);">
+            <div style="padding:20px">
+              <p style="font-weight:700;color:white;margin:0 0 8px">"The WhatsApp micro-course was short, practical and accessible."</p>
+              <p class="muted">— Daniel K., Abuja</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline / How it works -->
+    <section id="how">
+      <h3 style="color:white">How it works</h3>
+      <div class="timeline reveal">
+        <div class="titem">
+          <strong>Apply</strong>
+          <div class="muted">Quick sign-up, choose cohort and start date.</div>
+        </div>
+        <div class="titem">
+          <strong>Learn</strong>
+          <div class="muted">Daily bite-sized lessons, cohort activities & project work.</div>
+        </div>
+        <div class="titem">
+          <strong>Portfolio</strong>
+          <div class="muted">Complete capstone projects and build a shareable portfolio.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact / Form -->
+    <section id="contact">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <div style="flex:1;min-width:300px">
+          <h3 style="color:white">Contact Us</h3>
+          <p class="muted">Questions? Drop us a message or reach us on WhatsApp and email.</p>
+
+          <form id="contactForm" class="card" style="display:flex;flex-direction:column;gap:12px">
+            <input name="name" placeholder="Name" required style="padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:white" />
+            <input name="email" type="email" placeholder="Email" required style="padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:white" />
+            <textarea name="message" placeholder="Message" rows="4" style="padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:white"></textarea>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="cta" type="submit">Send Message</button>
+              <div class="muted">Email: info@brightrose.com</div>
+            </div>
+          </form>
+        </div>
+
+        <div style="width:340px;min-width:260px">
+          <div class="card reveal">
+            <h4 style="margin:0;color:white">Support</h4>
+            <p class="muted">WhatsApp: <a href="https://wa.me/2348012345678" style="color:var(--accent-1);text-decoration:none">+234 801 234 5678</a></p>
+            <p class="muted">© 2025 Brightrose Tech. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <a class="float-whatsapp" href="https://wa.me/2348012345678" target="_blank" aria-label="WhatsApp"><i class="fa fa-whatsapp"></i></a>
+
+  <footer class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div class="muted">Brightrose Tech — Learn Future-Ready Digital Skills</div>
+      <div class="muted">Email: info@brightrose.com • WhatsApp: +234 801 234 5678</div>
+    </div>
+  </footer>
+
+  <script>
+    // Drawer
+    const drawer = document.getElementById('drawer');
+    document.getElementById('openDrawer').addEventListener('click', ()=>{drawer.classList.add('open');drawer.setAttribute('aria-hidden','false')});
+    document.getElementById('closeDrawer').addEventListener('click', ()=>{drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true')});
+    document.getElementById('drawerJoin').addEventListener('click', ()=>{drawer.classList.remove('open');document.querySelector('a.cta').scrollIntoView({behavior:'smooth'})});
+
+    // Scroll progress
+    const progress = document.getElementById('progress');
+    function updateProgress(){
+      const scrolled = window.scrollY || document.documentElement.scrollTop;
+      const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const pct = (scrolled / h) * 100;
+      progress.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } })
+    },{root:null,threshold:0.12});
+    reveals.forEach(r=>io.observe(r));
+
+    // Testimonials slider (auto)
+    const slides = document.getElementById('slides');
+    let idx = 0;
+    setInterval(()=>{
+      idx = (idx+1) % slides.children.length;
+      slides.style.transform = `translateX(-${idx * 100}%)`;
+    },5000);
+
+    // Watch demo -- open a modal-style demo overlay
+    document.getElementById('watchDemo').addEventListener('click', ()=>{
+      const m = document.createElement('div');
+      m.style.position='fixed';m.style.inset=0;m.style.background='rgba(2,6,23,0.7)';m.style.display='grid';m.style.placeItems='center';m.style.zIndex=10002;
+      m.innerHTML = `<div style="width:92%;max-width:900px;background:linear-gradient(180deg,#021028,#041231);padding:18px;border-radius:12px;box-shadow:0 20px 80px rgba(2,6,23,0.6)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><strong style="color:white">Demo — Brightrose Tech</strong><button style="background:none;border:0;color:white;font-size:18px" id="closeDemo">✕</button></div>
+        <div style="background:#000;height:420px;border-radius:8px;display:grid;place-items:center;color:var(--muted)">Demo video placeholder<br><small>Replace with embed or Lottie animation</small></div>
+      </div>`;
+      document.body.appendChild(m);
+      m.querySelector('#closeDemo').addEventListener('click', ()=>m.remove());
+    });
+
+    // Contact form (demo: prints to console and shows success toast)
+    document.getElementById('contactForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const data = Object.fromEntries(fd.entries());
+      console.log('Contact form submitted', data);
+      const t = document.createElement('div');
+      t.style.position='fixed';t.style.right='18px';t.style.bottom='90px';t.style.background='linear-gradient(90deg,var(--accent-2),var(--accent-1))';t.style.color='white';t.style.padding='12px 16px';t.style.borderRadius='10px';t.style.zIndex=10003;t.textContent='Message sent — we will reply on WhatsApp or Email';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),4200);
+      e.target.reset();
+    });
+
+    // Accessibility: close drawer on Escape
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); } });
+
+    // Small nav link smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+  </script>
+</body>
+</html>
