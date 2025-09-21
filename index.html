@@ -14,6 +14,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
   <style>
     :root {
       --primary: #2563eb; /* Blue */
@@ -33,6 +34,7 @@
       --glass: rgba(255, 255, 255, 0.08);
       --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.1);
       --shadow-2: 0 20px 50px rgba(0, 0, 0, 0.2);
+      --shadow-3: 0 25px 60px rgba(0, 0, 0, 0.3);
       --radius-xl: 16px;
       --radius-2xl: 24px;
       --grad-1: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 45%, var(--secondary) 100%);
@@ -40,6 +42,7 @@
       --grad-3: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       --grad-glass: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(236, 72, 153, 0.1));
       --blur: saturate(1.3) blur(8px);
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     * { 
       box-sizing: border-box;
@@ -56,6 +59,7 @@
       color: var(--dark);
       overflow-x: hidden;
       line-height: 1.6;
+      transition: background-color 0.5s ease, color 0.5s ease;
     }
     /* ========= Utility Classes ========= */
     .container { 
@@ -70,7 +74,7 @@
       padding: 14px 28px; 
       font-weight: 600; 
       border-radius: 999px; 
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      transition: var(--transition-smooth);
       white-space: nowrap;
       display: inline-flex;
       align-items: center;
@@ -78,6 +82,7 @@
       gap: 8px;
       position: relative;
       overflow: hidden;
+      transform: translateZ(0);
     }
     .btn::before {
       content: '';
@@ -165,6 +170,11 @@
       font-size: 0.85rem; 
       font-weight: 600;
       color: var(--primary);
+      transition: var(--transition-smooth);
+    }
+    .chip:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-1);
     }
     /* ========= Notification System ========= */
     .notification-container {
@@ -241,9 +251,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: var(--transition-smooth);
     }
     .notification-close:hover {
       opacity: 1;
+      transform: rotate(90deg);
     }
     /* ========= Header & Navigation ========= */
     header {
@@ -255,7 +267,7 @@
       backdrop-filter: blur(10px);
       background: rgba(255, 255, 255, 0.95);
       border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
     }
     header.scrolled {
       background: rgba(255, 255, 255, 0.98);
@@ -283,6 +295,10 @@
       color: var(--primary);
       font-size: 1.5rem;
       text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+    .logo:hover {
+      transform: scale(1.03);
     }
     .logo img {
       height: 40px;
@@ -292,6 +308,10 @@
       background: white;
       padding: 5px;
       box-shadow: var(--shadow-1);
+      transition: var(--transition-smooth);
+    }
+    .logo:hover img {
+      transform: rotate(5deg);
     }
     .nav { 
       display: flex; 
@@ -338,6 +358,10 @@
       position: relative; 
       border: 1px solid #cbd5e1; 
       cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05);
     }
     .theme-toggle .dot { 
       position: absolute; 
@@ -348,7 +372,7 @@
       border-radius: 50%; 
       background: white; 
       box-shadow: var(--shadow-1); 
-      transition: 0.25s ease; 
+      transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
     }
     body.dark .theme-toggle { 
       background: #0b1220; 
@@ -364,6 +388,10 @@
       font-size: 1.5rem;
       cursor: pointer;
       color: var(--primary);
+      transition: var(--transition-smooth);
+    }
+    .mobile-menu-btn:hover {
+      transform: scale(1.1);
     }
     /* ========= Hero Section ========= */
     .hero {
@@ -431,10 +459,27 @@
       padding: 20px;
       text-align: center;
       backdrop-filter: var(--blur);
-      transition: transform 0.3s ease;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: var(--grad-1);
+      opacity: 0.05;
+      transition: height 0.6s ease;
+      z-index: -1;
     }
     .stat-card:hover {
       transform: translateY(-5px);
+    }
+    .stat-card:hover::before {
+      height: 100%;
     }
     body.dark .stat-card {
       background: rgba(15, 23, 42, 0.7);
@@ -471,6 +516,10 @@
       height: 480px;
       object-fit: cover;
       border-radius: var(--radius-2xl);
+      transition: transform 0.8s ease;
+    }
+    .hero-image:hover img {
+      transform: scale(1.05);
     }
     .floating-elements {
       position: absolute;
@@ -488,6 +537,7 @@
       background: var(--light);
       box-shadow: var(--shadow-1);
       animation: float 6s ease-in-out infinite;
+      transition: var(--transition-smooth);
     }
     body.dark .floating-element {
       background: var(--dark-2);
@@ -536,6 +586,10 @@
       width: 100%;
       border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-2);
+      transition: transform 0.8s ease;
+    }
+    .about-image:hover img {
+      transform: scale(1.03);
     }
     .about-image::before {
       content: '';
@@ -548,6 +602,11 @@
       border-radius: var(--radius-2xl);
       z-index: -1;
       opacity: 0.3;
+      transition: var(--transition-smooth);
+    }
+    .about-image:hover::before {
+      top: -15px;
+      left: -15px;
     }
     .about-text h2 {
       font-size: 2.5rem;
@@ -574,10 +633,18 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 16px;
+      transition: var(--transition-smooth);
+    }
+    .about-feature:hover {
+      transform: translateX(5px);
     }
     .about-feature i {
       color: var(--success);
       font-size: 1.2rem;
+      transition: var(--transition-smooth);
+    }
+    .about-feature:hover i {
+      transform: scale(1.2);
     }
     .about-feature span {
       font-weight: 500;
@@ -586,6 +653,20 @@
     .video-section {
       padding: 80px 0;
       background: var(--grad-glass);
+      position: relative;
+      overflow: hidden;
+    }
+    .video-section::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-1);
+      opacity: 0.05;
+      filter: blur(40px);
     }
     .video-container {
       position: relative;
@@ -596,6 +677,10 @@
       margin: 0 auto;
       aspect-ratio: 16/9;
       background: var(--dark);
+      transition: var(--transition-smooth);
+    }
+    .video-container:hover {
+      box-shadow: var(--shadow-3);
     }
     .video-placeholder {
       width: 100%;
@@ -611,6 +696,10 @@
     }
     .video-placeholder i {
       font-size: 3rem;
+      transition: var(--transition-smooth);
+    }
+    .video-placeholder:hover i {
+      transform: scale(1.1);
     }
     /* Video player styles */
     .video-player {
@@ -645,7 +734,7 @@
       font-size: 1.5rem;
       cursor: pointer;
       border: none;
-      transition: transform 0.3s ease;
+      transition: var(--transition-smooth);
     }
     .play-btn:hover {
       transform: scale(1.1);
@@ -653,6 +742,20 @@
     /* ========= Bootcamps Section ========= */
     .bootcamps {
       padding: 100px 0;
+      position: relative;
+    }
+    .bootcamps::before {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-2);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .bootcamps-grid {
       display: grid;
@@ -664,7 +767,7 @@
       border-radius: var(--radius-xl);
       overflow: hidden;
       box-shadow: var(--shadow-1);
-      transition: all 0.4s ease;
+      transition: var(--transition-smooth);
       position: relative;
       z-index: 1;
       display: flex;
@@ -700,6 +803,11 @@
       font-size: 3rem;
       color: var(--primary);
       background: rgba(37, 99, 235, 0.05);
+      transition: var(--transition-smooth);
+    }
+    .bootcamp-card:hover .bootcamp-icon {
+      transform: scale(1.05);
+      color: var(--secondary);
     }
     .bootcamp-content {
       padding: 24px;
@@ -712,6 +820,10 @@
       font-weight: 700;
       margin-bottom: 12px;
       color: var(--dark);
+      transition: var(--transition-smooth);
+    }
+    .bootcamp-card:hover .bootcamp-title {
+      color: var(--primary);
     }
     body.dark .bootcamp-title {
       color: var(--light);
@@ -745,11 +857,29 @@
     .bootcamp-price {
       font-weight: 800;
       color: var(--primary);
+      transition: var(--transition-smooth);
+    }
+    .bootcamp-card:hover .bootcamp-price {
+      transform: scale(1.05);
     }
     /* ========= Features Section ========= */
     .features {
       padding: 100px 0;
       background: var(--grad-glass);
+      position: relative;
+    }
+    .features::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-3);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .features-grid {
       display: grid;
@@ -761,7 +891,7 @@
       border-radius: var(--radius-xl);
       padding: 30px;
       box-shadow: var(--shadow-1);
-      transition: all 0.4s ease;
+      transition: var(--transition-smooth);
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -797,12 +927,21 @@
       font-size: 1.8rem;
       color: var(--primary);
       background: rgba(37, 99, 235, 0.1);
+      transition: var(--transition-smooth);
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+      color: var(--secondary);
     }
     .feature-title {
       font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 12px;
       color: var(--dark);
+      transition: var(--transition-smooth);
+    }
+    .feature-card:hover .feature-title {
+      color: var(--primary);
     }
     body.dark .feature-title {
       color: var(--light);
@@ -817,6 +956,19 @@
     .testimonials {
       padding: 100px 0;
       position: relative;
+    }
+    .testimonials::before {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-1);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .testimonials-slider {
       position: relative;
@@ -839,6 +991,11 @@
       padding: 30px;
       box-shadow: var(--shadow-1);
       position: relative;
+      transition: var(--transition-smooth);
+    }
+    .testimonial-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-2);
     }
     body.dark .testimonial-card {
       background: var(--dark-2);
@@ -873,6 +1030,10 @@
       height: 50px;
       border-radius: 50%;
       object-fit: cover;
+      transition: var(--transition-smooth);
+    }
+    .testimonial-card:hover .testimonial-avatar {
+      transform: scale(1.1);
     }
     .testimonial-info h4 {
       font-weight: 700;
@@ -898,16 +1059,33 @@
       border-radius: 50%;
       background: var(--muted-2);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
     }
     .testimonial-dot.active {
       background: var(--primary);
       transform: scale(1.2);
     }
+    .testimonial-dot:hover {
+      transform: scale(1.3);
+    }
     /* ========= Gallery Section ========= */
     .gallery {
       padding: 80px 0;
       background: var(--grad-glass);
+      position: relative;
+    }
+    .gallery::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-2);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .gallery-grid {
       display: grid;
@@ -920,10 +1098,12 @@
       position: relative;
       aspect-ratio: 4/3;
       box-shadow: var(--shadow-1);
-      transition: transform 0.3s ease;
+      transition: var(--transition-smooth);
+      cursor: pointer;
     }
     .gallery-item:hover {
       transform: translateY(-5px);
+      box-shadow: var(--shadow-2);
     }
     .gallery-item img {
       width: 100%;
@@ -937,6 +1117,20 @@
     /* ========= Contact Section ========= */
     .contact {
       padding: 100px 0;
+      position: relative;
+    }
+    .contact::before {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-3);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .contact-content {
       display: grid;
@@ -968,6 +1162,10 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 16px;
+      transition: var(--transition-smooth);
+    }
+    .contact-detail:hover {
+      transform: translateX(5px);
     }
     .contact-detail i {
       width: 40px;
@@ -978,6 +1176,12 @@
       justify-content: center;
       background: rgba(37, 99, 235, 0.1);
       color: var(--primary);
+      transition: var(--transition-smooth);
+    }
+    .contact-detail:hover i {
+      transform: scale(1.1);
+      background: var(--primary);
+      color: white;
     }
     .contact-detail span {
       font-weight: 500;
@@ -991,18 +1195,24 @@
       border-radius: var(--radius-xl);
       padding: 40px;
       box-shadow: var(--shadow-1);
+      transition: var(--transition-smooth);
+    }
+    .contact-form:hover {
+      box-shadow: var(--shadow-2);
     }
     body.dark .contact-form {
       background: var(--dark-2);
     }
     .form-group {
       margin-bottom: 20px;
+      position: relative;
     }
     .form-label {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
       color: var(--dark);
+      transition: var(--transition-smooth);
     }
     body.dark .form-label {
       color: var(--light);
@@ -1014,22 +1224,78 @@
       border-radius: 10px;
       font-family: inherit;
       font-size: 1rem;
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
+      background: transparent;
     }
     .form-control:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
     }
     textarea.form-control {
       min-height: 120px;
       resize: vertical;
+    }
+    /* Form floating labels */
+    .floating-label {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .floating-input {
+      width: 100%;
+      padding: 18px 16px 10px;
+      border: 1px solid var(--muted-2);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: var(--transition-smooth);
+      background: transparent;
+    }
+    .floating-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .floating-input:focus + .floating-label-text,
+    .floating-input:not(:placeholder-shown) + .floating-label-text {
+      top: -10px;
+      left: 10px;
+      font-size: 0.8rem;
+      background: var(--light);
+      padding: 0 5px;
+      color: var(--primary);
+    }
+    body.dark .floating-input:focus + .floating-label-text,
+    body.dark .floating-input:not(:placeholder-shown) + .floating-label-text {
+      background: var(--dark-2);
+    }
+    .floating-label-text {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      color: var(--muted);
     }
     /* ========= Footer ========= */
     footer {
       background: var(--dark);
       color: var(--muted-2);
       padding: 80px 0 30px;
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-1);
+      opacity: 0.05;
+      filter: blur(40px);
     }
     .footer-content {
       display: grid;
@@ -1046,6 +1312,10 @@
       color: var(--light);
       font-size: 1.5rem;
       margin-bottom: 16px;
+      transition: var(--transition-smooth);
+    }
+    .footer-logo:hover {
+      transform: scale(1.03);
     }
     .footer-logo img {
       height: 40px;
@@ -1054,6 +1324,10 @@
       border-radius: 12px;
       background: white;
       padding: 5px;
+      transition: var(--transition-smooth);
+    }
+    .footer-logo:hover img {
+      transform: rotate(5deg);
     }
     .footer-about p {
       margin-bottom: 20px;
@@ -1071,23 +1345,31 @@
       justify-content: center;
       background: rgba(255, 255, 255, 0.1);
       color: var(--light);
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
     }
     .footer-social a:hover {
       background: var(--primary);
-      transform: translateY(-3px);
+      transform: translateY(-3px) rotate(5deg);
     }
     .footer-heading {
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--light);
       margin-bottom: 20px;
+      transition: var(--transition-smooth);
+    }
+    .footer-heading:hover {
+      color: var(--primary-light);
     }
     .footer-links {
       list-style: none;
     }
     .footer-links li {
       margin-bottom: 12px;
+      transition: var(--transition-smooth);
+    }
+    .footer-links li:hover {
+      transform: translateX(5px);
     }
     .footer-links a {
       color: var(--muted-2);
@@ -1137,7 +1419,7 @@
       cursor: pointer;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
       z-index: 999;
     }
     .back-to-top.visible {
@@ -1145,7 +1427,7 @@
       visibility: visible;
     }
     .back-to-top:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) rotate(360deg);
     }
     /* ========= Dark Mode ========= */
     body.dark {
@@ -1158,11 +1440,29 @@
     /* ========= Horizontal Scroll Section ========= */
     .horizontal-scroll {
       padding: 80px 0;
+      position: relative;
+    }
+    .horizontal-scroll::before {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--grad-2);
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
     }
     .scroll-container {
       overflow-x: auto;
       padding: 20px 0;
       scrollbar-width: none; /* Firefox */
+      cursor: grab;
+    }
+    .scroll-container:active {
+      cursor: grabbing;
     }
     .scroll-container::-webkit-scrollbar {
       display: none; /* Chrome, Safari, Edge */
@@ -1178,7 +1478,7 @@
       border-radius: var(--radius-xl);
       padding: 30px;
       box-shadow: var(--shadow-1);
-      transition: all 0.3s ease;
+      transition: var(--transition-smooth);
     }
     body.dark .scroll-item {
       background: var(--dark-2);
@@ -1198,12 +1498,21 @@
       color: var(--primary);
       font-size: 1.5rem;
       margin-bottom: 20px;
+      transition: var(--transition-smooth);
+    }
+    .scroll-item:hover .scroll-icon {
+      transform: scale(1.1) rotate(5deg);
+      color: var(--secondary);
     }
     .scroll-title {
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 12px;
       color: var(--dark);
+      transition: var(--transition-smooth);
+    }
+    .scroll-item:hover .scroll-title {
+      color: var(--primary);
     }
     body.dark .scroll-title {
       color: var(--light);
@@ -1242,6 +1551,148 @@
       100% {
         background-position: -200% 0;
       }
+    }
+    /* ========= Modal ========= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal {
+      background: var(--light);
+      border-radius: var(--radius-2xl);
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: var(--shadow-3);
+      transform: translateY(50px);
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+    body.dark .modal {
+      background: var(--dark-2);
+    }
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    body.dark .modal-title {
+      color: var(--light);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+      transition: var(--transition-smooth);
+    }
+    .modal-close:hover {
+      color: var(--danger);
+      transform: rotate(90deg);
+    }
+    /* ========= Course Preview Modal ========= */
+    .course-preview {
+      text-align: center;
+    }
+    .course-preview-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+      color: var(--primary);
+      background: rgba(37, 99, 235, 0.1);
+    }
+    .course-preview-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+    body.dark .course-preview-title {
+      color: var(--light);
+    }
+    .course-preview-description {
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .course-preview-features {
+      text-align: left;
+      margin-bottom: 30px;
+    }
+    .course-preview-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .course-preview-feature i {
+      color: var(--success);
+    }
+    /* ========= Progress Bar ========= */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: var(--grad-1);
+      z-index: 1001;
+      transition: width 0.2s ease;
+    }
+    /* ========= Cursor Effects ========= */
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+    }
+    .cursor-outline {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.2s ease;
+      opacity: 0.5;
     }
     /* ========= Responsive Styles ========= */
     @media (max-width: 1200px) {
@@ -1324,6 +1775,10 @@
       .footer-content {
         grid-template-columns: 1fr;
       }
+      .cursor-dot,
+      .cursor-outline {
+        display: none;
+      }
     }
     @media (max-width: 576px) {
       .hero-title {
@@ -1341,12 +1796,38 @@
       .scroll-item {
         flex: 0 0 85%;
       }
+      .modal {
+        padding: 30px 20px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-outline" id="cursorOutline"></div>
+  
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+  
   <!-- Notification Container -->
   <div class="notification-container" id="notificationContainer"></div>
+  
+  <!-- Course Preview Modal -->
+  <div class="modal-overlay" id="courseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Course Preview</h3>
+        <button class="modal-close" id="modalClose">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="course-preview" id="coursePreviewContent">
+        <!-- Content will be dynamically inserted -->
+      </div>
+    </div>
+  </div>
+  
   <!-- Header -->
   <header id="header">
     <div class="container">
@@ -1376,6 +1857,7 @@
       </div>
     </div>
   </header>
+  
   <!-- Hero Section -->
   <section class="hero" id="home">
     <div class="container">
@@ -1398,15 +1880,15 @@
           </div>
           <div class="hero-stats">
             <div class="stat-card">
-              <div class="stat-number" data-count="1000">0</div>
+              <div class="stat-number">Pilot in Progress</div>
               <div class="stat-label">Students Trained</div>
             </div>
             <div class="stat-card">
-              <div class="stat-number" data-count="95">0%</div>
+              <div class="stat-number">Launching Soon</div>
               <div class="stat-label">Completion Rate</div>
             </div>
             <div class="stat-card">
-              <div class="stat-number" data-count="85">0%</div>
+              <div class="stat-number">Coming Soon</div>
               <div class="stat-label">Job Placement</div>
             </div>
           </div>
@@ -1430,6 +1912,7 @@
       </div>
     </div>
   </section>
+  
   <!-- About Section -->
   <section class="about" id="about">
     <div class="container">
@@ -1463,6 +1946,7 @@
               <span>Join a supportive community of learners</span>
             </div>
           </div>
+          <p style="margin-top: 20px; font-weight: 600;">Brightrose-Tech is currently in its pilot stage and preparing for official bootcamp launches.</p>
           <button class="btn primary" style="margin-top: 30px;">
             <i class="fa-solid fa-circle-info"></i>
             Learn More About Us
@@ -1471,6 +1955,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Video Section -->
   <section class="video-section">
     <div class="container">
@@ -1486,6 +1971,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Bootcamps Section -->
   <section class="bootcamps" id="bootcamps">
     <div class="container">
@@ -1495,7 +1981,7 @@
       </div>
       <div class="bootcamps-grid">
         <!-- Bootcamp 1 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="starter">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-laptop-code"></i>
           </div>
@@ -1505,15 +1991,15 @@
               <span><i class="fa-solid fa-clock"></i> 1 Week</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
             </div>
-            <p class="bootcamp-description">Digital basics & certification. Perfect for absolute beginners.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">FREE</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="starter">Learn More</button>
             </div>
           </div>
         </div>
         <!-- Bootcamp 2 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="remote">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-house-laptop"></i>
           </div>
@@ -1523,15 +2009,15 @@
               <span><i class="fa-solid fa-clock"></i> 2 Weeks</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
             </div>
-            <p class="bootcamp-description">Learn how to work effectively from your phone or computer.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">$49</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="remote">Learn More</button>
             </div>
           </div>
         </div>
         <!-- Bootcamp 3 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="sales">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-store"></i>
           </div>
@@ -1541,15 +2027,15 @@
               <span><i class="fa-solid fa-clock"></i> 2 Weeks</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
             </div>
-            <p class="bootcamp-description">Sell products and services via WhatsApp, Instagram and more.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">$69</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="sales">Learn More</button>
             </div>
           </div>
         </div>
         <!-- Bootcamp 4 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="tech">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-headset"></i>
           </div>
@@ -1559,15 +2045,15 @@
               <span><i class="fa-solid fa-clock"></i> 4 Weeks</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile + PC</span>
             </div>
-            <p class="bootcamp-description">Learn entry-level tech support skills for Microsoft 365.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">$99</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="tech">Learn More</button>
             </div>
           </div>
         </div>
         <!-- Bootcamp 5 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="ai">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-robot"></i>
           </div>
@@ -1577,15 +2063,15 @@
               <span><i class="fa-solid fa-clock"></i> 1 Week</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
             </div>
-            <p class="bootcamp-description">Learn to use ChatGPT and other AI tools effectively.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">$39</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="ai">Learn More</button>
             </div>
           </div>
         </div>
         <!-- Bootcamp 6 -->
-        <div class="bootcamp-card">
+        <div class="bootcamp-card" data-course="virtual">
           <div class="bootcamp-icon">
             <i class="fa-solid fa-user-tie"></i>
           </div>
@@ -1595,16 +2081,17 @@
               <span><i class="fa-solid fa-clock"></i> 2 Weeks</span>
               <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
             </div>
-            <p class="bootcamp-description">Learn how to support businesses remotely as a virtual assistant.</p>
+            <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">$79</div>
-              <button class="btn outline learn-more-btn">Learn More</button>
+              <button class="btn outline learn-more-btn" data-course="virtual">Learn More</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
+  
   <!-- Features Section -->
   <section class="features" id="features">
     <div class="container">
@@ -1664,6 +2151,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Horizontal Scroll Section -->
   <section class="horizontal-scroll">
     <div class="container">
@@ -1671,7 +2159,7 @@
         <h2>Learning Pathways</h2>
         <p>Explore our structured learning journeys designed for career growth</p>
       </div>
-      <div class="scroll-container">
+      <div class="scroll-container" id="scrollContainer">
         <div class="scroll-content">
           <div class="scroll-item">
             <div class="scroll-icon">
@@ -1712,6 +2200,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Testimonials Section -->
   <section class="testimonials" id="testimonials">
     <div class="container">
@@ -1721,41 +2210,16 @@
       </div>
       <div class="testimonials-slider">
         <div class="testimonials-track" id="testimonialsTrack">
-          <!-- Testimonial 1 -->
+          <!-- Single Testimonial Placeholder -->
           <div class="testimonial">
             <div class="testimonial-card">
-              <p class="testimonial-text">The Digital Sales bootcamp completely changed my business. I went from making occasional sales to having a steady stream of customers through Instagram and WhatsApp. The mobile-first approach meant I could learn while managing my small business.</p>
+              <p class="testimonial-text">Pilot testimonials coming soon.</p>
               <div class="testimonial-author">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Amina Yusuf" class="testimonial-avatar">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Denis Nmegwa" class="testimonial-avatar">
                 <div class="testimonial-info">
-                  <h4>Amina Yusuf</h4>
-                  <p>Digital Sales Graduate</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Testimonial 2 -->
-          <div class="testimonial">
-            <div class="testimonial-card">
-              <p class="testimonial-text">After completing the Virtual Assistance bootcamp, I landed my first remote job within weeks. The practical training and portfolio projects gave me the confidence to apply for positions, and the mobile learning meant I could study while caring for my family.</p>
-              <div class="testimonial-author">
-                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Chinedu Okoro" class="testimonial-avatar">
-                <div class="testimonial-info">
-                  <h4>Chinedu Okoro</h4>
-                  <p>Virtual Assistant</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Testimonial 3 -->
-          <div class="testimonial">
-            <div class="testimonial-card">
-              <p class="testimonial-text">The Tech Support bootcamp gave me the skills I needed to transition from retail to IT. I appreciated being able to learn on my phone during my commute. Now I have a stable job with growth opportunities that I never would have had otherwise.</p>
-              <div class="testimonial-author">
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Tunde Adebayo" class="testimonial-avatar">
-                <div class="testimonial-info">
-                  <h4>Tunde Adebayo</h4>
-                  <p>IT Support Specialist</p>
+                  <h4>Denis Nmegwa</h4>
+                  <p>Founder, Brightrose-Tech</p>
+                  <p style="font-style: normal; font-size: 0.85rem; margin-top: 8px;">Denis Nmegwa is the Founder of Brightrose-Tech, passionate about empowering students with digital skills and global opportunities. He has experience in Business Development, Tech Support, and Digital Banking.</p>
                 </div>
               </div>
             </div>
@@ -1763,12 +2227,11 @@
         </div>
         <div class="testimonials-nav" id="testimonialsNav">
           <div class="testimonial-dot active" data-index="0"></div>
-          <div class="testimonial-dot" data-index="1"></div>
-          <div class="testimonial-dot" data-index="2"></div>
         </div>
       </div>
     </div>
   </section>
+  
   <!-- Gallery Section -->
   <section class="gallery">
     <div class="container">
@@ -1781,6 +2244,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Contact Section -->
   <section class="contact" id="contact">
     <div class="container">
@@ -1813,17 +2277,17 @@
         </div>
         <div class="contact-form">
           <form id="contactForm">
-            <div class="form-group">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" id="name" class="form-control" placeholder="Your full name" required>
+            <div class="form-group floating-label">
+              <input type="text" id="name" class="floating-input" placeholder=" " required>
+              <label for="name" class="floating-label-text">Your full name</label>
             </div>
-            <div class="form-group">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" id="email" class="form-control" placeholder="Your email address" required>
+            <div class="form-group floating-label">
+              <input type="email" id="email" class="floating-input" placeholder=" " required>
+              <label for="email" class="floating-label-text">Your email address</label>
             </div>
-            <div class="form-group">
-              <label for="message" class="form-label">Message</label>
-              <textarea id="message" class="form-control" placeholder="How can we help you?" required></textarea>
+            <div class="form-group floating-label">
+              <textarea id="message" class="floating-input" placeholder=" " required style="min-height: 120px;"></textarea>
+              <label for="message" class="floating-label-text">How can we help you?</label>
             </div>
             <button type="submit" class="btn primary" style="width: 100%;">
               <i class="fa-solid fa-paper-plane"></i>
@@ -1834,6 +2298,7 @@
       </div>
     </div>
   </section>
+  
   <!-- Footer -->
   <footer>
     <div class="container">
@@ -1887,10 +2352,12 @@
       </div>
     </div>
   </footer>
+  
   <!-- Back to Top Button -->
   <div class="back-to-top" id="backToTop">
     <i class="fa-solid fa-arrow-up"></i>
   </div>
+  
   <script>
     // Firebase configuration - Replace with your actual config
     const firebaseConfig = {
@@ -1902,11 +2369,14 @@
       appId: "1:495303509160:web:1e945ec888138ff0d2ae9d",
       measurementId: "G-NFQP67NQ45"
     };
+    
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    
     // Initialize GSAP
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, TextPlugin);
+    
     // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -1920,25 +2390,184 @@
     const videoPlaceholder = document.getElementById('videoPlaceholder');
     const heroImage = document.getElementById('heroImage');
     const aboutImage = document.getElementById('aboutImage');
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorOutline = document.getElementById('cursorOutline');
+    const progressBar = document.getElementById('progressBar');
+    const courseModal = document.getElementById('courseModal');
+    const modalClose = document.getElementById('modalClose');
+    const coursePreviewContent = document.getElementById('coursePreviewContent');
+    const scrollContainer = document.getElementById('scrollContainer');
+    
+    // Course data for modal
+    const courses = {
+      starter: {
+        title: "Starter Bootcamp",
+        icon: "fa-laptop-code",
+        description: "Get started with digital skills in this comprehensive introductory course designed for complete beginners.",
+        features: [
+          "Learn basic digital literacy skills",
+          "Introduction to online collaboration tools",
+          "Build your first simple digital project",
+          "Certificate of completion"
+        ],
+        duration: "1 Week",
+        format: "Mobile",
+        price: "FREE"
+      },
+      remote: {
+        title: "Remote Work Mastery",
+        icon: "fa-house-laptop",
+        description: "Master the skills needed to thrive in remote work environments and land your first remote job.",
+        features: [
+          "Remote communication best practices",
+          "Time management and productivity techniques",
+          "Remote collaboration tools mastery",
+          "Building a remote work portfolio"
+        ],
+        duration: "2 Weeks",
+        format: "Mobile",
+        price: "$49"
+      },
+      sales: {
+        title: "Digital Sales",
+        icon: "fa-store",
+        description: "Learn how to sell products and services online through various digital channels and platforms.",
+        features: [
+          "Social media selling strategies",
+          "E-commerce platform fundamentals",
+          "Digital marketing for sales",
+          "Customer relationship management"
+        ],
+        duration: "2 Weeks",
+        format: "Mobile",
+        price: "$69"
+      },
+      tech: {
+        title: "Tech Support (M365)",
+        icon: "fa-headset",
+        description: "Become proficient in providing technical support for Microsoft 365 applications and services.",
+        features: [
+          "Microsoft 365 application support",
+          "Troubleshooting common issues",
+          "Customer service skills for tech support",
+          "Certification preparation"
+        ],
+        duration: "4 Weeks",
+        format: "Mobile + PC",
+        price: "$99"
+      },
+      ai: {
+        title: "Intro to AI & Prompting",
+        icon: "fa-robot",
+        description: "Discover the fundamentals of artificial intelligence and master the art of effective prompting.",
+        features: [
+          "Understanding AI concepts and applications",
+          "Effective prompt engineering techniques",
+          "AI tools for productivity",
+          "Ethical considerations in AI"
+        ],
+        duration: "1 Week",
+        format: "Mobile",
+        price: "$39"
+      },
+      virtual: {
+        title: "Virtual Assistance",
+        icon: "fa-user-tie",
+        description: "Develop the skills needed to become a successful virtual assistant and work with clients globally.",
+        features: [
+          "Administrative support skills",
+          "Client communication and management",
+          "Tools for virtual assistants",
+          "Building a VA business"
+        ],
+        duration: "2 Weeks",
+        format: "Mobile",
+        price: "$79"
+      }
+    };
+    
     // Navigation button redirects
     document.getElementById('registerBtn').addEventListener('click', () => {
       window.location.href = 'signup.html';
     });
+    
     document.getElementById('loginBtn').addEventListener('click', () => {
       window.location.href = 'login.html';
     });
+    
     document.getElementById('exploreBootcamps').addEventListener('click', () => {
       window.location.href = 'login.html';
     });
+    
     document.getElementById('joinCommunity').addEventListener('click', () => {
       window.location.href = 'signup.html';
     });
+    
     // Add event listeners to all "Learn More" buttons
     document.querySelectorAll('.learn-more-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        window.location.href = 'login.html';
+      button.addEventListener('click', (e) => {
+        const courseId = e.target.getAttribute('data-course');
+        showCourseModal(courseId);
       });
     });
+    
+    // Course card click handlers
+    document.querySelectorAll('.bootcamp-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Don't trigger if clicking on the learn more button
+        if (!e.target.classList.contains('learn-more-btn') && 
+            !e.target.closest('.learn-more-btn')) {
+          const courseId = card.getAttribute('data-course');
+          showCourseModal(courseId);
+        }
+      });
+    });
+    
+    // Modal close handler
+    modalClose.addEventListener('click', () => {
+      courseModal.classList.remove('active');
+    });
+    
+    // Close modal when clicking outside
+    courseModal.addEventListener('click', (e) => {
+      if (e.target === courseModal) {
+        courseModal.classList.remove('active');
+      }
+    });
+    
+    // Function to show course modal
+    function showCourseModal(courseId) {
+      const course = courses[courseId];
+      if (!course) return;
+      
+      coursePreviewContent.innerHTML = `
+        <div class="course-preview-icon">
+          <i class="fa-solid ${course.icon}"></i>
+        </div>
+        <h3 class="course-preview-title">${course.title}</h3>
+        <p class="course-preview-description">${course.description}</p>
+        <div class="course-preview-features">
+          ${course.features.map(feature => `
+            <div class="course-preview-feature">
+              <i class="fa-solid fa-check"></i>
+              <span>${feature}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="bootcamp-meta" style="justify-content: center; margin-bottom: 20px;">
+          <span><i class="fa-solid fa-clock"></i> ${course.duration}</span>
+          <span><i class="fa-solid fa-mobile-screen"></i> ${course.format}</span>
+        </div>
+        <div class="bootcamp-price" style="text-align: center; font-size: 1.5rem; margin-bottom: 20px;">${course.price}</div>
+        <button class="btn primary" style="width: 100%;">
+          <i class="fa-solid fa-cart-plus"></i>
+          Enroll Now
+        </button>
+      `;
+      
+      courseModal.classList.add('active');
+    }
+    
     // Function to show notification
     function showNotification(type, title, message) {
       const notificationContainer = document.getElementById('notificationContainer');
@@ -1957,21 +2586,27 @@
         </button>
       `;
       notificationContainer.appendChild(notification);
+      
       // Show notification
       setTimeout(() => {
-        notification.classList.add('show');
+        notification.style.transform = 'translateX(0)';
+        notification.style.opacity = '1';
       }, 100);
+      
       // Close notification on button click
       notification.querySelector('.notification-close').addEventListener('click', () => {
-        notification.classList.remove('show');
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
         setTimeout(() => {
           notificationContainer.removeChild(notification);
         }, 400);
       });
+      
       // Auto remove notification after 5 seconds
       setTimeout(() => {
         if (notification.parentNode) {
-          notification.classList.remove('show');
+          notification.style.transform = 'translateX(100%)';
+          notification.style.opacity = '0';
           setTimeout(() => {
             if (notification.parentNode) {
               notificationContainer.removeChild(notification);
@@ -1980,11 +2615,13 @@
         }
       }, 5000);
     }
+    
     // Function to load media from Firestore
     async function loadMediaFromFirestore() {
       try {
         // Show loading states
         videoPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Loading video content...</p>';
+        
         // Create skeleton loaders for gallery
         galleryGrid.innerHTML = '';
         for (let i = 0; i < 4; i++) {
@@ -1993,10 +2630,12 @@
           skeletonItem.innerHTML = '<div class="skeleton-loader" style="width: 100%; height: 100%;"></div>';
           galleryGrid.appendChild(skeletonItem);
         }
+        
         // Fetch media data from Firestore
         const mediaSnapshot = await db.collection('media').get();
         if (!mediaSnapshot.empty) {
           const mediaData = mediaSnapshot.docs.map(doc => doc.data());
+          
           // Load videos
           const videos = mediaData.filter(item => item.type === 'video');
           if (videos.length > 0) {
@@ -2013,8 +2652,10 @@
                 </button>
               </div>
             `;
+            
             const videoPlayer = videoContainer.querySelector('.video-player');
             const playButton = videoContainer.querySelector('#playButton');
+            
             playButton.addEventListener('click', () => {
               if (videoPlayer.paused) {
                 videoPlayer.play();
@@ -2024,9 +2665,11 @@
                 playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
               }
             });
+            
             videoPlayer.addEventListener('play', () => {
               playButton.innerHTML = '<i class="fa-solid fa-pause"></i>';
             });
+            
             videoPlayer.addEventListener('pause', () => {
               playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
             });
@@ -2038,6 +2681,7 @@
               </div>
             `;
           }
+          
           // Load gallery images
           const galleryImages = mediaData.filter(item => item.type === 'image' && item.category === 'gallery');
           galleryGrid.innerHTML = '';
@@ -2059,17 +2703,20 @@
               </div>
             `;
           }
+          
           // Load hero and about images if available
           const heroImageData = mediaData.find(item => item.type === 'image' && item.category === 'hero');
           if (heroImageData) {
             heroImage.src = heroImageData.url;
             heroImage.alt = heroImageData.title || 'Mobile Learning';
           }
+          
           const aboutImageData = mediaData.find(item => item.type === 'image' && item.category === 'about');
           if (aboutImageData) {
             aboutImage.src = aboutImageData.url;
             aboutImage.alt = aboutImageData.title || 'About Brightrose Tech';
           }
+          
           showNotification('success', 'Media Loaded', 'Content has been successfully loaded');
         } else {
           showNotification('info', 'No Media', 'No media content found in the database');
@@ -2077,6 +2724,7 @@
       } catch (error) {
         console.error('Error loading media:', error);
         showNotification('error', 'Loading Error', 'Failed to load media content');
+        
         // Fallback content in case of error
         videoContainer.innerHTML = `
           <div class="video-placeholder">
@@ -2086,16 +2734,110 @@
         `;
       }
     }
+    
+    // Custom cursor effect
+    function initCustomCursor() {
+      document.addEventListener('mousemove', (e) => {
+        const { clientX: x, clientY: y } = e;
+        
+        cursorDot.style.left = `${x}px`;
+        cursorDot.style.top = `${y}px`;
+        
+        cursorOutline.style.left = `${x}px`;
+        cursorOutline.style.top = `${y}px`;
+      });
+      
+      // Add hover effects for interactive elements
+      const interactiveElements = document.querySelectorAll('a, button, .btn, .card, .bootcamp-card, .feature-card, .scroll-item, .gallery-item, .theme-toggle, .nav a');
+      
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursorDot.style.transform = 'translate(-50%, -50%) scale(1.5)';
+          cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+          cursorOutline.style.borderWidth = '1px';
+        });
+        
+        el.addEventListener('mouseleave', () => {
+          cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
+          cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
+          cursorOutline.style.borderWidth = '2px';
+        });
+      });
+    }
+    
+    // Horizontal scroll with momentum
+    function initHorizontalScroll() {
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+      
+      scrollContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - scrollContainer.offsetLeft;
+        scrollLeft = scrollContainer.scrollLeft;
+        scrollContainer.style.cursor = 'grabbing';
+      });
+      
+      scrollContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollContainer.style.cursor = 'grab';
+      });
+      
+      scrollContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollContainer.style.cursor = 'grab';
+      });
+      
+      scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const walk = (x - startX) * 2;
+        scrollContainer.scrollLeft = scrollLeft - walk;
+      });
+      
+      // Add touch events for mobile
+      scrollContainer.addEventListener('touchstart', (e) => {
+        isDown = true;
+        startX = e.touches[0].pageX - scrollContainer.offsetLeft;
+        scrollLeft = scrollContainer.scrollLeft;
+      });
+      
+      scrollContainer.addEventListener('touchend', () => {
+        isDown = false;
+      });
+      
+      scrollContainer.addEventListener('touchmove', (e) => {
+        if (!isDown) return;
+        const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+        const walk = (x - startX) * 2;
+        scrollContainer.scrollLeft = scrollLeft - walk;
+      });
+    }
+    
+    // Scroll progress bar
+    function initProgressBar() {
+      window.addEventListener('scroll', () => {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight - windowHeight;
+        const scrollPercentage = (window.scrollY / documentHeight) * 100;
+        progressBar.style.width = `${scrollPercentage}%`;
+      });
+    }
+    
     // Dark Mode Toggle
     const isDarkPreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const storedTheme = localStorage.getItem('brightrose-theme');
+    
     if ((storedTheme === 'dark') || (!storedTheme && isDarkPreferred)) {
       document.body.classList.add('dark');
     }
+    
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark');
       localStorage.setItem('brightrose-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     });
+    
     // Mobile Menu Toggle
     mobileMenuBtn.addEventListener('click', () => {
       nav.classList.toggle('active');
@@ -2103,6 +2845,7 @@
         ? '<i class="fas fa-times"></i>' 
         : '<i class="fas fa-bars"></i>';
     });
+    
     // Close mobile menu when clicking on links
     document.querySelectorAll('.nav a').forEach(link => {
       link.addEventListener('click', () => {
@@ -2110,6 +2853,7 @@
         mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
       });
     });
+    
     // Back to Top Button
     window.addEventListener('scroll', () => {
       if (window.scrollY > 500) {
@@ -2117,6 +2861,7 @@
       } else {
         backToTop.classList.remove('visible');
       }
+      
       // Header scroll effect
       const header = document.getElementById('header');
       if (window.scrollY > 50) {
@@ -2125,122 +2870,178 @@
         header.classList.remove('scrolled');
       }
     });
+    
     backToTop.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    
     // Contact Form Submission
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      
       // Simulate form submission
       const submitBtn = contactForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
+      
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
       submitBtn.disabled = true;
+      
       setTimeout(() => {
         submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Sent!';
+        
         setTimeout(() => {
           submitBtn.innerHTML = originalText;
           submitBtn.disabled = false;
           contactForm.reset();
+          showNotification('success', 'Message Sent', 'We will get back to you soon!');
         }, 2000);
       }, 1500);
     });
-    // Testimonials Slider
+    
+    // Testimonials Slider (Simplified for single testimonial)
     let currentTestimonial = 0;
+    
     testimonialDots.forEach(dot => {
       dot.addEventListener('click', () => {
         const index = parseInt(dot.getAttribute('data-index'));
         showTestimonial(index);
       });
     });
+    
     function showTestimonial(index) {
       currentTestimonial = index;
       testimonialsTrack.style.transform = `translateX(-${index * 100}%)`;
+      
       testimonialDots.forEach(dot => {
         dot.classList.remove('active');
       });
+      
       testimonialDots[index].classList.add('active');
     }
-    // Auto-advance testimonials
-    setInterval(() => {
-      currentTestimonial = (currentTestimonial + 1) % testimonialDots.length;
-      showTestimonial(currentTestimonial);
-    }, 5000);
-    // Animated counters
-    const counters = document.querySelectorAll('[data-count]');
-    counters.forEach(counter => {
-      const target = +counter.getAttribute('data-count');
-      const isPercent = counter.textContent.includes('%');
-      let count = 0;
-      const duration = 2000;
-      const increment = target / (duration / 16);
-      const updateCount = () => {
-        if (count < target) {
-          count += increment;
-          counter.textContent = isPercent 
-            ? `${Math.round(count)}%` 
-            : Math.round(count).toLocaleString();
-          setTimeout(updateCount, 16);
-        } else {
-          counter.textContent = isPercent 
-            ? `${target}%` 
-            : target.toLocaleString();
-        }
-      };
-      // Start counting when element is in viewport
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            updateCount();
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.5 });
-      observer.observe(counter);
+    
+    // Animated counters - Removed since we're using static placeholder text now
+    
+    // General Polish: Ensure no broken links by redirecting empty pages
+    // This would typically be handled server-side, but for client-side, we can add a check
+    window.addEventListener('load', () => {
+      // Check if page is empty or has no content - this is a simple example
+      // In a real app, you might check for specific conditions
+      if (window.location.pathname === '/empty-page.html') {
+        window.location.href = '/coming-soon.html';
+      }
     });
+    
     // GSAP Animations
-    gsap.utils.toArray('.hero-text, .hero-visual').forEach(el => {
-      gsap.from(el, {
+    function initAnimations() {
+      // Hero section animations
+      gsap.from('.hero-text', {
         opacity: 0,
         y: 50,
         duration: 1,
+        ease: 'power3.out'
+      });
+      
+      gsap.from('.hero-visual', {
+        opacity: 0,
+        x: 50,
+        duration: 1,
+        delay: 0.3,
+        ease: 'power3.out'
+      });
+      
+      gsap.from('.floating-element', {
+        opacity: 0,
+        scale: 0,
+        duration: 1,
+        stagger: 0.2,
+        delay: 0.8,
+        ease: 'back.out(1.7)'
+      });
+      
+      gsap.from('.hero-stats .stat-card', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        stagger: 0.1,
+        delay: 1.2,
         scrollTrigger: {
-          trigger: el,
+          trigger: '.hero-stats',
           start: 'top 80%',
           toggleActions: 'play none none none'
         }
       });
-    });
-    gsap.utils.toArray('.section-title').forEach(el => {
-      gsap.from(el, {
+      
+      // Section title animations
+      gsap.utils.toArray('.section-title').forEach(el => {
+        gsap.from(el, {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        });
+      });
+      
+      // Card animations
+      gsap.utils.toArray('.bootcamp-card, .feature-card, .scroll-item, .gallery-item').forEach(el => {
+        gsap.from(el, {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        });
+      });
+      
+      // About section animations
+      gsap.from('.about-image', {
         opacity: 0,
-        y: 30,
-        duration: 0.8,
+        x: -50,
+        duration: 1,
         scrollTrigger: {
-          trigger: el,
+          trigger: '.about-content',
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        }
+      });
+      
+      gsap.from('.about-text', {
+        opacity: 0,
+        x: 50,
+        duration: 1,
+        scrollTrigger: {
+          trigger: '.about-content',
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        }
+      });
+      
+      gsap.from('.about-feature', {
+        opacity: 0,
+        x: -20,
+        duration: 0.6,
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: '.about-features',
           start: 'top 85%',
           toggleActions: 'play none none none'
         }
       });
-    });
-    gsap.utils.toArray('.bootcamp-card, .feature-card, .scroll-item, .gallery-item').forEach(el => {
-      gsap.from(el, {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          toggleActions: 'play none none none'
-        }
-      });
-    });
+    }
+    
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         e.preventDefault();
         const targetId = this.getAttribute('href');
         if (targetId === '#') return;
+        
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
           window.scrollTo({
@@ -2250,11 +3051,22 @@
         }
       });
     });
+    
     // Initialize current year
     document.getElementById('year').textContent = new Date().getFullYear();
-    // Load media from Firestore when page loads
+    
+    // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', () => {
       loadMediaFromFirestore();
+      initCustomCursor();
+      initHorizontalScroll();
+      initProgressBar();
+      initAnimations();
+      
+      // Add a slight delay to ensure all elements are rendered
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
     });
   </script>
 </body>
