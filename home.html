@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <!-- Fonts & Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -441,6 +442,7 @@
     .course-image {
       height: 160px;
       overflow: hidden;
+      position: relative;
     }
     .course-image img {
       width: 100%;
@@ -597,6 +599,82 @@
       grid-template-columns: 2fr 1fr;
       gap: 24px;
     }
+    
+    /* ========= Image Gallery ========= */
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .image-item {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+    .image-item:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-2);
+    }
+    .image-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: var(--transition-smooth);
+    }
+    .image-item:hover .image-overlay {
+      opacity: 1;
+    }
+    .image-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .image-action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .image-action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* ========= Loading Spinner ========= */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     /* ========= Responsive Styles ========= */
     @media (max-width: 1200px) {
       .two-column-grid {
@@ -630,6 +708,9 @@
       .course-grid {
         grid-template-columns: 1fr;
       }
+      .image-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
       .header {
         padding: 0 16px;
       }
@@ -651,6 +732,9 @@
       .stat-icon {
         margin-right: 0;
         margin-bottom: 16px;
+      }
+      .image-gallery {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
     /* ========= Dark Mode ========= */
@@ -687,6 +771,10 @@
         <a href="projects.html" class="nav-item">
           <i class="fa-solid fa-briefcase"></i>
           <span>Projects</span>
+        </a>
+        <a href="media.html" class="nav-item">
+          <i class="fa-solid fa-images"></i>
+          <span>Media Gallery</span>
         </a>
         <a href="community.html" class="nav-item">
           <i class="fa-solid fa-people-group"></i>
@@ -759,7 +847,7 @@
               <i class="fa-solid fa-book-open"></i>
             </div>
             <div class="stat-content">
-              <h3>4</h3>
+              <h3 id="activeCoursesCount">4</h3>
               <p>Active Courses</p>
             </div>
           </div>
@@ -768,7 +856,7 @@
               <i class="fa-solid fa-clock"></i>
             </div>
             <div class="stat-content">
-              <h3>12h</h3>
+              <h3 id="learningTime">12h</h3>
               <p>Learning Time</p>
             </div>
           </div>
@@ -777,17 +865,17 @@
               <i class="fa-solid fa-trophy"></i>
             </div>
             <div class="stat-content">
-              <h3>78%</h3>
+              <h3 id="completionRate">78%</h3>
               <p>Average Completion</p>
             </div>
           </div>
           <div class="stat-card stat-4">
             <div class="stat-icon">
-              <i class="fa-solid fa-certificate"></i>
+              <i class="fa-solid fa-images"></i>
             </div>
             <div class="stat-content">
-              <h3>2</h3>
-              <p>Certificates Earned</p>
+              <h3 id="imageCount">0</h3>
+              <p>Uploaded Images</p>
             </div>
           </div>
         </div>
@@ -804,128 +892,29 @@
                   View All <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
-              <div class="course-grid">
-                <!-- Course 1 -->
-                <div class="course-card">
-                  <div class="course-image">
-                    <img src="https://images.unsplash.com/photo-1550439062-609e1531270e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Web Development">
-                  </div>
-                  <div class="course-content">
-                    <h3 class="course-title">Web Development Basics</h3>
-                    <div class="course-progress">
-                      <div class="progress-info">
-                        <span>Progress</span>
-                        <span>65%</span>
-                      </div>
-                      <div class="progress-bar">
-                        <div class="progress-value" style="width: 65%;"></div>
-                      </div>
-                    </div>
-                    <div class="course-meta">
-                      <span><i class="fa-solid fa-play-circle"></i> 12/18 lessons</span>
-                      <span><i class="fa-solid fa-clock"></i> 4h 20m left</span>
-                    </div>
-                    <div class="course-action">
-                      <button class="btn primary small full-width">Continue Learning</button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Course 2 -->
-                <div class="course-card">
-                  <div class="course-image">
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Data Analytics">
-                  </div>
-                  <div class="course-content">
-                    <h3 class="course-title">Data Analytics Fundamentals</h3>
-                    <div class="course-progress">
-                      <div class="progress-info">
-                        <span>Progress</span>
-                        <span>42%</span>
-                      </div>
-                      <div class="progress-bar">
-                        <div class="progress-value" style="width: 42%;"></div>
-                      </div>
-                    </div>
-                    <div class="course-meta">
-                      <span><i class="fa-solid fa-play-circle"></i> 8/20 lessons</span>
-                      <span><i class="fa-solid fa-clock"></i> 6h 45m left</span>
-                    </div>
-                    <div class="course-action">
-                      <button class="btn primary small full-width">Continue Learning</button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Course 3 -->
-                <div class="course-card">
-                  <div class="course-image">
-                    <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="AI & Prompting">
-                  </div>
-                  <div class="course-content">
-                    <h3 class="course-title">Intro to AI & Prompting</h3>
-                    <div class="course-progress">
-                      <div class="progress-info">
-                        <span>Progress</span>
-                        <span>90%</span>
-                      </div>
-                      <div class="progress-bar">
-                        <div class="progress-value" style="width: 90%;"></div>
-                      </div>
-                    </div>
-                    <div class="course-meta">
-                      <span><i class="fa-solid fa-play-circle"></i> 9/10 lessons</span>
-                      <span><i class="fa-solid fa-clock"></i> 45m left</span>
-                    </div>
-                    <div class="course-action">
-                      <button class="btn primary small full-width">Continue Learning</button>
-                    </div>
-                  </div>
-                </div>
+              <div class="course-grid" id="coursesGrid">
+                <!-- Courses will be dynamically loaded here -->
               </div>
             </div>
 
-            <!-- Recommended Courses -->
+            <!-- Image Gallery -->
             <div class="card">
               <div class="card-header">
-                <h2 class="card-title">Recommended For You</h2>
-                <a href="courses.html" class="view-all">
-                  View All <i class="fa-solid fa-arrow-right"></i>
-                </a>
+                <h2 class="card-title">Image Gallery</h2>
+                <button class="btn primary small" id="uploadImageBtn">
+                  <i class="fa-solid fa-upload"></i> Upload Image
+                </button>
               </div>
-              <div class="course-grid">
-                <!-- Recommended Course 1 -->
-                <div class="course-card">
-                  <div class="course-image">
-                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Remote Work">
-                  </div>
-                  <div class="course-content">
-                    <h3 class="course-title">Remote Work Mastery</h3>
-                    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 15px;">Learn how to excel in remote work environments and boost your productivity.</p>
-                    <div class="course-meta">
-                      <span><i class="fa-solid fa-clock"></i> 2 weeks</span>
-                      <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
-                    </div>
-                    <div class="course-action">
-                      <button class="btn primary small full-width">Enroll Now</button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Recommended Course 2 -->
-                <div class="course-card">
-                  <div class="course-image">
-                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Digital Marketing">
-                  </div>
-                  <div class="course-content">
-                    <h3 class="course-title">Digital Marketing Strategies</h3>
-                    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 15px;">Master digital marketing techniques to grow businesses online.</p>
-                    <div class="course-meta">
-                      <span><i class="fa-solid fa-clock"></i> 3 weeks</span>
-                      <span><i class="fa-solid fa-mobile-screen"></i> Mobile</span>
-                    </div>
-                    <div class="course-action">
-                      <button class="btn primary small full-width">Enroll Now</button>
-                    </div>
-                  </div>
-                </div>
+              <div class="image-gallery" id="imageGallery">
+                <!-- Images will be dynamically loaded here -->
+              </div>
+              <div id="noImagesMessage" style="text-align: center; padding: 40px; color: var(--muted); display: none;">
+                <i class="fa-solid fa-images" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                <h3>No Images Yet</h3>
+                <p>Upload your first image to get started!</p>
+                <button class="btn primary" style="margin-top: 16px;" id="uploadFirstImageBtn">
+                  <i class="fa-solid fa-upload"></i> Upload Image
+                </button>
               </div>
             </div>
           </div>
@@ -940,90 +929,36 @@
                   View All <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
-              <ul class="activity-list">
-                <li class="activity-item activity-completed">
-                  <div class="activity-icon">
-                    <i class="fa-solid fa-check"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Completed HTML & CSS Module</div>
-                    <div class="activity-desc">Web Development Basics course</div>
-                    <div class="activity-time">2 hours ago</div>
-                  </div>
-                </li>
-                <li class="activity-item activity-started">
-                  <div class="activity-icon">
-                    <i class="fa-solid fa-play"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Started JavaScript Fundamentals</div>
-                    <div class="activity-desc">Web Development Basics course</div>
-                    <div class="activity-time">5 hours ago</div>
-                  </div>
-                </li>
-                <li class="activity-item activity-announcement">
-                  <div class="activity-icon">
-                    <i class="fa-solid fa-bullhorn"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">New Live Session Added</div>
-                    <div class="activity-desc">Q&A with industry experts this Friday</div>
-                    <div class="activity-time">1 day ago</div>
-                  </div>
-                </li>
-                <li class="activity-item activity-completed">
-                  <div class="activity-icon">
-                    <i class="fa-solid fa-trophy"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Earned AI Prompting Certificate</div>
-                    <div class="activity-desc">Scored 92% on final assessment</div>
-                    <div class="activity-time">2 days ago</div>
-                  </div>
-                </li>
+              <ul class="activity-list" id="activityList">
+                <!-- Activities will be dynamically loaded here -->
               </ul>
             </div>
 
-            <!-- Upcoming Events -->
+            <!-- Upload Image Section -->
             <div class="card">
               <div class="card-header">
-                <h2 class="card-title">Upcoming Events</h2>
-                <a href="events.html" class="view-all">
-                  View All <i class="fa-solid fa-arrow-right"></i>
-                </a>
+                <h2 class="card-title">Upload New Image</h2>
               </div>
-              <ul class="activity-list">
-                <li class="activity-item">
-                  <div class="activity-icon" style="background: rgba(236, 72, 153, 0.1); color: var(--secondary);">
-                    <i class="fa-solid fa-users"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Live Q&A Session</div>
-                    <div class="activity-desc">With industry experts</div>
-                    <div class="activity-time">Tomorrow, 3:00 PM WAT</div>
-                  </div>
-                </li>
-                <li class="activity-item">
-                  <div class="activity-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--primary-light);">
-                    <i class="fa-solid fa-laptop-code"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Web Development Workshop</div>
-                    <div class="activity-desc">Hands-on coding session</div>
-                    <div class="activity-time">June 15, 10:00 AM WAT</div>
-                  </div>
-                </li>
-                <li class="activity-item">
-                  <div class="activity-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--accent);">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Career Development Webinar</div>
-                    <div class="activity-desc">Preparing for tech interviews</div>
-                    <div class="activity-time">June 20, 2:00 PM WAT</div>
-                  </div>
-                </li>
-              </ul>
+              <div style="padding: 20px 0;">
+                <div id="uploadArea" style="border: 2px dashed var(--muted-2); border-radius: var(--radius-xl); padding: 30px; text-align: center; cursor: pointer; transition: var(--transition-smooth);">
+                  <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--muted); margin-bottom: 16px;"></i>
+                  <h3 style="margin-bottom: 8px;">Drag & Drop to Upload</h3>
+                  <p style="color: var(--muted); margin-bottom: 20px;">Supported formats: JPG, PNG, GIF</p>
+                  <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                  <label for="imageUpload" class="btn primary">
+                    <i class="fa-solid fa-folder-open"></i> Select Image
+                  </label>
+                </div>
+                <div id="uploadPreview" style="margin-top: 20px; display: none;">
+                  <!-- Preview will be shown here -->
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                  <button class="btn outline" id="cancelUpload" style="display: none;">Cancel</button>
+                  <button class="btn primary" id="confirmUpload" style="display: none;">
+                    <span id="uploadButtonText">Upload Image</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1047,6 +982,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const storage = firebase.storage();
     
     // DOM Elements
     const menuToggle = document.getElementById('menuToggle');
@@ -1057,6 +993,23 @@
     const userName = document.getElementById('userName');
     const userFirstName = document.getElementById('userFirstName');
     const logoutBtn = document.getElementById('logoutBtn');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const imageGallery = document.getElementById('imageGallery');
+    const activityList = document.getElementById('activityList');
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const cancelUpload = document.getElementById('cancelUpload');
+    const confirmUpload = document.getElementById('confirmUpload');
+    const uploadButtonText = document.getElementById('uploadButtonText');
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadImageBtn = document.getElementById('uploadImageBtn');
+    const uploadFirstImageBtn = document.getElementById('uploadFirstImageBtn');
+    const noImagesMessage = document.getElementById('noImagesMessage');
+    const imageCount = document.getElementById('imageCount');
+    
+    // Global variables
+    let selectedFile = null;
+    let userImages = [];
     
     // Check authentication state
     auth.onAuthStateChanged((user) => {
@@ -1089,6 +1042,11 @@
           .catch((error) => {
             console.error('Error getting user document:', error);
           });
+        
+        // Load user data
+        loadUserCourses();
+        loadUserImages();
+        loadRecentActivity();
       } else {
         // User is signed out, redirect to login
         window.location.href = 'login.html';
@@ -1156,6 +1114,391 @@
           alert('Error signing out. Please try again.');
         });
     });
+    
+    // Load user courses from Firestore
+    function loadUserCourses() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      db.collection('courses')
+        .where('userId', '==', user.uid)
+        .orderBy('lastAccessed', 'desc')
+        .limit(3)
+        .get()
+        .then((querySnapshot) => {
+          coursesGrid.innerHTML = '';
+          
+          if (querySnapshot.empty) {
+            coursesGrid.innerHTML = `
+              <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--muted);">
+                <i class="fa-solid fa-book-open" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                <h3>No Courses Yet</h3>
+                <p>Enroll in your first course to get started!</p>
+                <button class="btn primary" style="margin-top: 16px;">
+                  <i class="fa-solid fa-plus"></i> Browse Courses
+                </button>
+              </div>
+            `;
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const course = { id: doc.id, ...doc.data() };
+            
+            const courseCard = document.createElement('div');
+            courseCard.className = 'course-card';
+            
+            courseCard.innerHTML = `
+              <div class="course-image">
+                <img src="${course.imageUrl || 'https://images.unsplash.com/photo-1550439062-609e1531270e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}" alt="${course.title}">
+              </div>
+              <div class="course-content">
+                <h3 class="course-title">${course.title}</h3>
+                <div class="course-progress">
+                  <div class="progress-info">
+                    <span>Progress</span>
+                    <span>${course.progress || 0}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-value" style="width: ${course.progress || 0}%;"></div>
+                  </div>
+                </div>
+                <div class="course-meta">
+                  <span><i class="fa-solid fa-play-circle"></i> ${course.completedLessons || 0}/${course.totalLessons || 0} lessons</span>
+                  <span><i class="fa-solid fa-clock"></i> ${course.timeLeft || 'N/A'}</span>
+                </div>
+                <div class="course-action">
+                  <button class="btn primary small full-width">Continue Learning</button>
+                </div>
+              </div>
+            `;
+            
+            coursesGrid.appendChild(courseCard);
+          });
+          
+          // Update active courses count
+          document.getElementById('activeCoursesCount').textContent = querySnapshot.size;
+        })
+        .catch((error) => {
+          console.error('Error loading courses:', error);
+          coursesGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--danger);">
+              <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px;"></i>
+              <h3>Error Loading Courses</h3>
+              <p>Please try refreshing the page.</p>
+            </div>
+          `;
+        });
+    }
+    
+    // Load user images from Firestore
+    function loadUserImages() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      db.collection('images')
+        .where('userId', '==', user.uid)
+        .orderBy('uploadedAt', 'desc')
+        .get()
+        .then((querySnapshot) => {
+          imageGallery.innerHTML = '';
+          userImages = [];
+          
+          if (querySnapshot.empty) {
+            noImagesMessage.style.display = 'block';
+            imageCount.textContent = '0';
+            return;
+          }
+          
+          noImagesMessage.style.display = 'none';
+          
+          querySnapshot.forEach((doc) => {
+            const image = { id: doc.id, ...doc.data() };
+            userImages.push(image);
+            
+            const imageItem = document.createElement('div');
+            imageItem.className = 'image-item';
+            
+            imageItem.innerHTML = `
+              <img src="${image.url}" alt="${image.name || 'Uploaded image'}" loading="lazy">
+              <div class="image-overlay">
+                <div class="image-actions">
+                  <div class="image-action-btn" title="View">
+                    <i class="fa-solid fa-eye"></i>
+                  </div>
+                  <div class="image-action-btn" title="Download">
+                    <i class="fa-solid fa-download"></i>
+                  </div>
+                  <div class="image-action-btn delete-image" data-id="${doc.id}" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            imageGallery.appendChild(imageItem);
+          });
+          
+          // Update image count
+          imageCount.textContent = querySnapshot.size;
+          
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-image').forEach(button => {
+            button.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const imageId = button.getAttribute('data-id');
+              deleteImage(imageId);
+            });
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading images:', error);
+          noImagesMessage.style.display = 'block';
+          noImagesMessage.innerHTML = `
+            <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px;"></i>
+            <h3>Error Loading Images</h3>
+            <p>Please try refreshing the page.</p>
+          `;
+        });
+    }
+    
+    // Load recent activity from Firestore
+    function loadRecentActivity() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      db.collection('activities')
+        .where('userId', '==', user.uid)
+        .orderBy('timestamp', 'desc')
+        .limit(4)
+        .get()
+        .then((querySnapshot) => {
+          activityList.innerHTML = '';
+          
+          if (querySnapshot.empty) {
+            activityList.innerHTML = `
+              <li style="text-align: center; padding: 30px; color: var(--muted);">
+                <i class="fa-solid fa-inbox" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                <p>No recent activity</p>
+              </li>
+            `;
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const activity = doc.data();
+            
+            const activityItem = document.createElement('li');
+            activityItem.className = `activity-item ${activity.type}`;
+            
+            let icon = 'fa-check';
+            if (activity.type === 'started') icon = 'fa-play';
+            if (activity.type === 'announcement') icon = 'fa-bullhorn';
+            
+            activityItem.innerHTML = `
+              <div class="activity-icon">
+                <i class="fa-solid ${icon}"></i>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-desc">${activity.description}</div>
+                <div class="activity-time">${formatTime(activity.timestamp?.toDate())}</div>
+              </div>
+            `;
+            
+            activityList.appendChild(activityItem);
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading activities:', error);
+          activityList.innerHTML = `
+            <li style="text-align: center; padding: 30px; color: var(--danger);">
+              <i class="fa-solid fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+              <p>Error loading activities</p>
+            </li>
+          `;
+        });
+    }
+    
+    // Format timestamp to readable format
+    function formatTime(timestamp) {
+      if (!timestamp) return 'Recently';
+      
+      const now = new Date();
+      const diffMs = now - timestamp;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins} minutes ago`;
+      if (diffHours < 24) return `${diffHours} hours ago`;
+      if (diffDays < 7) return `${diffDays} days ago`;
+      
+      return timestamp.toLocaleDateString();
+    }
+    
+    // Image upload functionality
+    uploadArea.addEventListener('click', () => {
+      imageUpload.click();
+    });
+    
+    uploadImageBtn.addEventListener('click', () => {
+      imageUpload.click();
+    });
+    
+    uploadFirstImageBtn.addEventListener('click', () => {
+      imageUpload.click();
+    });
+    
+    // Handle file selection
+    imageUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Check if file is an image
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file (JPG, PNG, GIF)');
+        return;
+      }
+      
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File is too large. Maximum size is 5MB.');
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // Show preview
+      uploadPreview.style.display = 'block';
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadPreview.innerHTML = `
+          <div style="text-align: center;">
+            <img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: var(--radius-xl);">
+            <p style="margin-top: 10px; color: var(--muted);">${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</p>
+          </div>
+        `;
+      };
+      reader.readAsDataURL(file);
+      
+      // Show upload buttons
+      cancelUpload.style.display = 'inline-block';
+      confirmUpload.style.display = 'inline-block';
+    });
+    
+    // Cancel upload
+    cancelUpload.addEventListener('click', () => {
+      imageUpload.value = '';
+      uploadPreview.style.display = 'none';
+      uploadPreview.innerHTML = '';
+      cancelUpload.style.display = 'none';
+      confirmUpload.style.display = 'none';
+      selectedFile = null;
+    });
+    
+    // Confirm upload
+    confirmUpload.addEventListener('click', () => {
+      if (!selectedFile) {
+        alert('Please select an image first');
+        return;
+      }
+      
+      uploadImage(selectedFile);
+    });
+    
+    // Upload image to Firebase Storage and save to Firestore
+    function uploadImage(file) {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      // Show loading state
+      uploadButtonText.innerHTML = '<span class="loading-spinner"></span> Uploading...';
+      confirmUpload.disabled = true;
+      
+      // Create a reference to the file in Firebase Storage
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child(`images/${user.uid}/${Date.now()}_${file.name}`);
+      
+      // Upload the file
+      fileRef.put(file)
+        .then((snapshot) => {
+          // Get the download URL
+          return snapshot.ref.getDownloadURL();
+        })
+        .then((downloadURL) => {
+          // Save image info to Firestore
+          return db.collection('images').add({
+            userId: user.uid,
+            url: downloadURL,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          // Success
+          alert('Image uploaded successfully!');
+          
+          // Reset form
+          imageUpload.value = '';
+          uploadPreview.style.display = 'none';
+          uploadPreview.innerHTML = '';
+          cancelUpload.style.display = 'none';
+          confirmUpload.style.display = 'none';
+          selectedFile = null;
+          
+          // Reload images
+          loadUserImages();
+        })
+        .catch((error) => {
+          console.error('Error uploading image:', error);
+          alert('Error uploading image. Please try again.');
+        })
+        .finally(() => {
+          // Reset button
+          uploadButtonText.textContent = 'Upload Image';
+          confirmUpload.disabled = false;
+        });
+    }
+    
+    // Delete image from Firebase Storage and Firestore
+    function deleteImage(imageId) {
+      if (!confirm('Are you sure you want to delete this image?')) {
+        return;
+      }
+      
+      // Find the image in our local array
+      const image = userImages.find(img => img.id === imageId);
+      if (!image) return;
+      
+      // Delete from Firestore
+      db.collection('images').doc(imageId).delete()
+        .then(() => {
+          // Try to delete from Storage if we have the path
+          if (image.url && image.url.includes('firebasestorage.googleapis.com')) {
+            // Extract the path from the URL and create a reference
+            const urlParts = image.url.split('/');
+            const encodedPath = urlParts.slice(urlParts.indexOf('o') + 1)[0];
+            const filePath = decodeURIComponent(encodedPath.split('?')[0]);
+            const storageRef = storage.ref();
+            const fileRef = storageRef.child(filePath);
+            
+            return fileRef.delete();
+          }
+        })
+        .then(() => {
+          // Success
+          alert('Image deleted successfully!');
+          loadUserImages();
+        })
+        .catch((error) => {
+          console.error('Error deleting image:', error);
+          alert('Error deleting image. Please try again.');
+        });
+    }
     
     // Initialize GSAP animations
     gsap.registerPlugin(ScrollTrigger);

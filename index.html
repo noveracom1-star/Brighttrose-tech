@@ -2620,8 +2620,8 @@
     async function loadMediaFromFirestore() {
       try {
         // Show loading states
-        videoPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Loading video content...</p>';
-        
+        videoPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Loading media content...</p>';
+
         // Create skeleton loaders for gallery
         galleryGrid.innerHTML = '';
         for (let i = 0; i < 4; i++) {
@@ -2630,16 +2630,16 @@
           skeletonItem.innerHTML = '<div class="skeleton-loader" style="width: 100%; height: 100%;"></div>';
           galleryGrid.appendChild(skeletonItem);
         }
-        
-        // Fetch media data from Firestore
+
+        // Fetch media data from Firestore (admin stores to `media` collection)
         const mediaSnapshot = await db.collection('media').get();
         if (!mediaSnapshot.empty) {
-          const mediaData = mediaSnapshot.docs.map(doc => doc.data());
-          
-          // Load videos
+          // Map docs to objects including id so we can use metadata if needed
+          const mediaData = mediaSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+          // Load videos (if any)
           const videos = mediaData.filter(item => item.type === 'video');
           if (videos.length > 0) {
-            // Use the first video or implement a video player with multiple videos
             const video = videos[0];
             videoContainer.innerHTML = `
               <video class="video-player" controls poster="${video.thumbnail || ''}">
@@ -2652,10 +2652,10 @@
                 </button>
               </div>
             `;
-            
+
             const videoPlayer = videoContainer.querySelector('.video-player');
             const playButton = videoContainer.querySelector('#playButton');
-            
+
             playButton.addEventListener('click', () => {
               if (videoPlayer.paused) {
                 videoPlayer.play();
@@ -2665,14 +2665,9 @@
                 playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
               }
             });
-            
-            videoPlayer.addEventListener('play', () => {
-              playButton.innerHTML = '<i class="fa-solid fa-pause"></i>';
-            });
-            
-            videoPlayer.addEventListener('pause', () => {
-              playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
-            });
+
+            videoPlayer.addEventListener('play', () => playButton.innerHTML = '<i class="fa-solid fa-pause"></i>');
+            videoPlayer.addEventListener('pause', () => playButton.innerHTML = '<i class="fa-solid fa-play"></i>');
           } else {
             videoContainer.innerHTML = `
               <div class="video-placeholder">
@@ -2681,9 +2676,14 @@
               </div>
             `;
           }
-          
-          // Load gallery images
-          const galleryImages = mediaData.filter(item => item.type === 'image' && item.category === 'gallery');
+
+          // Build a list of image items. Admin may not set a `category` field, so treat any image as usable.
+          const allImages = mediaData.filter(item => item.type === 'image' && item.url);
+
+          // Gallery: prefer items explicitly marked as category='gallery', otherwise use all images
+          let galleryImages = allImages.filter(i => i.category === 'gallery');
+          if (galleryImages.length === 0) galleryImages = allImages.slice(0, 12);
+
           galleryGrid.innerHTML = '';
           if (galleryImages.length > 0) {
             galleryImages.forEach(image => {
@@ -2695,7 +2695,6 @@
               galleryGrid.appendChild(galleryItem);
             });
           } else {
-            // Fallback if no gallery images
             galleryGrid.innerHTML = `
               <div class="no-content" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                 <i class="fa-solid fa-image" style="font-size: 3rem; color: var(--muted); margin-bottom: 16px;"></i>
@@ -2703,28 +2702,32 @@
               </div>
             `;
           }
-          
-          // Load hero and about images if available
-          const heroImageData = mediaData.find(item => item.type === 'image' && item.category === 'hero');
+
+          // Hero image: prefer category='hero', otherwise use the first available image
+          let heroImageData = allImages.find(item => item.category === 'hero');
+          if (!heroImageData && allImages.length > 0) heroImageData = allImages[0];
           if (heroImageData) {
             heroImage.src = heroImageData.url;
             heroImage.alt = heroImageData.title || 'Mobile Learning';
           }
-          
-          const aboutImageData = mediaData.find(item => item.type === 'image' && item.category === 'about');
+
+          // About image: prefer category='about', otherwise use second available image if present
+          let aboutImageData = allImages.find(item => item.category === 'about');
+          if (!aboutImageData && allImages.length > 1) aboutImageData = allImages[1];
           if (aboutImageData) {
             aboutImage.src = aboutImageData.url;
             aboutImage.alt = aboutImageData.title || 'About Brightrose Tech';
           }
-          
-          showNotification('success', 'Media Loaded', 'Content has been successfully loaded');
+
+          showNotification('Success', 'Media Loaded', 'Content has been successfully loaded');
         } else {
-          showNotification('info', 'No Media', 'No media content found in the database');
+          showNotification('Info', 'No Media', 'No media content found in the database');
+          galleryGrid.innerHTML = '';
         }
       } catch (error) {
         console.error('Error loading media:', error);
-        showNotification('error', 'Loading Error', 'Failed to load media content');
-        
+        showNotification('Error', 'Loading Error', 'Failed to load media content');
+
         // Fallback content in case of error
         videoContainer.innerHTML = `
           <div class="video-placeholder">
