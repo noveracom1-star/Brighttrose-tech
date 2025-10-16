@@ -974,7 +974,7 @@
           // Send email verification
           userCredential.user.sendEmailVerification()
             .then(() => {
-              showNotification('Success', 'Verification email sent. Please check your inbox.', 'success');
+              showNotification('Success', 'Verification email sent. Please check your inbox or your gmail spam folder.', 'success');
             });
           
           // Save user data to Firestore
