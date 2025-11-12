@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Game History — EnglaBet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- html2pdf library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- html2canvas library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root{
+      --ocean-900: #003f63;
+      --ocean-700: #0072a8;
+      --ocean-500: #00a0ff;
+      --ocean-300: #7fd1ff;
+      --white: #ffffff;
+      --muted: #6b7280;
+      --glass: rgba(255,255,255,0.08);
+      --card-radius: 12px;
+      --shadow-lg: 0 10px 30px rgba(3,10,34,0.25);
+      --shadow-md: 0 6px 18px rgba(3,10,34,0.12);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      padding:0;
+      background: linear-gradient(180deg, #eaf8ff 0%, #f7fbff 100%);
+      color: #0b1220;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Page container - MOBILE FIRST */
+    .page {
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow-md);
+      color:var(--white);
+      font-weight:800;
+      font-size: 16px;
+      letter-spacing:0.6px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    h1 {
+      margin:0;
+      font-size: 18px;
+      font-weight:700;
+      color:var(--ocean-900);
+      line-height: 1.2;
+    }
+
+    .sub {
+      color:var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    /* Controls */
+    .controls {
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      width: 100%;
+      margin-top: 12px;
+      order: 3;
+    }
+
+    .search {
+      background:var(--white);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-md);
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .search input{
+      border:0;
+      outline:none;
+      font-size: 14px;
+      width: 100%;
+      background: transparent;
+    }
+
+    .filter-btn{
+      background:var(--white);
+      border:1px solid rgba(0,0,0,0.06);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:var(--shadow-md);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+    }
+
+    /* Game type tabs */
+    .game-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding-bottom: 8px;
+    }
+
+    .tab {
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted);
+      transition: all 0.2s ease;
+    }
+
+    .tab.active {
+      background: var(--ocean-500);
+      color: var(--white);
+    }
+
+    /* List container */
+    .list {
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--ocean-300);
+      border-top: 2px solid var(--ocean-700);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Receipt row (horizontal) */
+    .receipt {
+      background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+      border-radius: var(--card-radius);
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      cursor:pointer;
+      border-left: 4px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .receipt.win {
+      border-left-color: #0a8f3c;
+    }
+
+    .receipt.lose {
+      border-left-color: #d63d3d;
+    }
+
+    .receipt.partial {
+      border-left-color: #f59e0b;
+    }
+
+    .receipt:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .receipt .left {
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .game-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      color:var(--white);
+      font-weight:800;
+      font-size: 12px;
+      box-shadow: 0 4px 12px rgba(0,112,168,0.25);
+      flex-shrink:0;
+    }
+
+    .meta {
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .meta .title {
+      font-weight:700;
+      color:var(--ocean-900);
+      letter-spacing:0.4px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .meta .small {
+      font-size: 12px;
+      color:var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .middle {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(0,160,255,0.07), rgba(0,112,168,0.04));
+      color:var(--ocean-700);
+      font-weight:600;
+      border:1px solid rgba(0,112,168,0.06);
+      white-space: nowrap;
+    }
+
+    .amount {
+      font-weight:800;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .amount.plus{
+      color: #0a8f3c;
+    }
+
+    .amount.minus{
+      color: #d63d3d;
+    }
+
+    /* small note */
+    .note {
+      display:block;
+      color:var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    /* Modal (pop-out) */
+    .overlay {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(3,10,34,0.45);
+      backdrop-filter: blur(4px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease;
+      z-index:60;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .overlay.open{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 500px;
+      max-height:90vh;
+      overflow:auto;
+      border-radius:16px;
+      background: linear-gradient(180deg, var(--white), #fbfeff);
+      box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+      transform: translateY(10px) scale(.99);
+      transition: transform .28s cubic-bezier(.2,.9,.3,1);
+      position:relative;
+      border:1px solid rgba(0,0,0,0.04);
+    }
+
+    .overlay.open .modal{
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      padding: 20px 20px 16px 20px;
+      border-top-left-radius:16px;
+      border-top-right-radius:16px;
+      color:var(--white);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .modal-header .center-title{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-direction:column;
+      text-align:center;
+    }
+
+    .modal-header .game-big {
+      font-size: 18px;
+      font-weight:800;
+      letter-spacing:0.8px;
+    }
+
+    .modal-header .sub-title {
+      font-size: 12px;
+      opacity:0.95;
+      font-weight:600;
+    }
+
+    .close-btn {
+      position:absolute;
+      right: 16px;
+      top: 16px;
+      background:rgba(255,255,255,0.12);
+      border:none;
+      padding: 8px;
+      border-radius: 10px;
+      color:var(--white);
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    /* Simplified receipt details */
+    .receipt-simple {
+      background: linear-gradient(180deg, rgba(0,112,168,0.03), rgba(127,209,255,0.02));
+      border-radius:12px;
+      padding: 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .receipt-simple .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      gap: 12px;
+    }
+
+    .receipt-simple .header .left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .receipt-simple .header .badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      color:var(--white);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .receipt-simple .header .player-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .receipt-simple .header .player-name {
+      font-weight:800;
+      font-size: 16px;
+      color: var(--ocean-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .receipt-simple .header .player-date {
+      color:var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .receipt-simple .header .amount {
+      font-weight:900;
+      font-size: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .receipt-simple .header .amount.plus {
+      color: #0a8f3c;
+    }
+
+    .receipt-simple .header .amount.minus {
+      color: #d63d3d;
+    }
+
+    .receipt-simple .details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .receipt-simple .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .receipt-simple .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .receipt-simple .detail-row .label {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .receipt-simple .detail-row .value {
+      font-weight: 800;
+      text-align: right;
+      font-size: 14px;
+      color: var(--ocean-900);
+      max-width: 60%;
+      word-break: break-word;
+      text-align: right;
+    }
+
+    .receipt-simple .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .receipt-simple .btn {
+      flex: 1;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 0;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .receipt-simple .btn.primary {
+      background: linear-gradient(90deg, var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+      box-shadow: 0 6px 20px rgba(0,112,168,0.2);
+    }
+
+    .receipt-simple .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      color: var(--ocean-900);
+    }
+
+    /* Download Options Modal */
+    .download-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 80;
+      background: rgba(3,10,34,0.45);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .download-modal.open {
+      display: grid;
+    }
+
+    .download-container {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--white), #fbfeff);
+      box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .download-header {
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      padding: 20px 20px 16px 20px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .download-header .center-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .download-header .game-big {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .download-header .sub-title {
+      font-size: 12px;
+      opacity: 0.95;
+      font-weight: 600;
+    }
+
+    .download-close-btn {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      padding: 8px;
+      border-radius: 10px;
+      color: var(--white);
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .download-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .download-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .download-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .download-option:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--ocean-300);
+    }
+
+    .download-option .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .download-option .text {
+      flex: 1;
+    }
+
+    .download-option .title {
+      font-weight: 700;
+      color: var(--ocean-900);
+      font-size: 16px;
+    }
+
+    .download-option .description {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    /* Words Modal */
+    .words-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 70;
+      background: rgba(3,10,34,0.45);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .words-modal.open {
+      display: grid;
+    }
+
+    .words-container {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--white), #fbfeff);
+      box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .words-header {
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      padding: 20px 20px 16px 20px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .words-header .center-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .words-header .game-big {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .words-header .sub-title {
+      font-size: 12px;
+      opacity: 0.95;
+      font-weight: 600;
+    }
+
+    .words-close-btn {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      padding: 8px;
+      border-radius: 10px;
+      color: var(--white);
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .words-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .words-section {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .words-section h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ocean-900);
+    }
+
+    .word-bag-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .letter-chip {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .words-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .word-badge {
+      padding: 8px 12px;
+      background: rgba(0,160,255,0.1);
+      border: 1px solid rgba(0,160,255,0.2);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .word-badge.valid {
+      background: rgba(10, 143, 60, 0.1);
+      border-color: rgba(10, 143, 60, 0.3);
+    }
+
+    .word-badge.invalid {
+      background: rgba(214, 61, 61, 0.1);
+      border-color: rgba(214, 61, 61, 0.3);
+    }
+
+    /* Letter analysis display */
+    .letter-analysis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .letter-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .letter-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .letter-circle.correct {
+      background: rgba(10, 143, 60, 0.2);
+      color: #0a8f3c;
+      border: 2px solid rgba(10, 143, 60, 0.4);
+    }
+
+    .letter-circle.incorrect {
+      background: rgba(214, 61, 61, 0.2);
+      color: #d63d3d;
+      border: 2px solid rgba(214, 61, 61, 0.4);
+    }
+
+    /* Tablet and desktop */
+    @media (min-width: 768px) {
+      .page {
+        max-width: 800px;
+        padding: 24px;
+      }
+
+      header {
+        flex-wrap: nowrap;
+      }
+
+      .controls {
+        width: auto;
+        margin-top: 0;
+        order: 0;
+      }
+
+      .search {
+        min-width: 200px;
+      }
+    }
+
+    /* Large desktop */
+    @media (min-width: 1024px) {
+      .page {
+        max-width: 1100px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo">EB</div>
+      <div class="brand-text">
+        <h1>Game History</h1>
+        <div class="sub">Recent game results & receipts</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search" aria-hidden="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="#0b1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#0b1220" stroke-width="2"/></svg>
+        <input id="search" placeholder="Search by name, word, level..." />
+      </div>
+      <button class="filter-btn active" id="filterAll">All</button>
+      <button class="filter-btn" id="filterWin">Won</button>
+      <button class="filter-btn" id="filterPartial">Partial</button>
+      <button class="filter-btn" id="filterLost">Lost</button>
+    </div>
+  </header>
+
+  <div class="game-tabs">
+    <button class="tab active" id="tabVirtualSpelling">Virtual Spelling</button>
+    <button class="tab" id="tabTransactionHistory">WordBet</button>
+  </div>
+
+  <main>
+    <div class="list" id="list">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <div>Loading game history...</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal overlay -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <button class="close-btn" id="closeBtn" title="Close">✕</button>
+      <div class="center-title">
+        <div class="game-big" id="modalGame">VIRTUAL SPELLING</div>
+        <div class="sub-title" id="modalSub">Game receipt</div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="receipt-simple">
+        <div class="header">
+          <div class="left">
+            <div class="badge" id="modalBadge">VS</div>
+            <div class="player-info">
+              <div class="player-name" id="modalPlayer">Player — JOHN DOE</div>
+              <div class="player-date" id="modalDate">May 1, 2025 — 12:34 PM</div>
+            </div>
+          </div>
+          <div class="amount" id="modalAmount">+50</div>
+        </div>
+
+        <div class="details">
+          <div class="detail-row">
+            <div class="label">Status</div>
+            <div class="value" id="sStatus">Successful</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Date & Time</div>
+            <div class="value" id="sDate">—</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Game</div>
+            <div class="value" id="sGame">Virtual Spelling</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Player</div>
+            <div class="value" id="sPlayer">JOHN DOE</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Bet Amount</div>
+            <div class="value" id="sBet">₦0</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Winnings</div>
+            <div class="value" id="sReward">₦0</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Target Word</div>
+            <div class="value" id="sTargetWord">—</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Player Word</div>
+            <div class="value" id="sPlayerWord">—</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Correct Letters</div>
+            <div class="value" id="sCorrectLetters">0/0</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Time Used</div>
+            <div class="value" id="sTimeUsed">0s</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Level</div>
+            <div class="value" id="sLevel">—</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="viewWordsBtn">View Letter Analysis</button>
+        </div>
+        
+        <div class="actions">
+          <button class="btn ghost" id="printBtn">Print</button>
+          <button class="btn primary" id="downloadBtn">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Download Options Modal -->
+<div class="download-modal" id="downloadModal">
+  <div class="download-container">
+    <div class="download-header">
+      <button class="download-close-btn" id="downloadCloseBtn" title="Close">✕</button>
+      <div class="center-title">
+        <div class="game-big">VIRTUAL SPELLING</div>
+        <div class="sub-title">Download Receipt</div>
+      </div>
+    </div>
+    <div class="download-body">
+      <div class="download-options">
+        <div class="download-option" id="downloadPdf">
+          <div class="icon">PDF</div>
+          <div class="text">
+            <div class="title">Download as PDF</div>
+            <div class="description">High quality document format</div>
+          </div>
+        </div>
+        <div class="download-option" id="downloadImage">
+          <div class="icon">IMG</div>
+          <div class="text">
+            <div class="title">Download as Image</div>
+            <div class="description">PNG image format</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Words Modal -->
+<div class="words-modal" id="wordsModal">
+  <div class="words-container">
+    <div class="words-header">
+      <button class="words-close-btn" id="wordsCloseBtn" title="Close">✕</button>
+      <div class="center-title">
+        <div class="game-big">VIRTUAL SPELLING</div>
+        <div class="sub-title">Letter Analysis</div>
+      </div>
+    </div>
+    <div class="words-body">
+      <div class="words-section">
+        <h3>Target Word</h3>
+        <div class="word-bag-display" id="targetWordDisplay">
+          <!-- Target word letters will be inserted here -->
+        </div>
+      </div>
+      <div class="words-section">
+        <h3>Player Word</h3>
+        <div class="word-bag-display" id="playerWordDisplay">
+          <!-- Player word letters will be inserted here -->
+        </div>
+      </div>
+      <div class="words-section">
+        <h3>Letter Analysis</h3>
+        <div class="letter-analysis" id="letterAnalysisDisplay">
+          <!-- Letter analysis will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+    authDomain: "englabet-ad1fe.firebaseapp.com",
+    projectId: "englabet-ad1fe",
+    storageBucket: "englabet-ad1fe.firebasestorage.app",
+    messagingSenderId: "124544822433",
+    appId: "1:124544822433:web:c77c980f28c99364c214e0",
+    measurementId: "G-JMYYM433R7"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  let currentUser = null;
+  let virtualSpellingData = [];
+  let transactionData = [];
+  let currentSelectedItem = null;
+  let currentGameType = 'virtualSpelling'; // Default to Virtual Spelling
+
+  const listEl = document.getElementById('list');
+  const overlay = document.getElementById('overlay');
+  const wordsModal = document.getElementById('wordsModal');
+  const downloadModal = document.getElementById('downloadModal');
+  const tabVirtualSpelling = document.getElementById('tabVirtualSpelling');
+  const tabTransactionHistory = document.getElementById('tabTransactionHistory');
+
+  // Format currency
+  function formatCurrency(n){
+    const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '₦' + nf.format(n);
+  }
+
+  // Format date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  // Load Virtual Spelling games from Firestore
+  async function loadVirtualSpellingGames() {
+    try {
+      if (!currentUser) {
+        throw new Error("No user logged in");
+      }
+
+      const snapshot = await db.collection('users').doc(currentUser.uid)
+        .collection('game_history')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+
+      const games = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        
+        // Map Virtual Spelling Firestore fields to our game structure
+        const betAmount = data.betAmount || 0;
+        const winnings = data.winnings || 0;
+        const netAmount = winnings - betAmount;
+        
+        games.push({
+          id: doc.id,
+          game: 'Virtual Spelling',
+          player: data.userName || 'Unknown Player',
+          bet: betAmount,
+          reward: winnings,
+          amount: netAmount,
+          date: data.date || (data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
+          status: data.resultStatus || 'UNKNOWN',
+          balanceAfter: 0, // This would need to be calculated or stored separately
+          ref: doc.id,
+          targetWord: data.targetWord || '',
+          playerWord: data.playerWord || '',
+          correctLetters: data.correctLetters || 0,
+          totalLetters: data.totalLetters || 0,
+          timeUsed: data.timeUsed || 0,
+          level: data.level || 0,
+          letterAnalysis: data.letterAnalysis || []
+        });
+      });
+
+      return games;
+    } catch (error) {
+      console.error("Error loading Virtual Spelling games:", error);
+      throw error;
+    }
+  }
+
+  // Load transactions from Firestore
+  async function loadTransactions() {
+    try {
+      if (!currentUser) {
+        throw new Error("No user logged in");
+      }
+
+      const snapshot = await db.collection('users').doc(currentUser.uid)
+        .collection('bet_history')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+
+      const transactions = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        
+        // Map Firestore fields to our transaction structure
+        transactions.push({
+          id: doc.id,
+          game: data.gameName || 'Unknown Game',
+          player: data.userName || data.userEmail || 'Unknown Player',
+          bet: data.betAmount || 0,
+          reward: data.reward || 0,
+          amount: data.amountWonLost || 0,
+          date: data.date || new Date().toISOString(),
+          status: data.status || 'UNKNOWN',
+          balanceAfter: data.finalBalance || 0,
+          ref: data.betId || data.ref || doc.id,
+          wordsPlayed: data.wordsPlayed || [],
+          wordBag: data.wordBag || [],
+          validWords: data.validWords || [],
+          wordsCount: data.wordsCount || 0,
+          keyLetter: data.keyLetter || '',
+          session: data.session || ''
+        });
+      });
+
+      return transactions;
+    } catch (error) {
+      console.error("Error loading transactions:", error);
+      throw error;
+    }
+  }
+
+  // Create Virtual Spelling game row
+  function createVirtualSpellingRow(item){
+    const r = document.createElement('div');
+    
+    // Determine status class
+    let statusClass = '';
+    if (item.status === 'won') {
+      statusClass = 'win';
+    } else if (item.status === 'partial') {
+      statusClass = 'partial';
+    } else {
+      statusClass = 'lose';
+    }
+    
+    r.className = `receipt ${statusClass}`;
+    r.dataset.id = item.id;
+
+    // left
+    const left = document.createElement('div');
+    left.className = 'left';
+    const badge = document.createElement('div');
+    badge.className = 'game-badge';
+    badge.textContent = 'VS';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = item.player.toUpperCase();
+    const small = document.createElement('div');
+    small.className = 'small';
+    small.textContent = `Level ${item.level} • ${item.targetWord} • ${formatDate(item.date).split(' — ')[0]}`;
+
+    meta.appendChild(title);
+    meta.appendChild(small);
+    left.appendChild(badge);
+    left.appendChild(meta);
+
+    // middle
+    const middle = document.createElement('div');
+    middle.className = 'middle';
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = item.status.toUpperCase();
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = `${item.correctLetters}/${item.totalLetters} letters`;
+
+    middle.appendChild(tag);
+    middle.appendChild(note);
+
+    // amount
+    const amount = document.createElement('div');
+    amount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+    amount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+
+    r.appendChild(left);
+    r.appendChild(middle);
+    r.appendChild(amount);
+
+    r.addEventListener('click', () => openModal(item));
+    return r;
+  }
+
+  // Create transaction row
+  function createTransactionRow(item){
+    const r = document.createElement('div');
+    r.className = `receipt ${item.status === 'WIN' ? 'win' : 'lose'}`;
+    r.dataset.id = item.id;
+
+    // left
+    const left = document.createElement('div');
+    left.className = 'left';
+    const badge = document.createElement('div');
+    badge.className = 'game-badge';
+    badge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = item.player.toUpperCase();
+    const small = document.createElement('div');
+    small.className = 'small';
+    small.textContent = item.game + ' • ' + formatDate(item.date).split(' — ')[0];
+
+    meta.appendChild(title);
+    meta.appendChild(small);
+    left.appendChild(badge);
+    left.appendChild(meta);
+
+    // middle
+    const middle = document.createElement('div');
+    middle.className = 'middle';
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = item.status;
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = 'Ref: ' + item.ref.substring(0, 8) + '...';
+
+    middle.appendChild(tag);
+    middle.appendChild(note);
+
+    // amount
+    const amount = document.createElement('div');
+    amount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+    amount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+
+    r.appendChild(left);
+    r.appendChild(middle);
+    r.appendChild(amount);
+
+    r.addEventListener('click', () => openModal(item));
+    return r;
+  }
+
+  // Render game list based on current game type
+  function renderList(){
+    listEl.innerHTML = '';
+    
+    let items = [];
+    let emptyMessage = '';
+    
+    if (currentGameType === 'virtualSpelling') {
+      items = virtualSpellingData;
+      emptyMessage = 'No Virtual Spelling games found';
+    } else {
+      items = transactionData;
+      emptyMessage = 'No transactions found';
+    }
+    
+    if (items.length === 0) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+            <path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z" fill="currentColor"/>
+            <path d="M14 17H7V15H14V17ZM17 13H7V11H17V13ZM17 9H7V7H17V9Z" fill="currentColor"/>
+          </svg>
+          <div>${emptyMessage}</div>
+          <div style="font-size: 12px; margin-top: 8px;">Your ${currentGameType === 'virtualSpelling' ? 'game history' : 'transaction history'} will appear here</div>
+        </div>
+      `;
+      return;
+    }
+
+    for(const it of items){
+      if (currentGameType === 'virtualSpelling') {
+        listEl.appendChild(createVirtualSpellingRow(it));
+      } else {
+        listEl.appendChild(createTransactionRow(it));
+      }
+    }
+  }
+
+  // Show loading state
+  function showLoading() {
+    listEl.innerHTML = `
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <div>Loading ${currentGameType === 'virtualSpelling' ? 'Virtual Spelling games' : 'transactions'}...</div>
+      </div>
+    `;
+  }
+
+  // Show error state
+  function showError(message) {
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+        </svg>
+        <div>Unable to load ${currentGameType === 'virtualSpelling' ? 'games' : 'transactions'}</div>
+        <div style="font-size: 12px; margin-top: 8px;">${message}</div>
+        <button class="filter-btn" onclick="initializeApp()" style="margin-top: 12px;">Try Again</button>
+      </div>
+    `;
+  }
+
+  // Modal population & open/close
+  const modalGame = document.getElementById('modalGame');
+  const modalSub  = document.getElementById('modalSub');
+  const modalBadge = document.getElementById('modalBadge');
+  const modalPlayer = document.getElementById('modalPlayer');
+  const modalDate = document.getElementById('modalDate');
+  const modalAmount = document.getElementById('modalAmount');
+
+  const sStatus = document.getElementById('sStatus');
+  const sDate = document.getElementById('sDate');
+  const sGame = document.getElementById('sGame');
+  const sPlayer = document.getElementById('sPlayer');
+  const sBet = document.getElementById('sBet');
+  const sReward = document.getElementById('sReward');
+  const sTargetWord = document.getElementById('sTargetWord');
+  const sPlayerWord = document.getElementById('sPlayerWord');
+  const sCorrectLetters = document.getElementById('sCorrectLetters');
+  const sTimeUsed = document.getElementById('sTimeUsed');
+  const sLevel = document.getElementById('sLevel');
+
+  const viewWordsBtn = document.getElementById('viewWordsBtn');
+  const targetWordDisplay = document.getElementById('targetWordDisplay');
+  const playerWordDisplay = document.getElementById('playerWordDisplay');
+  const letterAnalysisDisplay = document.getElementById('letterAnalysisDisplay');
+
+  function openModal(item){
+    currentSelectedItem = item;
+    
+    if (currentGameType === 'virtualSpelling') {
+      // Virtual Spelling modal
+      modalGame.textContent = 'VIRTUAL SPELLING';
+      modalSub.textContent = 'Game Receipt';
+      modalBadge.textContent = 'VS';
+      modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
+      modalDate.textContent = formatDate(item.date);
+      modalAmount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+      modalAmount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+
+      sStatus.textContent = item.status.toUpperCase();
+      sDate.textContent = formatDate(item.date);
+      sGame.textContent = 'Virtual Spelling';
+      sPlayer.textContent = item.player;
+      sBet.textContent = formatCurrency(item.bet);
+      sReward.textContent = formatCurrency(item.reward);
+      sTargetWord.textContent = item.targetWord || '—';
+      sPlayerWord.textContent = item.playerWord || '—';
+      sCorrectLetters.textContent = `${item.correctLetters}/${item.totalLetters}`;
+      sTimeUsed.textContent = `${item.timeUsed}s`;
+      sLevel.textContent = `Level ${item.level}`;
+
+      // Show the letter analysis button for Virtual Spelling
+      viewWordsBtn.style.display = 'block';
+    } else {
+      // Transaction History modal
+      modalGame.textContent = item.game;
+      modalSub.textContent = 'Transaction Receipt';
+      modalBadge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+      modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
+      modalDate.textContent = formatDate(item.date);
+      modalAmount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+      modalAmount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+
+      sStatus.textContent = item.status;
+      sDate.textContent = formatDate(item.date);
+      sGame.textContent = item.game;
+      sPlayer.textContent = item.player;
+      sBet.textContent = formatCurrency(item.bet);
+      sReward.textContent = formatCurrency(item.reward);
+      sTargetWord.textContent = '—';
+      sPlayerWord.textContent = '—';
+      sCorrectLetters.textContent = '—';
+      sTimeUsed.textContent = '—';
+      sLevel.textContent = '—';
+
+      // Hide the letter analysis button for Transaction History
+      viewWordsBtn.style.display = 'none';
+    }
+
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    document.getElementById('closeBtn').focus();
+  }
+
+  function openWordsModal() {
+    if (!currentSelectedItem || currentGameType !== 'virtualSpelling') return;
+    
+    // Clear previous content
+    targetWordDisplay.innerHTML = '';
+    playerWordDisplay.innerHTML = '';
+    letterAnalysisDisplay.innerHTML = '';
+    
+    // Display target word
+    if (currentSelectedItem.targetWord) {
+      const targetLetters = currentSelectedItem.targetWord.split('');
+      targetLetters.forEach(letter => {
+        const chip = document.createElement('div');
+        chip.className = 'letter-chip';
+        chip.textContent = letter.toUpperCase();
+        targetWordDisplay.appendChild(chip);
+      });
+    } else {
+      targetWordDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No target word data available</div>';
+    }
+    
+    // Display player word
+    if (currentSelectedItem.playerWord) {
+      const playerLetters = currentSelectedItem.playerWord.split('');
+      playerLetters.forEach(letter => {
+        const chip = document.createElement('div');
+        chip.className = 'letter-chip';
+        chip.textContent = letter.toUpperCase();
+        playerWordDisplay.appendChild(chip);
+      });
+    } else {
+      playerWordDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No player word data available</div>';
+    }
+    
+    // Display letter analysis
+    if (currentSelectedItem.letterAnalysis && currentSelectedItem.letterAnalysis.length > 0) {
+      currentSelectedItem.letterAnalysis.forEach(letterItem => {
+        const letterElement = document.createElement('div');
+        letterElement.className = 'letter-item';
+        
+        const circle = document.createElement('div');
+        circle.className = `letter-circle ${letterItem.correct ? 'correct' : 'incorrect'}`;
+        circle.textContent = letterItem.letter.toUpperCase();
+        
+        const status = document.createElement('div');
+        status.style.fontSize = '10px';
+        status.style.color = letterItem.correct ? '#0a8f3c' : '#d63d3d';
+        status.textContent = letterItem.correct ? '✓' : '✗';
+        
+        letterElement.appendChild(circle);
+        letterElement.appendChild(status);
+        letterAnalysisDisplay.appendChild(letterElement);
+      });
+    } else {
+      letterAnalysisDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No letter analysis data available</div>';
+    }
+    
+    wordsModal.classList.add('open');
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    currentSelectedItem = null;
+  }
+
+  function closeWordsModal() {
+    wordsModal.classList.remove('open');
+  }
+
+  function openDownloadModal() {
+    downloadModal.classList.add('open');
+  }
+
+  function closeDownloadModal() {
+    downloadModal.classList.remove('open');
+  }
+
+  document.getElementById('closeBtn').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (ev) => {
+    if(ev.target === overlay) closeModal();
+  });
+
+  document.getElementById('wordsCloseBtn').addEventListener('click', closeWordsModal);
+  wordsModal.addEventListener('click', (ev) => {
+    if(ev.target === wordsModal) closeWordsModal();
+  });
+
+  document.getElementById('downloadCloseBtn').addEventListener('click', closeDownloadModal);
+  downloadModal.addEventListener('click', (ev) => {
+    if(ev.target === downloadModal) closeDownloadModal();
+  });
+
+  viewWordsBtn.addEventListener('click', openWordsModal);
+
+  // Download functionality
+  function downloadAsPDF() {
+    if (!currentSelectedItem) return;
+    
+    const receiptElement = document.querySelector('.receipt-simple');
+    const options = {
+      margin: 10,
+      filename: `${currentGameType === 'virtualSpelling' ? 'virtual-spelling' : 'transaction'}-${currentSelectedItem.id}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(options).from(receiptElement).save();
+    closeDownloadModal();
+  }
+
+  function downloadAsImage() {
+    if (!currentSelectedItem) return;
+    
+    const receiptElement = document.querySelector('.receipt-simple');
+    
+    html2canvas(receiptElement, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `${currentGameType === 'virtualSpelling' ? 'virtual-spelling' : 'transaction'}-${currentSelectedItem.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      closeDownloadModal();
+    });
+  }
+
+  document.getElementById('downloadBtn').addEventListener('click', openDownloadModal);
+  document.getElementById('downloadPdf').addEventListener('click', downloadAsPDF);
+  document.getElementById('downloadImage').addEventListener('click', downloadAsImage);
+
+  // Search & filters
+  const searchInput = document.getElementById('search');
+  const filterAll = document.getElementById('filterAll');
+  const filterWin = document.getElementById('filterWin');
+  const filterPartial = document.getElementById('filterPartial');
+  const filterLost = document.getElementById('filterLost');
+
+  let currentFilter = 'all';
+
+  function applyFilter(query='', mode='all'){
+    const q = query.trim().toLowerCase();
+    let items = [];
+    
+    if (currentGameType === 'virtualSpelling') {
+      items = virtualSpellingData.filter(it => {
+        if(!q) return true;
+        return it.player.toLowerCase().includes(q) || 
+               it.targetWord.toLowerCase().includes(q) || 
+               it.playerWord.toLowerCase().includes(q);
+      });
+
+      if(mode === 'win'){
+        items = items.filter(it => it.status === 'won');
+      } else if(mode === 'partial'){
+        items = items.filter(it => it.status === 'partial');
+      } else if(mode === 'lost'){
+        items = items.filter(it => it.status === 'lost');
+      }
+    } else {
+      items = transactionData.filter(it => {
+        if(!q) return true;
+        return it.player.toLowerCase().includes(q) || 
+               it.game.toLowerCase().includes(q) || 
+               it.ref.toLowerCase().includes(q);
+      });
+
+      if(mode === 'win'){
+        items = items.filter(it => it.amount > 0);
+      } else if(mode === 'partial'){
+        // For transactions, partial might not apply, so we'll use it for small wins
+        items = items.filter(it => it.amount > 0 && it.amount < 100);
+      } else if(mode === 'lost'){
+        items = items.filter(it => it.amount < 0);
+      }
+    }
+    
+    renderList(items);
+  }
+
+  function setActiveFilter(button, mode) {
+    // Remove active class from all filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Add active class to clicked button
+    button.classList.add('active');
+    currentFilter = mode;
+    applyFilter(searchInput.value, mode);
+  }
+
+  searchInput.addEventListener('input', (e) => applyFilter(e.target.value, currentFilter));
+  filterAll.addEventListener('click', () => setActiveFilter(filterAll, 'all'));
+  filterWin.addEventListener('click', () => setActiveFilter(filterWin, 'win'));
+  filterPartial.addEventListener('click', () => setActiveFilter(filterPartial, 'partial'));
+  filterLost.addEventListener('click', () => setActiveFilter(filterLost, 'lost'));
+
+  // Game type tabs
+  function setActiveTab(button, gameType) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    button.classList.add('active');
+    currentGameType = gameType;
+    
+    // Update search placeholder based on game type
+    if (gameType === 'virtualSpelling') {
+      searchInput.placeholder = 'Search by name, word, level...';
+    } else {
+      searchInput.placeholder = 'Search by name, game, ref...';
+    }
+    
+    // Reset filter to "All"
+    setActiveFilter(filterAll, 'all');
+    
+    // Render the appropriate list
+    renderList();
+  }
+
+  tabVirtualSpelling.addEventListener('click', () => setActiveTab(tabVirtualSpelling, 'virtualSpelling'));
+  tabTransactionHistory.addEventListener('click', () => setActiveTab(tabTransactionHistory, 'transactionHistory'));
+
+  // Print
+  document.getElementById('printBtn').addEventListener('click', () => {
+    window.print();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    if(e.key === 'Escape' && wordsModal.classList.contains('open')) closeWordsModal();
+    if(e.key === 'Escape' && downloadModal.classList.contains('open')) closeDownloadModal();
+  });
+
+  // Make receipt elements focusable for keyboard
+  function makeFocusable(){
+    document.querySelectorAll('.receipt').forEach(el => {
+      el.setAttribute('tabindex','0');
+      el.setAttribute('role','button');
+      el.style.outline = 'none';
+    });
+  }
+
+  // Initialize app
+  async function initializeApp() {
+    showLoading();
+    
+    try {
+      // Check authentication
+      await new Promise((resolve, reject) => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+          unsubscribe();
+          if (user) {
+            currentUser = user;
+            resolve(user);
+          } else {
+            reject(new Error("User not authenticated"));
+          }
+        });
+      });
+
+      // Load both Virtual Spelling games and transactions
+      [virtualSpellingData, transactionData] = await Promise.all([
+        loadVirtualSpellingGames(),
+        loadTransactions()
+      ]);
+      
+      renderList();
+      makeFocusable();
+      
+    } catch (error) {
+      console.error("Initialization error:", error);
+      if (error.message === "User not authenticated") {
+        showError("Please log in to view your game history");
+      } else {
+        showError("Failed to load data. Please check your connection.");
+      }
+    }
+  }
+
+  // Observe list changes to reassign focusable
+  const obs = new MutationObserver(() => makeFocusable());
+  obs.observe(listEl, { childList:true });
+
+  // Start the app
+  initializeApp();
+
+</script>
+</body>
+</html>

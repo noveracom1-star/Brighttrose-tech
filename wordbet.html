@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Englabet Word Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <style>
+    :root{
+      --bg1:#006aa6;
+      --bg2:#003f63;
+      --panel:#012a3f;
+      --mint:#a8e6cf;
+      --mint-2:#6ed3cf;
+      --ink:#032538;
+      --good:#19c37d;
+      --bad:#f25f5c;
+      --chip:#0a3a53;
+      --txt:#e8fbff;
+      --glow:0 20px 50px rgba(0,0,0,.35);
+      --ring:#bfeee0;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%; overflow-x: hidden;}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial;
+      color:var(--txt);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, #0287cc 0%, #015f91 35%, #003a58 100%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      background-attachment: fixed;
+      padding:10px;
+      overflow-x:hidden;
+      font-size:14px;
+      min-height: 100vh;
+    }
+
+    /* animated ocean gradient sheen */
+    body::before{
+      content:""; position:fixed; inset:-20%;
+      background: conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 35%, rgba(255,255,255,.07) 55%, rgba(255,255,255,0) 85%);
+      filter: blur(60px);
+      animation: drift 26s linear infinite;
+      pointer-events:none; z-index:0;
+      opacity:.5;
+    }
+    @keyframes drift{to{transform:rotate(360deg)}}
+
+    /* floating bubbles */
+    .bubbles{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+    .bubble{
+      position:absolute; bottom:-120px; border-radius:999px; opacity:.15;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 65%);
+      filter: blur(0.2px);
+      animation: rise var(--dur) linear infinite, sway calc(var(--dur)*.6) ease-in-out infinite;
+    }
+    @keyframes rise{ to { transform: translateY(-115vh) translateZ(0) } }
+    @keyframes sway{ 50% { transform: translateX(18px) } }
+
+    .container{max-width:100%;margin:0 auto;display:flex;flex-direction:column;gap:12px; position:relative; z-index:2;}
+
+    /* top nav */
+    .nav{
+      display:flex; align-items:center; gap:8px; justify-content:space-between;
+      background:rgba(0,33,51,.55);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(6px);
+      padding:8px 10px; border-radius:12px; box-shadow: var(--glow);
+      flex-wrap: wrap;
+    }
+    .brand{ display:flex; align-items:center; gap:6px; font-weight:900; letter-spacing:.4px; }
+    .logo{
+      width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--mint),var(--mint-2));
+      color:var(--ink); font-weight:900; box-shadow:0 6px 18px rgba(0,0,0,.25);
+    }
+    .nav-ctas{display:flex; gap:6px; align-items:center; flex-wrap: wrap;}
+    .pill{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      font-weight:700;
+      font-size: 0.75rem;
+    }
+    .action{
+      display:inline-flex;align-items:center;gap:4px; padding:5px 6px;
+      border-radius:8px; border:1px solid rgba(168,230,207,.35); background:rgba(255,255,255,.06);
+      cursor:pointer; font-weight:700;
+      transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
+      font-size: 0.75rem;
+      min-height: 32px;
+    }
+    .action:hover{ transform: translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.22) }
+
+    header{text-align:center;padding-top:2px}
+    h1{
+      font-size:1.5rem;
+      letter-spacing:.5px;
+      background:linear-gradient(90deg,var(--mint),#d7f7e9);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 6px 18px rgba(0,0,0,.25));
+      position:relative;display:inline-block
+    }
+    h1::after{
+      content:"";position:absolute;left:50%;transform:translateX(-50%);
+      bottom:-6px;width:80px;height:2px;border-radius:3px;
+      background:linear-gradient(90deg,var(--mint),#d7f7e9);
+      opacity:.9
+    }
+    .subtitle{opacity:.92;margin-top:6px; font-weight:600; font-size: 0.8rem; line-height: 1.3; padding: 0 5px;}
+    .top-bar{
+      display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+      background:rgba(0,33,51,.55);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(6px);
+      padding:8px 10px;border-radius:10px;
+      box-shadow:0 10px 28px rgba(0,0,0,.25) inset, 0 6px 16px rgba(0,0,0,.18)
+    }
+    .top-bar .pill{font-weight:800}
+
+    /* GAME LAYOUT */
+    .game{display:grid;grid-template-columns:1fr;gap:12px; align-items:start}
+
+    .panel{
+      background:linear-gradient(180deg,rgba(1,33,51,.7),rgba(1,26,40,.7));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:14px;
+      box-shadow:var(--glow);
+      transform: translateY(0);
+      animation: fadeUp .5s ease both;
+    }
+    @keyframes fadeUp{
+      from{opacity:0; transform: translateY(8px)}
+      to{opacity:1; transform: translateY(0)}
+    }
+    .panel h2{
+      font-size:1rem;margin-bottom:8px;color:var(--mint);letter-spacing:.35px; text-transform:uppercase
+    }
+    .lede{font-size:0.8rem; opacity:.88; margin:-2px 0 8px; line-height:1.45}
+
+    /* inputs */
+    .input{display:grid;gap:8px}
+    .field label{display:block;margin:2px 0 4px 2px;opacity:.98; font-weight:700; font-size: 0.8rem;}
+    .field input, .field select{
+      width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(168,230,207,.35);
+      background:rgba(255,255,255,.06);color:#fff;font-size:0.85rem;outline:none;
+      transition:box-shadow .2s,border-color .2s;text-transform:uppercase;
+      min-height: 40px;
+    }
+    .field input:focus{ border-color:var(--mint); box-shadow:0 0 0 4px rgba(168,230,207,.20) }
+
+    .btn{
+      display:flex;align-items:center;justify-content:center;gap:4px;
+      padding:8px 10px;border-radius:8px;border:none;cursor:pointer;
+      font-weight:900;color:var(--ink);
+      background:linear-gradient(90deg,var(--mint),var(--mint-2));
+      box-shadow:0 8px 20px rgba(0,0,0,.22);
+      transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      font-size: 0.8rem;
+      min-height: 40px;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.30)}
+    .btn.secondary{
+      background:transparent;color:#e5f9ff;border:1px solid rgba(168,230,207,.35)
+    }
+    .btn.ghost{
+      background:transparent;color:#e5f9ff;border:1px dashed rgba(168,230,207,.35)
+    }
+    .btn:disabled{ opacity:.6; cursor:not-allowed }
+
+    /* NEW COMPACT WORD GRID DESIGN */
+    .search-container {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .search-container input {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(168,230,207,.35);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      outline: none;
+      font-size: 0.85rem;
+      min-height: 40px;
+    }
+    .search-container input:focus {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 4px rgba(168,230,207,.20);
+    }
+    .search-container button {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--ink);
+      background: linear-gradient(90deg, var(--mint), var(--mint-2));
+      box-shadow: 0 8px 20px rgba(0,0,0,.22);
+      transition: transform .15s ease, box-shadow .15s ease;
+      min-width: 80px;
+    }
+    .search-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+    }
+
+    .word-grid-container {
+      background: rgba(1, 33, 51, 0.4);
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    }
+
+    /* COMPACT GRID - similar to second example */
+    .word-grid {
+      --cols: 3;
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      grid-auto-rows: minmax(24px, 1fr);
+      gap: 4px;
+      min-height: 150px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .word-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 3px;
+      border-radius: 5px;
+      background: linear-gradient(145deg, rgba(168,230,207,.20), rgba(168,230,207,.08));
+      border: 1px solid rgba(168,230,207,.35);
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: .35px;
+      user-select: none;
+      cursor: pointer;
+      transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.6rem;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(0,0,0,.25);
+      position: relative;
+      isolation: isolate;
+      min-height: 28px;
+    }
+    .word-item:hover {
+      background: rgba(168,230,207,.32);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,.18)
+    }
+    .word-item.selected {
+      background: linear-gradient(145deg, rgba(255,215,0,.3), rgba(255,215,0,.2));
+      border-color: #ffd700;
+      color: #ffd700;
+      transform: scale(1.05);
+    }
+    .word-item::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(60% 90% at 50% 0%, rgba(255,255,255,.18), transparent 60%);
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+    .word-item:hover::after {
+      opacity: 1;
+    }
+
+    .grid-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .grid-info {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .refresh-btn {
+      background: transparent;
+      color: var(--mint);
+      border: 1px solid rgba(168,230,207,.35);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(168,230,207,.1);
+      transform: translateY(-1px);
+    }
+
+    /* bet slip (selected words) */
+    .slip{
+      display:flex;flex-wrap:wrap;gap:4px;align-items:center;
+      padding:6px;border-radius:8px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(168,230,207,.25);
+      min-height:36px;
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:4px 6px;border-radius:999px;
+      background:linear-gradient(145deg, rgba(168,230,207,.15), rgba(168,230,207,.06));
+      border:1px solid rgba(168,230,207,.35);
+      font-weight:900;font-size:0.75rem; letter-spacing:.3px;
+      box-shadow:0 4px 10px rgba(0,0,0,.18) inset;
+      animation: pop .2s ease;
+    }
+    @keyframes pop{ from{ transform:scale(.92); opacity:0 } to { transform:scale(1); opacity:1 } }
+    .chip .x{
+      width:14px;height:14px;display:grid;place-items:center;cursor:pointer;
+      border-radius:50%;border:1px solid rgba(168,230,207,.4);
+      background:rgba(255,255,255,.12);font-size:0.6rem;line-height:1
+    }
+    .slip-meta{opacity:.9;font-size:0.75rem;margin-left:auto; font-weight:800}
+
+    /* review box */
+    .review{
+      padding:6px;border-radius:8px;background:rgba(255,255,255,.05);
+      border:1px dashed rgba(168,230,207,.35);font-weight:800;letter-spacing:.5px;
+      font-size: 0.8rem;
+    }
+
+    /* result section - HIDDEN */
+    .result{
+      display:none;
+    }
+
+    footer{opacity:.8;text-align:center;margin-top:4px; font-size: 0.7rem;}
+
+    /* toast popup */
+    .toast{
+      position:fixed;left:50%;top:20px;transform:translateX(-50%);
+      background:#fff;color:#00324d;border-radius:10px;padding:8px 10px;
+      box-shadow:0 10px 26px rgba(0,0,0,.30);z-index:3000;display:none;max-width:90%;
+      font-weight:900;
+      font-size: 0.8rem;
+    }
+    .toast.show{display:block;animation:drop .24s ease-out}
+    @keyframes drop{from{transform:translate(-50%,-14px);opacity:.0}to{transform:translate(-50%,0);opacity:1}}
+
+    /* modal hint */
+    .modal{
+      position:fixed;inset:0;display:none;place-items:center;z-index:2600;
+      background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
+      padding: 10px;
+    }
+    .modal-card{
+      background:#fff;color:#00324d;border-radius:12px;padding:14px;max-width:100%;width:100%;
+      box-shadow:0 18px 48px rgba(0,0,0,.35);text-align:center
+    }
+    .modal .btn{width:auto}
+
+    /* progress ring timer */
+    .ring{
+      position:relative; width:40px; height:40px; display:grid; place-items:center;
+    }
+    .ring svg{ transform: rotate(-90deg); width: 40px; height: 40px; }
+    .ring .num{ position:absolute; font-size:.6rem; font-weight:900; letter-spacing:.3px }
+
+    /* subtle shimmering highlight for primary CTA */
+    .shimmer{
+      position:relative; overflow:hidden;
+    }
+    .shimmer::after{
+      content:""; position:absolute; top:0; left:-120%;
+      width:60%; height:100%;
+      background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.6) 45%, transparent 100%);
+      animation: shimmer 3.2s ease-in-out infinite;
+    }
+    @keyframes shimmer{ 50% { left:160% } }
+
+    /* reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
+    }
+    
+    /* Hidden letters bag */
+    #letters-bag {
+      display: none;
+    }
+    
+    /* Three words button */
+    .three-words-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--ink);
+      background: linear-gradient(90deg, #ffb347, #ffcc33);
+      box-shadow: 0 8px 20px rgba(0,0,0,.22);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      margin-top: 8px;
+      width: 100%;
+      font-size: 0.8rem;
+      min-height: 40px;
+    }
+    .three-words-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+    }
+    
+    /* Ads modal */
+    .ads-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 3000;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      padding: 10px;
+    }
+    .ads-container {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      max-width: 100%;
+      width: 100%;
+    }
+    .ads-content {
+      padding: 16px;
+      text-align: center;
+      color: #00324d;
+    }
+    .ads-content h3 {
+      margin-bottom: 12px;
+      font-weight: 900;
+      font-size: 1rem;
+    }
+    .ads-media {
+      width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+      margin-bottom: 12px;
+      border-radius: 6px;
+    }
+    .ads-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .ads-timer {
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #006aa6;
+      font-size: 0.9rem;
+    }
+    
+    /* User info */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.75rem;
+    }
+    .user-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    /* Bet History Modal */
+    .history-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 3000;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      padding: 10px;
+    }
+    .history-container {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      max-width: 100%;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .history-header {
+      background: var(--bg1);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-content {
+      padding: 16px;
+      color: #00324d;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.8rem;
+    }
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    .history-date {
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+    .history-words {
+      font-weight: 700;
+      margin: 4px 0;
+    }
+    .history-result {
+      font-weight: 900;
+    }
+    .history-result.win {
+      color: var(--good);
+    }
+    .history-result.lose {
+      color: var(--bad);
+    }
+
+    /* Media queries for larger screens */
+    @media (min-width: 768px) {
+      body {
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      .container {
+        max-width: 768px;
+      }
+      
+      .game {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .word-grid {
+        --cols: 4;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ambient audio -->
+  <audio id="bg-music" loop>
+    <source src="dewdrop.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- bubbles -->
+  <div class="bubbles" aria-hidden="true" id="bubbles"></div>
+
+  <div class="container" role="application">
+    <!-- nav -->
+    <div class="nav" aria-label="Top Navigation">
+      <div class="brand">
+        <div class="logo" style="background: transparent; box-shadow: none;">
+          <img src="englabet.png" alt="Englabet Logo" style="width: 28px; height: 28px; border-radius: 8px;">
+        </div>
+        <div>
+          <div style="font-size:0.8rem" id="game-name">Dewdrop</div>
+          <small style="opacity:.8;font-weight:700; font-size: 0.6rem;" id="game-edition">Ocean Blue Edition</small>
+        </div>
+      </div>
+      <div class="nav-ctas">
+        <div class="user-info" id="user-info" style="display: none;">
+          <img src="" alt="User Avatar" class="user-avatar" id="user-avatar">
+          <span id="user-name"></span>
+        </div>
+        <div class="pill" title="Session Window" id="session-time">08:00am – 10:00am</div>
+        <button id="music-toggle" class="action" aria-pressed="true" title="Toggle Ocean Ambience">
+          <i class="fa-solid fa-music"></i> <span>Sound On</span>
+        </button>
+        <button id="history-btn" class="action" title="Bet History"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+        <button id="help-btn" class="action" title="How to play" aria-haspopup="dialog"><i class="fa-regular fa-circle-question"></i> Help</button>
+        <button id="logout-btn" class="action" title="Logout" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+
+    <header>
+      <h1 id="game-title">Dewdrop Challenge</h1>
+      <p class="subtitle" id="game-subtitle">Form valid words using the available letters. <strong>Key letter = O</strong>. Win per correct word, lose per incorrect pick. Choose wisely.</p>
+    </header>
+
+    <div class="top-bar" role="status" aria-live="polite">
+      <div class="pill"><i class="fa-solid fa-wallet"></i> Balance: <span id="balance">₦1000</span></div>
+      <div class="pill" style="gap:8px">
+        <i class="fa-regular fa-clock"></i>
+        <div class="ring" aria-label="Round timer">
+          <svg width="40" height="40">
+            <circle cx="20" cy="20" r="17" stroke="rgba(255,255,255,.15)" stroke-width="4" fill="none"></circle>
+            <circle id="ring-arc" cx="20" cy="20" r="17" stroke="url(#grad)" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="107" stroke-dashoffset="0"/>
+            <defs>
+              <linearGradient id="grad" x1="0" x2="1">
+                <stop offset="0%" stop-color="#a8e6cf"/>
+                <stop offset="100%" stop-color="#6ed3cf"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="num" id="timer">02:00:00</div>
+        </div>
+      </div>
+      <div class="pill"><i class="fa-solid fa-key"></i> Key Letter: <b id="key-letter">O</b></div>
+    </div>
+
+    <div class="game">
+      <!-- Left: input / actions -->
+      <section class="panel" aria-labelledby="guess-title">
+        <h2 id="guess-title">Your Guess</h2>
+        <p class="lede">Enter a word built from the current letter bag. Each correct guess earns your bet; each miss deducts it. Add up to 10 picks per round.</p>
+
+        <div class="input">
+          <div class="review" id="review-box" aria-live="polite">
+            Review: <span id="review-text">—</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button id="add-word" class="btn secondary" style="flex:1"><i class="fa-solid fa-plus"></i> Add to Bet Slip</button>
+            <button id="clear-slip" class="btn ghost" style="flex:0 0 auto"><i class="fa-regular fa-trash-can"></i> Clear</button>
+          </div>
+
+          <div class="field">
+            <label>Bet Slip (<span id="slip-count">0</span>/10)</label>
+            <div id="bet-slip" class="slip">
+              <span style="opacity:.8">No words added yet</span>
+            </div>
+            <div class="slip-meta" id="slip-meta">Total: ₦0</div>
+          </div>
+
+          <div class="field" style="display:grid; grid-template-columns: 1fr auto; gap:6px; align-items:center">
+            <div>
+              <label for="bet-amount">Bet Amount <small>(per word, Min 50)</small></label>
+              <input id="bet-amount" type="number" value="50" min="50" inputmode="numeric" />
+            </div>
+            <button id="submit-btn" class="btn shimmer" title="Place your bet now"><i class="fa-solid fa-coins"></i> Place Bet</button>
+          </div>
+
+          <div style="display:flex; gap:6px; flex-wrap:wrap">
+            <button id="hint-btn" class="btn secondary"><i class="fa-regular fa-lightbulb"></i> Give Me a Hint</button>
+          </div>
+          
+          <!-- Three Words Button -->
+          <button id="three-words-btn" class="three-words-btn">
+            <i class="fa-solid fa-3"></i> 3 Words
+          </button>
+        </div>
+      </section>
+
+      <!-- Right: word list -->
+      <section class="panel" aria-labelledby="list-title">
+        <h2 id="list-title" id="word-list-title">Word Search</h2>
+        <p class="lede">Search for words or browse our collection. Tap to add instantly to your slip.</p>
+
+        <!-- NEW SEARCH CONTAINER -->
+        <div class="search-container">
+          <input id="search-words" type="text" placeholder="Search for words..." aria-label="Search words"/>
+          <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </div>
+
+        <!-- NEW COMPACT WORD GRID CONTAINER -->
+        <div class="word-grid-container">
+          <div id="word-grid" class="word-grid" role="list">
+            <div class="word-item">Loading…</div>
+          </div>
+          <div class="grid-controls">
+            <div class="grid-info" id="grid-info">Showing 0 words</div>
+            <button class="refresh-btn" id="refresh-grid"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <p style="opacity:.85;margin-top:8px;font-size:.75rem">Tip: Tap a word to add it to your bet slip. Max 10 words.</p>
+      </section>
+    </div>
+
+    <!-- Result section - HIDDEN -->
+    <section id="result" class="result" aria-live="polite">
+      <!-- This section is now hidden and won't show results to the user -->
+    </section>
+
+    <footer><p>From ENGLAGIP powered by AITECH • <span id="footer-game-name">Dewdrop</span> Challenge © 2025 • Ocean Blue Edition • Crafted for clarity, speed, and thrill.</p></footer>
+  </div>
+
+  <!-- Help modal -->
+  <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="modal-card">
+      <h3 id="help-title" style="font-weight:900;margin-bottom:8px">How to Play</h3>
+      <div style="text-align:left; font-weight:700; line-height:1.35; margin-bottom:12px">
+        <ol style="padding-left:18px">
+          <li>Form words using only the <b>Letters Bag</b>.</li>
+          <li>Add up to <b>10</b> words to your bet slip.</li>
+          <li>Set your <b>Bet Amount</b> (at least ₦50 per word).</li>
+          <li>Place your bet before time runs out.</li>
+          <li>Each correct word pays +bet; incorrect deducts −bet.</li>
+        </ol>
+      </div>
+      <button id="help-ok" class="btn">Got it</button>
+    </div>
+  </div>
+
+  <!-- Hint modal -->
+  <div id="hint-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="hint-title">
+    <div class="modal-card">
+      <h3 id="hint-title" style="font-weight:900;margin-bottom:8px">Hint</h3>
+      <div id="hint-text" style="font-weight:800;margin-bottom:12px">Hint</div>
+      <button id="hint-ok" class="btn">OK</button>
+    </div>
+  </div>
+
+  <!-- Ads modal -->
+  <div id="ads-modal" class="ads-modal">
+    <div class="ads-container">
+      <div class="ads-content">
+        <h3>Watch an Ad for Another Hint</h3>
+        <div id="ads-timer" class="ads-timer">Ad will play in 5 seconds</div>
+        <div id="ads-media-container"></div>
+        <div class="ads-actions">
+          <button id="ads-cancel" class="btn secondary">Cancel</button>
+          <button id="ads-watch" class="btn">Watch Ad</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bet History Modal -->
+  <div id="history-modal" class="history-modal">
+    <div class="history-container">
+      <div class="history-header">
+        <h3 style="margin:0">Bet History</h3>
+        <button id="history-close" class="action" style="background:transparent;color:white;border:none;font-size:1.2rem">&times;</button>
+      </div>
+      <div class="history-content">
+        <div id="history-list"></div>
+        <div id="no-history" style="text-align:center;padding:20px;opacity:0.7">No bet history yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+
+<script>
+(() => {
+  // ---- STATE ----
+  let dict=[], validWords=[], availableLetters=[], keyword="";
+  let balance=1000, currency="₦";
+  let roundActive=true, timerInterval=null;
+  const MAX_SLIP = 10;
+  let slip = []; // selected words
+  let hintUsed = false;
+  let betHistory = [];
+  let currentUser = null;
+  let currentWords = []; // Words currently displayed in grid
+  
+  // Game schedule configuration
+  const gameSchedule = {
+    monday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Evolution", start: "10:00", end: "12:00", keyLetter: "A", dictLetter: "A" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Genius", start: "14:00", end: "16:00", keyLetter: "C", dictLetter: "C" },
+      { name: "Fast Lane", start: "16:00", end: "18:00", keyLetter: "D", dictLetter: "D" },
+      { name: "Anglophones", start: "18:00", end: "20:00", keyLetter: "E", dictLetter: "E" },
+      { name: "Cheetah", start: "20:00", end: "22:00", keyLetter: "F", dictLetter: "F" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "G", dictLetter: "G" }
+    ],
+    tuesday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Peak", start: "10:00", end: "12:00", keyLetter: "H", dictLetter: "H" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Skyline", start: "14:00", end: "16:00", keyLetter: "I", dictLetter: "I" },
+      { name: "Word Best", start: "16:00", end: "18:00", keyLetter: "J", dictLetter: "J" },
+      { name: "Champion", start: "18:00", end: "20:00", keyLetter: "K", dictLetter: "K" },
+      { name: "Crossing", start: "20:00", end: "22:00", keyLetter: "L", dictLetter: "L" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "M", dictLetter: "M" }
+    ],
+    wednesday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Breakfast", start: "10:00", end: "12:00", keyLetter: "N", dictLetter: "N" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Fun Base", start: "14:00", end: "16:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Challenge", start: "16:00", end: "18:00", keyLetter: "P", dictLetter: "P" },
+      { name: "Smart", start: "18:00", end: "20:00", keyLetter: "Q", dictLetter: "Q" },
+      { name: "Bridge", start: "20:00", end: "22:00", keyLetter: "R", dictLetter: "R" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "S", dictLetter: "S" }
+    ],
+    thursday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Starter", start: "10:00", end: "12:00", keyLetter: "T", dictLetter: "T" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Free Lunch", start: "14:00", end: "16:00", keyLetter: "U", dictLetter: "U" },
+      { name: "Access", start: "16:00", end: "18:00", keyLetter: "V", dictLetter: "V" },
+      { name: "Reminder", start: "18:00", end: "20:00", keyLetter: "W", dictLetter: "W" }
+    ],
+    friday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Intro", start: "10:00", end: "12:00", keyLetter: "A", dictLetter: "A" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "TGIF", start: "14:00", end: "16:00", keyLetter: "C", dictLetter: "C" },
+      { name: "Fluke", start: "16:00", end: "18:00", keyLetter: "D", dictLetter: "D" },
+      { name: "Oxford 3000", start: "18:00", end: "20:00", keyLetter: "E", dictLetter: "E" },
+      { name: "Masterclass", start: "20:00", end: "22:00", keyLetter: "F", dictLetter: "F" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "G", dictLetter: "G" }
+    ],
+    saturday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Wordbase", start: "10:00", end: "12:00", keyLetter: "H", dictLetter: "H" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Free Lunch", start: "14:00", end: "16:00", keyLetter: "I", dictLetter: "I" },
+      { name: "AWL", start: "16:00", end: "18:00", keyLetter: "J", dictLetter: "J" },
+      { name: "Weekend", start: "18:00", end: "20:00", keyLetter: "K", dictLetter: "K" },
+      { name: "Structure", start: "20:00", end: "22:00", keyLetter: "L", dictLetter: "L" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "M", dictLetter: "M" }
+    ],
+    sunday: [
+      { name: "Dewdrop", start: "08:00", end: "10:00", keyLetter: "O", dictLetter: "O" },
+      { name: "Relief", start: "10:00", end: "12:00", keyLetter: "N", dictLetter: "N" },
+      { name: "Midday", start: "12:00", end: "14:00", keyLetter: "B", dictLetter: "B" },
+      { name: "Wordfinder", start: "14:00", end: "16:00", keyLetter: "P", dictLetter: "P" },
+      { name: "Weekend Extra", start: "16:00", end: "18:00", keyLetter: "Q", dictLetter: "Q" },
+      { name: "Go-Getter", start: "18:00", end: "20:00", keyLetter: "R", dictLetter: "R" },
+      { name: "Ambition", start: "20:00", end: "22:00", keyLetter: "S", dictLetter: "S" },
+      { name: "Exit", start: "22:00", end: "00:00", keyLetter: "T", dictLetter: "T" }
+    ]
+  };
+  
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+    authDomain: "englabet-ad1fe.firebaseapp.com",
+    projectId: "englabet-ad1fe",
+    storageBucket: "englabet-ad1fe.firebasestorage.app",
+    messagingSenderId: "124544822433",
+    appId: "1:124544822433:web:c77c980f28c99364c214e0",
+    measurementId: "G-JMYYM433R7"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // ---- DOM ----
+  const els = {
+    balance: document.getElementById('balance'),
+    timer: document.getElementById('timer'),
+    ringArc: document.getElementById('ring-arc'),
+    grid: document.getElementById('word-grid'),
+    bet: document.getElementById('bet-amount'),
+    result: document.getElementById('result'),
+    search: document.getElementById('search-words'),
+    searchBtn: document.getElementById('search-btn'),
+    toast: document.getElementById('toast'),
+    hintModal: document.getElementById('hint-modal'),
+    hintText: document.getElementById('hint-text'),
+    reviewText: document.getElementById('review-text'),
+    reviewBox: document.getElementById('review-box'),
+    betSlip: document.getElementById('bet-slip'),
+    slipCount: document.getElementById('slip-count'),
+    addWord: document.getElementById('add-word'),
+    clearSlip: document.getElementById('clear-slip'),
+    bag: document.getElementById('bag-letters'),
+    helpBtn: document.getElementById('help-btn'),
+    helpModal: document.getElementById('help-modal'),
+    helpOk: document.getElementById('help-ok'),
+    musicToggle: document.getElementById('music-toggle'),
+    bg: document.getElementById('bg-music'),
+    slipMeta: document.getElementById('slip-meta'),
+    bubbles: document.getElementById('bubbles'),
+    threeWordsBtn: document.getElementById('three-words-btn'),
+    adsModal: document.getElementById('ads-modal'),
+    adsMediaContainer: document.getElementById('ads-media-container'),
+    adsTimer: document.getElementById('ads-timer'),
+    adsCancel: document.getElementById('ads-cancel'),
+    adsWatch: document.getElementById('ads-watch'),
+    userInfo: document.getElementById('user-info'),
+    userAvatar: document.getElementById('user-avatar'),
+    userName: document.getElementById('user-name'),
+    logoutBtn: document.getElementById('logout-btn'),
+    historyBtn: document.getElementById('history-btn'),
+    historyModal: document.getElementById('history-modal'),
+    historyList: document.getElementById('history-list'),
+    historyClose: document.getElementById('history-close'),
+    noHistory: document.getElementById('no-history'),
+    gameName: document.getElementById('game-name'),
+    gameTitle: document.getElementById('game-title'),
+    gameSubtitle: document.getElementById('game-subtitle'),
+    keyLetter: document.getElementById('key-letter'),
+    sessionTime: document.getElementById('session-time'),
+    footerGameName: document.getElementById('footer-game-name'),
+    wordListTitle: document.getElementById('word-list-title'),
+    gridInfo: document.getElementById('grid-info'),
+    refreshGrid: document.getElementById('refresh-grid')
+  };
+
+  // ---- UTIL ----
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  const shuffle = a => {for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const rand = (n)=>Math.floor(Math.random()*n);
+  const randomLetters = (c) => Array.from({length:c},()=> "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random()*26)]).join("");
+  const canFormWord = (word, letters) => {
+    let bag=[...letters]; 
+    for(const ch of word){
+      const k=bag.indexOf(ch); 
+      if(k<0) return false; 
+      bag.splice(k,1);
+    } 
+    return true;
+  };
+  const formatMoney = (n)=> currency + n.toLocaleString();
+
+  function notify(msg, type="info"){
+    els.toast.textContent = msg;
+    els.toast.style.color = type==="error" ? "#6a0000" : "#00324d";
+    els.toast.classList.add('show');
+    setTimeout(()=>els.toast.classList.remove('show'), 1400);
+  }
+
+  // Get current game session based on day and time
+  function getCurrentGameSession() {
+    const now = new Date();
+    const day = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    
+    if (!gameSchedule[day]) return null;
+    
+    // Find the current session based on time
+    for (const session of gameSchedule[day]) {
+      if (timeStr >= session.start && timeStr < session.end) {
+        return session;
+      }
+    }
+    
+    // If no session found for the current time, return the first session of the next day
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDayIndex = days.indexOf(day);
+    const nextDayIndex = (currentDayIndex + 1) % 7;
+    const nextDay = days[nextDayIndex];
+    return gameSchedule[nextDay][0];
+  }
+
+  // Calculate remaining time for current session - FIXED COUNTDOWN SYSTEM
+  function getRemainingTimeForSession() {
+    const session = getCurrentGameSession();
+    if (!session) return 7200; // Default 2 hours if no session found
+    
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    
+    // Parse session end time
+    const [endHour, endMinute] = session.end.split(':').map(Number);
+    
+    // Create date objects for comparison
+    const endTime = new Date();
+    endTime.setHours(endHour, endMinute, 0, 0);
+    
+    // If end time is 00:00, it means next day
+    if (session.end === '00:00') {
+      endTime.setDate(endTime.getDate() + 1);
+    }
+    
+    // Calculate difference in seconds
+    const diffMs = endTime - now;
+    const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
+    
+    return diffSeconds;
+  }
+
+  // Update UI for current game session
+  function updateGameSessionUI() {
+    const session = getCurrentGameSession();
+    if (!session) return;
+    
+    // Update UI elements
+    els.gameName.textContent = session.name;
+    els.gameTitle.textContent = `${session.name} Challenge`;
+    els.gameSubtitle.innerHTML = `Form valid words using the available letters. <strong>Key letter = ${session.keyLetter}</strong>. Win per correct word, lose per incorrect pick. Choose wisely.`;
+    els.keyLetter.textContent = session.keyLetter;
+    
+    // Format time display
+    const formatTime = (timeStr) => {
+      const [hours, minutes] = timeStr.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'pm' : 'am';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minutes}${ampm}`;
+    };
+    
+    els.sessionTime.textContent = `${formatTime(session.start)} – ${formatTime(session.end)}`;
+    els.footerGameName.textContent = session.name;
+    els.wordListTitle.textContent = `${session.keyLetter}-Words`;
+  }
+
+  // progress ring (circumference 2πr with r=17 ≈ 107)
+  const RING_LEN = 107;
+  function setRing(progress){ // 1.0 -> full, 0 -> empty
+    const offset = RING_LEN * (1 - progress);
+    els.ringArc.setAttribute('stroke-dasharray', RING_LEN);
+    els.ringArc.setAttribute('stroke-dashoffset', offset.toFixed(2));
+  }
+
+  // NEW COMPACT GRID RENDERING FUNCTION
+  function renderGrid(words){
+    currentWords = words;
+    els.grid.innerHTML = "";
+    
+    if(!words.length){
+      els.grid.innerHTML = "<div class='word-item'>No words found</div>";
+      els.gridInfo.textContent = "Showing 0 words";
+      return;
+    }
+    
+    words.slice(0, 30).forEach(w => {
+      const item = document.createElement('div');
+      item.className = 'word-item';
+      item.setAttribute('role', 'listitem');
+      item.textContent = w.toUpperCase();
+      item.title = "Click to add: " + w.toUpperCase();
+      
+      // Check if word is already in slip
+      if (slip.includes(w)) {
+        item.classList.add('selected');
+      }
+      
+      item.onclick = () => {
+        addToSlip(w);
+        // Update UI to show selection
+        document.querySelectorAll('.word-item').forEach(c => c.classList.remove('selected'));
+        item.classList.add('selected');
+      };
+      
+      els.grid.appendChild(item);
+    });
+    
+    els.gridInfo.textContent = `Showing ${Math.min(words.length, 30)} of ${words.length} words`;
+  }
+
+  function renderSlip(){
+    els.betSlip.innerHTML = "";
+    if(slip.length === 0){
+      els.betSlip.innerHTML = "<span style='opacity:.8'>No words added yet</span>";
+    } else {
+      slip.forEach((w,idx)=>{
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        const span = document.createElement('span');
+        span.textContent = w.toUpperCase();
+        const x = document.createElement('div');
+        x.className = 'x';
+        x.setAttribute('title','Remove');
+        x.setAttribute('aria-label','Remove '+w.toUpperCase());
+        x.innerHTML = '&times;';
+        x.onclick = ()=>{ removeFromSlip(idx); };
+        chip.appendChild(span);
+        chip.appendChild(x);
+        els.betSlip.appendChild(chip);
+      });
+    }
+    els.slipCount.textContent = slip.length;
+    const bet = Math.max(50, parseInt(els.bet.value||"0",10) || 0);
+    els.slipMeta.textContent = "Total: " + formatMoney(bet * slip.length);
+    
+    // Update grid to reflect selections
+    document.querySelectorAll('.word-item').forEach(item => {
+      const word = item.textContent.toLowerCase();
+      if (slip.includes(word)) {
+        item.classList.add('selected');
+      } else {
+        item.classList.remove('selected');
+      }
+    });
+  }
+
+  function addToSlip(raw){
+    const w = (raw||"").trim().toLowerCase();
+    if(!w) return notify("Select a word first");
+    if(w.length<3) return notify("Word must be at least 3 letters","error");
+    
+    if(slip.includes(w)) return notify("Already in your slip");
+    if(slip.length>=MAX_SLIP) return notify("Bet slip full (max 10)","error");
+    slip.push(w);
+    renderSlip();
+  }
+
+  function removeFromSlip(index){
+    slip.splice(index,1);
+    renderSlip();
+  }
+
+  function clearSlip(){
+    slip = [];
+    renderSlip();
+  }
+
+  function updateReview(){
+    // Review box is now static since we removed the input field
+    els.reviewText.textContent = "Select words from the list";
+  }
+
+  function startTimer(){
+    // Get remaining time for current session - FIXED COUNTDOWN
+    let t = getRemainingTimeForSession();
+    
+    clearInterval(timerInterval);
+    
+    function tick(){
+      t = Math.max(0, t - 1);
+      
+      const h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=t%60;
+      els.timer.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      
+      // Calculate progress for ring (2 hours = 7200 seconds)
+      const progress = t / 7200;
+      setRing(progress);
+      
+      if(t<=0){ 
+        clearInterval(timerInterval); 
+        roundActive=false; 
+        notify("⏱️ Time up!", "error"); 
+        
+        // Update game session and restart timer
+        updateGameSessionUI();
+        startNewRound();
+      }
+    }
+    
+    tick(); 
+    timerInterval=setInterval(tick,1000);
+  }
+
+  function setLettersBag(letters){
+    els.bag.textContent = letters.map(x=>x.toUpperCase()).join(" ");
+  }
+
+  // Fetch words from Datamuse API - SIMILAR TO VIRTUAL SPELLING
+  async function fetchWordsFromAPI(letter) {
+    try {
+      // Use Datamuse API to fetch words starting with the specified letter
+      const response = await fetch(`https://api.datamuse.com/words?sp=${letter}*&max=100`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch words from API');
+      }
+      
+      const data = await response.json();
+      
+      // Filter words to ensure they are valid (only letters, no spaces)
+      const validWords = data
+        .filter(item => 
+          item.word && 
+          item.word.length >= 3 && 
+          /^[a-zA-Z]+$/.test(item.word) &&
+          !item.word.includes(' ')
+        )
+        .map(item => item.word.toLowerCase());
+      
+      return validWords;
+    } catch (error) {
+      console.error('Error fetching words from API:', error);
+      // Return fallback words if API fails
+      return getFallbackWords(letter);
+    }
+  }
+
+  // NEW: Enhanced search function - shows exact matches first
+  async function searchWords(query) {
+    try {
+      // Use Datamuse API to fetch words similar to the query
+      const response = await fetch(`https://api.datamuse.com/words?ml=${query}&max=50`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search words from API');
+      }
+      
+      const data = await response.json();
+      
+      // Filter words to ensure they are valid (only letters, no spaces)
+      const validWords = data
+        .filter(item => 
+          item.word && 
+          item.word.length >= 3 && 
+          /^[a-zA-Z]+$/.test(item.word) &&
+          !item.word.includes(' ')
+        )
+        .map(item => item.word.toLowerCase());
+      
+      // Check if the exact query exists in the dictionary
+      const exactMatch = dict.includes(query.toLowerCase());
+      
+      // If exact match exists, put it at the beginning
+      if (exactMatch && !validWords.includes(query.toLowerCase())) {
+        validWords.unshift(query.toLowerCase());
+      }
+      
+      return validWords;
+    } catch (error) {
+      console.error('Error searching words from API:', error);
+      // Return fallback words if API fails
+      const fallback = getFallbackWords();
+      // Check if the exact query exists in the fallback dictionary
+      const exactMatch = fallback.includes(query.toLowerCase());
+      if (exactMatch) {
+        fallback.unshift(query.toLowerCase());
+      }
+      return fallback;
+    }
+  }
+
+  // Fallback words in case API fails
+  function getFallbackWords(letter = null) {
+    const fallbackWords = [
+      "ocean", "orange", "olive", "opera", "orbit", "order", "organ", "other", "often", "offer",
+      "office", "onion", "opera", "orbit", "order", "organ", "other", "outer", "owner", "oasis",
+      "obey", "object", "obtain", "occur", "ocean", "offer", "office", "often", "onion", "opera",
+      "orbit", "order", "organ", "other", "outer", "owner", "oasis", "obey", "object", "obtain"
+    ];
+    
+    if (letter) {
+      return fallbackWords.filter(word => word.startsWith(letter));
+    }
+    return fallbackWords;
+  }
+
+  // NEW: Get random words for the grid
+  async function getRandomWords(count = 30) {
+    try {
+      // Get a random letter
+      const randomLetter = "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
+      const words = await fetchWordsFromAPI(randomLetter);
+      
+      // If we don't have enough words, add some fallback words
+      if (words.length < count) {
+        const additionalWords = getFallbackWords().slice(0, count - words.length);
+        return [...words, ...additionalWords];
+      }
+      
+      return words.slice(0, count);
+    } catch (error) {
+      console.error('Error getting random words:', error);
+      return getFallbackWords().slice(0, count);
+    }
+  }
+
+  async function startNewRound(){
+    // Hide result section completely
+    els.result.style.display="none";
+    roundActive=true;
+    hintUsed = false;
+    updateReview();
+    clearSlip();
+
+    // Update game session UI
+    updateGameSessionUI();
+    
+    const session = getCurrentGameSession();
+    if (!session) return;
+    
+    // Fetch random words for the grid
+    notify("Loading words for this round...");
+    const randomWords = await getRandomWords(30);
+    
+    // If no words found, use fallback words
+    let keyword;
+    if (randomWords.length > 0) {
+      keyword = randomWords[rand(randomWords.length)];
+    } else {
+      // Use a simple fallback
+      keyword = session.keyLetter.toLowerCase() + "il";
+    }
+    
+    const extra = randomLetters(rand(2)+2);
+    availableLetters = shuffle((keyword+extra).split(""));
+    validWords = dict.filter(w => w.length>=3 && canFormWord(w, availableLetters));
+
+    // UI
+    setLettersBag(availableLetters);
+    renderGrid(randomWords);
+    startTimer();
+  }
+
+  // Generate unique reference ID
+  function generateRef() {
+    return 'REF' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
+  }
+
+  // Save comprehensive bet data to Firestore
+  async function saveBetToFirestore(result, net) {
+    if (!currentUser) {
+      console.error("No user logged in");
+      return;
+    }
+    
+    try {
+      const session = getCurrentGameSession();
+      const betAmount = parseInt(els.bet.value, 10);
+      const ref = generateRef();
+      const status = net >= 0 ? 'WIN' : 'LOSE';
+      
+      const betData = {
+        // User Information
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email,
+        userEmail: currentUser.email,
+        
+        // Game Information
+        gameName: session ? session.name : "Unknown",
+        keyLetter: session ? session.keyLetter : "Unknown",
+        date: new Date().toISOString(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        
+        // Bet Information
+        betId: ref,
+        betAmount: betAmount,
+        wordsPlayed: slip,
+        wordsCount: slip.length,
+        totalBet: betAmount * slip.length,
+        
+        // Result Information
+        status: status,
+        amountWonLost: net,
+        finalBalance: balance,
+        
+        // Game Data
+        wordBag: availableLetters,
+        validWords: validWords,
+        wordsArranged: slip.map(word => ({
+          word: word,
+          isValid: validWords.includes(word),
+          points: validWords.includes(word) ? betAmount : -betAmount
+        })),
+        
+        // Additional Fields
+        reward: net > 0 ? net : 0,
+        ref: ref,
+        session: session ? `${session.start} - ${session.end}` : "Unknown"
+      };
+      
+      // Save to user's bet_history subcollection
+      await db.collection('users').doc(currentUser.uid)
+        .collection('bet_history').add(betData);
+        
+      console.log("Comprehensive bet data saved to Firestore");
+      return betData;
+    } catch (error) {
+      console.error("Error saving bet to Firestore:", error);
+      return null;
+    }
+  }
+
+  // Load bet history from Firestore
+  async function loadBetHistory() {
+    if (!currentUser) {
+      console.error("No user logged in");
+      return [];
+    }
+    
+    try {
+      const snapshot = await db.collection('users').doc(currentUser.uid)
+        .collection('bet_history')
+        .orderBy('timestamp', 'desc')
+        .limit(20)
+        .get();
+      
+      const history = [];
+      snapshot.forEach(doc => {
+        history.push({ id: doc.id, ...doc.data() });
+      });
+      
+      return history;
+    } catch (error) {
+      console.error("Error loading bet history:", error);
+      return [];
+    }
+  }
+
+  // Display bet history in modal
+  async function showBetHistory() {
+    const history = await loadBetHistory();
+    els.historyList.innerHTML = '';
+    
+    if (history.length === 0) {
+      els.noHistory.style.display = 'block';
+    } else {
+      els.noHistory.style.display = 'none';
+      history.forEach(bet => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        
+        const left = document.createElement('div');
+        const date = document.createElement('div');
+        date.className = 'history-date';
+        date.textContent = new Date(bet.date).toLocaleString();
+        
+        const gameSession = document.createElement('div');
+        gameSession.className = 'history-words';
+        gameSession.textContent = `${bet.gameName} (${bet.keyLetter}) - ${bet.wordsPlayed.map(w => w.toUpperCase()).join(', ')}`;
+        
+        left.appendChild(date);
+        left.appendChild(gameSession);
+        
+        const right = document.createElement('div');
+        const result = document.createElement('div');
+        result.className = `history-result ${bet.status === 'WIN' ? 'win' : 'lose'}`;
+        result.textContent = (bet.amountWonLost >= 0 ? '+' : '') + formatMoney(bet.amountWonLost);
+        
+        right.appendChild(result);
+        
+        item.appendChild(left);
+        item.appendChild(right);
+        els.historyList.appendChild(item);
+      });
+    }
+    
+    els.historyModal.style.display = 'grid';
+  }
+
+  // Enhanced dictionary loading with online sources
+  async function loadDict(){
+    try {
+      const session = getCurrentGameSession();
+      if (!session) {
+        throw new Error("No game session found");
+      }
+      
+      const letter = session.dictLetter.toLowerCase();
+      let allWords = [];
+      
+      // Try multiple online sources
+      const wordSources = [
+        fetchWordsFromAPI(letter),
+        getFallbackWords(letter)
+      ];
+      
+      // Try each source until we get words
+      for (const source of wordSources) {
+        try {
+          const words = await source;
+          if (words && words.length > 0) {
+            allWords = [...allWords, ...words];
+            console.log(`Got ${words.length} words from source`);
+            if (allWords.length >= 50) break; // Stop if we have enough words
+          }
+        } catch (e) {
+          console.log("Source failed:", e.message);
+        }
+      }
+      
+      // Remove duplicates and filter by starting letter
+      const uniqueWords = [...new Set(allWords)].filter(w => w.startsWith(letter) && w.length >= 3);
+      
+      if (uniqueWords.length > 0) {
+        notify(`Loaded ${uniqueWords.length} words for ${letter.toUpperCase()}!`);
+        return uniqueWords;
+      } else {
+        throw new Error("No words found from any source");
+      }
+    } catch (error) {
+      console.error("Failed to load dictionary:", error);
+      notify("Using comprehensive fallback dictionary", "error");
+      return getFallbackWords();
+    }
+  }
+
+  // ---- EVENTS ----
+  els.addWord.addEventListener('click', ()=>{ 
+    notify("Please select words from the word list");
+  });
+  els.clearSlip.addEventListener('click', clearSlip);
+  els.bet.addEventListener('input', renderSlip);
+  els.logoutBtn.addEventListener('click', logout);
+  els.historyBtn.addEventListener('click', showBetHistory);
+  els.historyClose.addEventListener('click', () => {
+    els.historyModal.style.display = 'none';
+  });
+  
+  // NEW: Search button event with enhanced search
+  els.searchBtn.addEventListener('click', async () => {
+    const query = els.search.value.trim().toLowerCase();
+    if (!query) {
+      notify("Please enter a search term", "error");
+      return;
+    }
+    
+    notify(`Searching for "${query}"...`);
+    const searchResults = await searchWords(query);
+    
+    // Sort results to show exact matches first
+    const sortedResults = searchResults.sort((a, b) => {
+      if (a === query) return -1;
+      if (b === query) return 1;
+      return 0;
+    });
+    
+    renderGrid(sortedResults);
+    notify(`Found ${searchResults.length} words for "${query}"`);
+  });
+  
+  // NEW: Refresh grid button
+  els.refreshGrid.addEventListener('click', async () => {
+    notify("Refreshing word grid...");
+    const randomWords = await getRandomWords(30);
+    renderGrid(randomWords);
+  });
+  
+  // Three Words Button
+  els.threeWordsBtn.addEventListener('click', () => {
+    window.location.href = 'dewdrop3.html';
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', async ()=>{
+    if(!roundActive){
+      notify("Round finished. Start a new one.", "error");
+      return;
+    }
+
+    if(slip.length===0){ notify("Add at least one word to bet on","error"); return; }
+
+    const bet = parseInt(els.bet.value,10);
+    if(isNaN(bet) || bet<50){ notify("Minimum bet is ₦50", "error"); return; }
+    const totalCost = bet * slip.length;
+    if(totalCost>balance){ notify("Insufficient balance for all words", "error"); return; }
+
+    roundActive=false;
+
+    // Evaluate each word
+    let net = 0;
+    slip.forEach(w=>{
+      const ok = validWords.includes(w);
+      net += ok ? bet : -bet;
+    });
+
+    balance += net;
+    els.balance.textContent = currency + balance;
+    
+    // Update user balance in Firestore
+    if (currentUser) {
+      try {
+        await db.collection('users').doc(currentUser.uid).update({
+          balance: balance
+        });
+      } catch (error) {
+        console.error("Error updating user balance:", error);
+      }
+    }
+    
+    // Save comprehensive data to Firestore
+    await saveBetToFirestore(net >= 0 ? 'WIN' : 'LOSE', net);
+
+    // Show success message - BET PLACED SUCCESSFULLY AWAITING RESULT
+    const session = getCurrentGameSession();
+    const gameType = session ? session.name : "Current Game";
+    notify(`✅ Bet placed successfully! Results will be available when ${gameType} session ends in 2 hours. Check your history for details.`);
+    
+    // Start new round immediately
+    updateReview();
+    startNewRound();
+  });
+
+  // help
+  els.helpBtn.addEventListener('click', ()=> els.helpModal.style.display='grid');
+  els.helpOk.addEventListener('click', ()=> els.helpModal.style.display='none');
+
+  // hint
+  document.getElementById('hint-btn').addEventListener('click', async ()=>{
+    if (!keyword) return;
+    
+    if (hintUsed) {
+      const watched = await showAdForHint();
+      if (!watched) return;
+    }
+    
+    const hintLetter = keyword[rand(keyword.length)].toUpperCase();
+    els.hintText.innerHTML = `💡 The keyword contains the letter <b>${hintLetter}</b>`;
+    els.hintModal.style.display='grid';
+    hintUsed = true;
+  });
+  document.getElementById('hint-ok').addEventListener('click', ()=> els.hintModal.style.display='none');
+
+  // music toggle
+  function syncMusicUI(){
+    const on = !els.bg.paused;
+    els.musicToggle.setAttribute('aria-pressed', String(on));
+    els.musicToggle.querySelector('span').textContent = on ? "Sound On" : "Sound Off";
+    els.musicToggle.querySelector('i').className = on ? "fa-solid fa-music" : "fa-solid fa-music-slash";
+  }
+  els.musicToggle.addEventListener('click', async ()=>{
+    if(els.bg.paused){ try{ await els.bg.play(); }catch(e){} } else { els.bg.pause(); }
+    syncMusicUI();
+  });
+
+  // bubbles
+  function spawnBubbles(){
+    const n = 18;
+    for(let i=0;i<n;i++){
+      const b = document.createElement('div');
+      b.className='bubble';
+      const size = 10 + Math.random()*26;
+      b.style.width = size+'px';
+      b.style.height = size+'px';
+      b.style.left = (Math.random()*100)+'%';
+      b.style.setProperty('--dur', (12 + Math.random()*18) + 's');
+      b.style.animationDelay = (-Math.random()*20)+'s';
+      els.bubbles.appendChild(b);
+    }
+  }
+
+  // Load ads from Firestore
+  async function loadAds() {
+    try {
+      const snapshot = await db.collection('ads').get();
+      const ads = [];
+      snapshot.forEach(doc => {
+        ads.push(doc.data());
+      });
+      return ads;
+    } catch (error) {
+      console.error("Error loading ads:", error);
+      return [];
+    }
+  }
+
+  // Show ad for hint
+  async function showAdForHint() {
+    const ads = await loadAds();
+    if (ads.length === 0) {
+      notify("No ads available at the moment", "error");
+      return false;
+    }
+    
+    const randomAd = ads[Math.floor(Math.random() * ads.length)];
+    els.adsMediaContainer.innerHTML = '';
+    
+    // Create appropriate media element based on file type
+    let mediaElement;
+    if (randomAd.url.endsWith('.mp4')) {
+      mediaElement = document.createElement('video');
+      mediaElement.controls = true;
+      mediaElement.autoplay = true;
+      mediaElement.style.width = '100%';
+    } else if (randomAd.url.endsWith('.mp3')) {
+      mediaElement = document.createElement('audio');
+      mediaElement.controls = true;
+      mediaElement.autoplay = true;
+    } else if (randomAd.url.endsWith('.png') || randomAd.url.endsWith('.jpg') || randomAd.url.endsWith('.jpeg')) {
+      mediaElement = document.createElement('img');
+      mediaElement.style.maxWidth = '100%';
+      mediaElement.style.maxHeight = '150px';
+    }
+    
+    mediaElement.src = randomAd.url;
+    els.adsMediaContainer.appendChild(mediaElement);
+    
+    // Show ad modal
+    els.adsModal.style.display = 'grid';
+    
+    // Countdown timer
+    let countdown = 5;
+    const countdownInterval = setInterval(() => {
+      els.adsTimer.textContent = `Ad will play in ${countdown} seconds`;
+      countdown--;
+      
+      if (countdown < 0) {
+        clearInterval(countdownInterval);
+        els.adsWatch.click();
+      }
+    }, 1000);
+    
+    // Return a promise that resolves when the ad is watched
+    return new Promise((resolve) => {
+      els.adsWatch.onclick = () => {
+        clearInterval(countdownInterval);
+        els.adsModal.style.display = 'none';
+        resolve(true);
+      };
+      
+      els.adsCancel.onclick = () => {
+        clearInterval(countdownInterval);
+        els.adsModal.style.display = 'none';
+        resolve(false);
+      };
+    });
+  }
+
+  // Check authentication state
+  function checkAuthState() {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        // Show user info
+        els.userInfo.style.display = 'flex';
+        els.userName.textContent = user.displayName || user.email;
+        els.userAvatar.src = user.photoURL || 'https://via.placeholder.com/24';
+        els.logoutBtn.style.display = 'block';
+        
+        // Load user balance from Firestore
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            balance = userData.balance || 1000;
+            els.balance.textContent = currency + balance;
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+      } else {
+        // No user is signed in, redirect to login
+        window.location.href = 'login.html';
+      }
+    });
+  }
+
+  // Logout function
+  function logout() {
+    auth.signOut().then(() => {
+      window.location.href = 'login.html';
+    }).catch((error) => {
+      console.error("Logout error:", error);
+    });
+  }
+
+  (async function init(){
+    // Check authentication
+    checkAuthState();
+    
+    // restore balance
+    const saved = parseInt(localStorage.getItem('dewdrop_balance')||"0",10);
+    if(!isNaN(saved) && saved>0){ balance = saved; }
+    els.balance.textContent = currency + balance;
+
+    notify("Loading dictionary from online sources…");
+    try{
+      dict = await loadDict();
+      notify(`Dictionary loaded with ${dict.length} words!`);
+    }catch(e){
+      notify("Failed to load dictionary","error");
+      console.error("Dictionary loading error:", e);
+    }
+
+    // start audio automatically on init (attempt autoplay)
+    try{ 
+      await els.bg.play(); 
+      syncMusicUI(); // sync UI to reflect "on" state
+    } catch(e) {
+      console.warn("Autoplay failed, user interaction may be required.");
+      syncMusicUI(); // still sync UI in case it was paused
+    }
+
+    // visuals
+    spawnBubbles();
+
+    // Update game session UI
+    updateGameSessionUI();
+
+    // kick off round
+    startNewRound();
+    updateReview();
+  })();
+})();
+</script>
+</body>
+</html>
