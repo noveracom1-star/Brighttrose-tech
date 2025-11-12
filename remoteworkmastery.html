@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Work Mastery | Brightrose Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-light: #3f83f8;
+            --primary-dark: #1e429f;
+            --secondary: #047857;
+            --accent: #1e40af;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #f3f4f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: var(--light);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.2rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            margin-right: 0.8rem;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin-right: 0.8rem;
+        }
+
+        .user-info h2 {
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* Course Hero Section */
+        .course-hero {
+            padding: 2.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .course-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .course-description {
+            font-size: 1.1rem;
+            margin-bottom: 1.8rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-info p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            min-height: 48px;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Course Content Section */
+        .course-content {
+            padding: 3rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            font-weight: 700;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .modules-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid #e5e7eb;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .module-duration {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .module-content {
+            padding: 1.5rem;
+        }
+
+        .module-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .module-lessons {
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .lesson-item:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-name {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .lesson-duration {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .module-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+
+        /* Exam Section */
+        .exam-section {
+            background: var(--gray-light);
+            padding: 3rem 1rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: var(--card-shadow);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .exam-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .exam-title {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .exam-description {
+            color: var(--gray);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .exam-details {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-detail {
+            text-align: center;
+        }
+
+        .detail-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.8rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--primary);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Certificate Preview */
+        .certificate-section {
+            padding: 3rem 1rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .certificate-preview {
+            max-width: 100%;
+            margin: 0 auto 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .certificate-container {
+            background: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .certificate-border {
+            border: 2px solid var(--primary);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .certificate-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 4rem;
+            color: rgba(26, 86, 219, 0.05);
+            font-weight: 700;
+            z-index: 0;
+            white-space: nowrap;
+        }
+
+        .certificate-header {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .certificate-logo {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .certificate-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .certificate-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .certificate-body {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .certificate-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .certificate-text {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .certificate-course {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .certificate-date {
+            font-size: 0.95rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2.5rem;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .signature {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .signature-line {
+            width: 150px;
+            height: 1px;
+            background: var(--dark);
+            margin: 0 auto 1rem;
+        }
+
+        .signature-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .signature-title {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .certificate-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Exam Interface */
+        .exam-interface {
+            display: none;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .exam-progress {
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-text {
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+
+        .progress-bar-exam {
+            width: 150px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill-exam {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .exam-timer {
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .exam-timer i {
+            margin-right: 0.5rem;
+        }
+
+        .question-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .question-number {
+            font-size: 0.95rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .option-item {
+            padding: 1.2rem 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary-light);
+            background: rgba(26, 86, 219, 0.03);
+        }
+
+        .option-item.selected {
+            border-color: var(--primary);
+            background: rgba(26, 86, 219, 0.08);
+        }
+
+        .option-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray);
+            flex-shrink: 0;
+        }
+
+        .option-item.selected .option-marker {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .exam-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            padding: 3rem 1rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem 1.5rem;
+            box-shadow: var(--card-shadow);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .results-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.2rem;
+        }
+
+        .results-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .results-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .results-message {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--gray);
+        }
+
+        .results-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .result-detail {
+            background: var(--gray-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--primary);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .header, .course-hero, .course-content, .exam-section, .certificate-section {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+            
+            .modules-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .course-title {
+                font-size: 2.5rem;
+            }
+            
+            .certificate-container {
+                padding: 3rem;
+            }
+            
+            .certificate-border {
+                padding: 3rem;
+            }
+            
+            .certificate-watermark {
+                font-size: 6rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .modules-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .course-title {
+                font-size: 3rem;
+            }
+            
+            .certificate-watermark {
+                font-size: 8rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-laptop-house"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Brightrose Tech</h1>
+                        <p>Remote Work Mastery</p>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="User" class="user-img">
+                    <div class="user-info">
+                        <h2>Alex Morgan</h2>
+                        <p>Student</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Course Hero Section -->
+        <section class="course-hero">
+            <div class="hero-content">
+                <div class="course-badge">
+                    <i class="fas fa-star"></i> PREMIUM COURSE
+                </div>
+                <h1 class="course-title">Remote Work Mastery</h1>
+                <p class="course-description">Master the skills and strategies needed to excel in remote work environments. Boost productivity, communication, and work-life balance.</p>
+                
+                <div class="course-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="far fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>24</h3>
+                            <p>Hours</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>12</h3>
+                            <p>Modules</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Certificate</h3>
+                            <p>Upon Completion</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="start-course">
+                        <i class="fas fa-play-circle"></i> Start Learning
+                    </button>
+                    <button class="btn btn-secondary" id="view-certificate">
+                        <i class="fas fa-award"></i> View Certificate
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Course Content Section -->
+        <section class="course-content">
+            <h2 class="section-title">Course Curriculum</h2>
+            
+            <div class="modules-container">
+                <!-- Module 1 -->
+                <div class="module-card fade-in-up">
+                    <div class="module-header">
+                        <div class="module-title">Module 1: Remote Work Fundamentals</div>
+                        <div class="module-duration">2h 15m</div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">Understand the core principles of remote work and set yourself up for success from day one.</p>
+                        
+                        <div class="module-lessons">
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Introduction to Remote Work</div>
+                                    <div class="lesson-duration">25 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Setting Up Your Workspace</div>
+                                    <div class="lesson-duration">35 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Essential Tools & Software</div>
+                                    <div class="lesson-duration">45 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Creating a Productive Routine</div>
+                                    <div class="lesson-duration">30 min</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-action">
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                                <div class="progress-text">75% Complete</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 0.7rem 1.2rem;">
+                                <i class="fas fa-play"></i> Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Module 2 -->
+                <div class="module-card fade-in-up">
+                    <div class="module-header">
+                        <div class="module-title">Module 2: Communication & Collaboration</div>
+                        <div class="module-duration">3h 30m</div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">Master remote communication strategies and collaboration tools to stay connected with your team.</p>
+                        
+                        <div class="module-lessons">
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Effective Virtual Meetings</div>
+                                    <div class="lesson-duration">40 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Written Communication Skills</div>
+                                    <div class="lesson-duration">50 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Collaboration Tools Mastery</div>
+                                    <div class="lesson-duration">60 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Building Remote Relationships</div>
+                                    <div class="lesson-duration">60 min</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-action">
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 40%"></div>
+                                </div>
+                                <div class="progress-text">40% Complete</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 0.7rem 1.2rem;">
+                                <i class="fas fa-play"></i> Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Module 3 -->
+                <div class="module-card fade-in-up">
+                    <div class="module-header">
+                        <div class="module-title">Module 3: Productivity & Time Management</div>
+                        <div class="module-duration">2h 45m</div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">Learn proven techniques to maximize productivity and effectively manage your time while working remotely.</p>
+                        
+                        <div class="module-lessons">
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Time Blocking Strategies</div>
+                                    <div class="lesson-duration">35 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Task Prioritization Methods</div>
+                                    <div class="lesson-duration">40 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Overcoming Procrastination</div>
+                                    <div class="lesson-duration">30 min</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <div class="lesson-name">Deep Work Techniques</div>
+                                    <div class="lesson-duration">60 min</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-action">
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 20%"></div>
+                                </div>
+                                <div class="progress-text">20% Complete</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 0.7rem 1.2rem;">
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exam Section -->
+            <div class="exam-section">
+                <div class="exam-card fade-in">
+                    <div class="exam-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h2 class="exam-title">Final Assessment</h2>
+                    <p class="exam-description">Test your knowledge and earn your Remote Work Mastery certificate by completing this comprehensive exam. You'll have 60 minutes to answer 25 questions covering all course modules.</p>
+                    
+                    <div class="exam-details">
+                        <div class="exam-detail">
+                            <div class="detail-icon">
+                                <i class="far fa-question-circle"></i>
+                            </div>
+                            <div class="detail-value">25</div>
+                            <div class="detail-label">Questions</div>
+                        </div>
+                        <div class="exam-detail">
+                            <div class="detail-icon">
+                                <i class="far fa-clock"></i>
+                            </div>
+                            <div class="detail-value">60 min</div>
+                            <div class="detail-label">Time Limit</div>
+                        </div>
+                        <div class="exam-detail">
+                            <div class="detail-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="detail-value">80%</div>
+                            <div class="detail-label">Passing Score</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="start-exam">
+                        <i class="fas fa-play-circle"></i> Start Exam
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificate Preview -->
+        <section class="certificate-section">
+            <h2 class="section-title">Your Certificate</h2>
+            <p style="color: var(--gray); margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Upon successful completion of the course and exam, you will receive this professionally designed certificate that you can share with employers and on professional networks.
+            </p>
+            
+            <div class="certificate-preview">
+                <div class="certificate-container" id="certificate">
+                    <div class="certificate-border">
+                        <div class="certificate-watermark">REMOTE WORK MASTERY</div>
+                        
+                        <div class="certificate-header">
+                            <div class="certificate-logo">
+                                <i class="fas fa-laptop-house"></i>
+                            </div>
+                            <h1 class="certificate-title">Certificate of Completion</h1>
+                            <p class="certificate-subtitle">This is to certify that</p>
+                        </div>
+                        
+                        <div class="certificate-body">
+                            <h2 class="certificate-name" id="certificate-user-name">Alex Morgan</h2>
+                            <p class="certificate-text">has successfully completed all requirements and demonstrated proficiency in</p>
+                            <h3 class="certificate-course">Remote Work Mastery</h3>
+                            <p class="certificate-date" id="certificate-date">Completed on October 18, 2023</p>
+                        </div>
+                        
+                        <div class="certificate-footer">
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <p class="signature-name">Nmegwa Denis Bright</p>
+                                <p class="signature-title">Founder & Lead Instructor</p>
+                            </div>
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <p class="signature-name">Brightrose Tech</p>
+                                <p class="signature-title">Date of Issue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="certificate-actions">
+                <button class="btn btn-primary" id="download-pdf">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+                <button class="btn btn-secondary" id="download-png">
+                    <i class="fas fa-image"></i> Download PNG
+                </button>
+                <button class="btn btn-secondary" id="share-certificate">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        </section>
+
+        <!-- Exam Interface (Hidden by default) -->
+        <section class="exam-interface" id="exam-interface">
+            <div class="exam-header">
+                <div class="exam-progress">
+                    <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">25</span></div>
+                    <div class="progress-bar-exam">
+                        <div class="progress-fill-exam" id="exam-progress-bar"></div>
+                    </div>
+                </div>
+                <div class="exam-timer">
+                    <i class="far fa-clock"></i> <span id="exam-timer-text">60:00</span>
+                </div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-number">Question 1</div>
+                <div class="question-text" id="question-text">What is the most important factor for successful remote work according to industry experts?</div>
+                
+                <div class="options-list" id="options-list">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+                
+                <div class="exam-navigation">
+                    <button class="btn btn-secondary" id="prev-question">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" id="next-question">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" id="submit-exam" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Submit Exam
+                </button>
+            </div>
+        </section>
+
+        <!-- Results Section (Hidden by default) -->
+        <section class="results-section" id="results-section">
+            <div class="results-card">
+                <div class="results-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 class="results-title">Exam Results</h2>
+                <div class="results-score" id="results-score">92%</div>
+                <p class="results-message" id="results-message">Congratulations! You have passed the Remote Work Mastery exam with flying colors.</p>
+                
+                <div class="results-details">
+                    <div class="result-detail">
+                        <div class="detail-value" id="correct-answers">23</div>
+                        <div class="detail-label">Correct Answers</div>
+                    </div>
+                    <div class="result-detail">
+                        <div class="detail-value" id="total-questions-result">25</div>
+                        <div class="detail-label">Total Questions</div>
+                    </div>
+                    <div class="result-detail">
+                        <div class="detail-value" id="time-spent">42:15</div>
+                        <div class="detail-label">Time Spent</div>
+                    </div>
+                    <div class="result-detail">
+                        <div class="detail-value" id="passing-score">80%</div>
+                        <div class="detail-label">Passing Score</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="view-certificate-result">
+                    <i class="fas fa-award"></i> View Your Certificate
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-laptop-house"></i>
+                </div>
+                <p class="footer-text">Brightrose Tech is dedicated to providing high-quality education in remote work, digital skills, and technology. Our mission is to empower individuals and organizations to thrive in the digital age.</p>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">About Us</a>
+                    <a href="#" class="footer-link">Courses</a>
+                    <a href="#" class="footer-link">Contact</a>
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                </div>
+                
+                <p class="copyright">© 2023 Brightrose Tech. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Course data
+        const courseData = {
+            title: "Remote Work Mastery",
+            modules: [
+                {
+                    title: "Remote Work Fundamentals",
+                    duration: "2h 15m",
+                    progress: 75,
+                    lessons: [
+                        { name: "Introduction to Remote Work", duration: "25 min" },
+                        { name: "Setting Up Your Workspace", duration: "35 min" },
+                        { name: "Essential Tools & Software", duration: "45 min" },
+                        { name: "Creating a Productive Routine", duration: "30 min" }
+                    ]
+                },
+                {
+                    title: "Communication & Collaboration",
+                    duration: "3h 30m",
+                    progress: 40,
+                    lessons: [
+                        { name: "Effective Virtual Meetings", duration: "40 min" },
+                        { name: "Written Communication Skills", duration: "50 min" },
+                        { name: "Collaboration Tools Mastery", duration: "60 min" },
+                        { name: "Building Remote Relationships", duration: "60 min" }
+                    ]
+                },
+                {
+                    title: "Productivity & Time Management",
+                    duration: "2h 45m",
+                    progress: 20,
+                    lessons: [
+                        { name: "Time Blocking Strategies", duration: "35 min" },
+                        { name: "Task Prioritization Methods", duration: "40 min" },
+                        { name: "Overcoming Procrastination", duration: "30 min" },
+                        { name: "Deep Work Techniques", duration: "60 min" }
+                    ]
+                }
+            ],
+            exam: {
+                title: "Remote Work Mastery Final Exam",
+                duration: 60, // minutes
+                questions: [
+                    {
+                        question: "What is the most important factor for successful remote work according to industry experts?",
+                        options: [
+                            "Having the fastest internet connection",
+                            "Maintaining clear communication with your team",
+                            "Working longer hours than everyone else",
+                            "Having an expensive home office setup"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Which of these is NOT a recommended practice for virtual meetings?",
+                        options: [
+                            "Setting a clear agenda beforehand",
+                            "Turning on your camera when possible",
+                            "Multitasking during the meeting",
+                            "Muting your microphone when not speaking"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "What is the 'Pomodoro Technique' used for in remote work?",
+                        options: [
+                            "Cooking Italian food during breaks",
+                            "Managing time and maintaining focus",
+                            "Organizing digital files efficiently",
+                            "Measuring internet connection speed"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Which tool is specifically designed for project management in remote teams?",
+                        options: [
+                            "Microsoft Word",
+                            "Adobe Photoshop",
+                            "Trello or Asana",
+                            "Google Search"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "What is a common challenge faced by remote workers that can be addressed by establishing boundaries?",
+                        options: [
+                            "Work-life balance issues",
+                            "Lack of technical skills",
+                            "Poor internet connectivity",
+                            "Inadequate computer hardware"
+                        ],
+                        correctAnswer: 0
+                    }
+                    // In a real application, there would be 25 questions
+                ]
+            }
+        };
+
+        // Global variables
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let examTimer = null;
+        let timeRemaining = 0;
+        let examStartTime = null;
+
+        // DOM elements
+        const startCourseBtn = document.getElementById('start-course');
+        const viewCertificateBtn = document.getElementById('view-certificate');
+        const startExamBtn = document.getElementById('start-exam');
+        const examInterface = document.getElementById('exam-interface');
+        const resultsSection = document.getElementById('results-section');
+        const certificateSection = document.querySelector('.certificate-section');
+        const downloadPdfBtn = document.getElementById('download-pdf');
+        const downloadPngBtn = document.getElementById('download-png');
+        const shareCertificateBtn = document.getElementById('share-certificate');
+        const viewCertificateResultBtn = document.getElementById('view-certificate-result');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date on certificate
+            const currentDate = new Date();
+            const formattedDate = currentDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('certificate-date').textContent = `Completed on ${formattedDate}`;
+            
+            // Add event listeners
+            startCourseBtn.addEventListener('click', function() {
+                alert('Course content would open here. In a full implementation, this would navigate to the first lesson.');
+            });
+            
+            viewCertificateBtn.addEventListener('click', function() {
+                certificateSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            startExamBtn.addEventListener('click', startExam);
+            
+            downloadPdfBtn.addEventListener('click', downloadCertificateAsPdf);
+            downloadPngBtn.addEventListener('click', downloadCertificateAsPng);
+            shareCertificateBtn.addEventListener('click', shareCertificate);
+            viewCertificateResultBtn.addEventListener('click', function() {
+                certificateSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Initialize button animations
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+
+        // Start the exam
+        function startExam() {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(courseData.exam.questions.length).fill(null);
+            timeRemaining = courseData.exam.duration * 60; // Convert to seconds
+            examStartTime = new Date();
+            
+            // Hide other sections and show exam interface
+            document.querySelector('.course-content').style.display = 'none';
+            document.querySelector('.certificate-section').style.display = 'none';
+            examInterface.style.display = 'block';
+            
+            // Initialize exam UI
+            document.getElementById('total-questions').textContent = courseData.exam.questions.length;
+            updateExamProgress();
+            startTimer();
+            displayQuestion();
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const question = courseData.exam.questions[currentQuestionIndex];
+            
+            // Update question number and text
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            document.getElementById('question-text').textContent = question.question;
+            
+            // Update options
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionItem.classList.add('selected');
+                }
+                
+                optionItem.innerHTML = `
+                    <div class="option-marker">${String.fromCharCode(65 + index)}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionItem.addEventListener('click', () => selectOption(index));
+                optionsList.appendChild(optionItem);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prev-question').style.display = currentQuestionIndex === 0 ? 'none' : 'flex';
+            document.getElementById('next-question').style.display = currentQuestionIndex === courseData.exam.questions.length - 1 ? 'none' : 'flex';
+            document.getElementById('submit-exam').style.display = currentQuestionIndex === courseData.exam.questions.length - 1 ? 'block' : 'none';
+            
+            // Update progress bar
+            updateExamProgress();
+        }
+
+        // Select an option
+        function selectOption(optionIndex) {
+            userAnswers[currentQuestionIndex] = optionIndex;
+            
+            // Update UI
+            document.querySelectorAll('.option-item').forEach((item, index) => {
+                if (index === optionIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // Next question
+        function nextQuestion() {
+            if (currentQuestionIndex < courseData.exam.questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        // Previous question
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        // Update exam progress
+        function updateExamProgress() {
+            const progress = ((currentQuestionIndex + 1) / courseData.exam.questions.length) * 100;
+            document.getElementById('exam-progress-bar').style.width = `${progress}%`;
+        }
+
+        // Start exam timer
+        function startTimer() {
+            updateTimerDisplay();
+            
+            examTimer = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(examTimer);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('exam-timer-text').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Change color when time is running out
+            if (timeRemaining < 300) { // 5 minutes
+                document.getElementById('exam-timer').style.background = 'var(--secondary)';
+            }
+        }
+
+        // Submit exam
+        function submitExam() {
+            clearInterval(examTimer);
+            
+            // Calculate score
+            let correctAnswers = 0;
+            courseData.exam.questions.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    correctAnswers++;
+                }
+            });
+            
+            const score = Math.round((correctAnswers / courseData.exam.questions.length) * 100);
+            const timeTaken = Math.round((new Date() - examStartTime) / 1000);
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+            const timeTakenFormatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Show results
+            showResults(score, correctAnswers, courseData.exam.questions.length, timeTakenFormatted);
+        }
+
+        // Show exam results
+        function showResults(score, correctAnswers, totalQuestions, timeTaken) {
+            // Update results section
+            document.getElementById('results-score').textContent = `${score}%`;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+            document.getElementById('total-questions-result').textContent = totalQuestions;
+            document.getElementById('time-spent').textContent = timeTaken;
+            document.getElementById('passing-score').textContent = '80%';
+            
+            // Update message based on score
+            let message = '';
+            if (score >= 90) {
+                message = 'Outstanding! You have demonstrated exceptional understanding of remote work principles.';
+            } else if (score >= 80) {
+                message = 'Excellent work! You have a strong grasp of remote work best practices.';
+            } else if (score >= 70) {
+                message = 'Good job! You passed the exam and have a solid understanding of the material.';
+            } else {
+                message = 'You did not pass this time. We recommend reviewing the course material and trying again.';
+            }
+            document.getElementById('results-message').textContent = message;
+            
+            // Show results section
+            examInterface.style.display = 'none';
+            resultsSection.style.display = 'block';
+        }
+
+        // Download certificate as PDF
+        function downloadCertificateAsPdf() {
+            // In a real implementation, this would use a library like jsPDF
+            // For this demo, we'll simulate the download
+            alert('In a full implementation, this would generate and download a PDF version of your certificate.');
+            
+            // Example implementation with jsPDF:
+            /*
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'a4');
+            
+            // Capture certificate as image
+            html2canvas(document.getElementById('certificate')).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = doc.internal.pageSize.getWidth();
+                const imgHeight = doc.internal.pageSize.getHeight();
+                
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                doc.save('remote-work-mastery-certificate.pdf');
+            });
+            */
+        }
+
+        // Download certificate as PNG
+        function downloadCertificateAsPng() {
+            // Use html2canvas to capture the certificate as an image
+            html2canvas(document.getElementById('certificate')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'remote-work-mastery-certificate.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Share certificate
+        function shareCertificate() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Remote Work Mastery Certificate',
+                    text: 'I just completed the Remote Work Mastery course from Brightrose Tech!',
+                    url: window.location.href
+                })
+                .then(() => console.log('Successful share'))
+                .catch((error) => console.log('Error sharing:', error));
+            } else {
+                alert('Web Share API not supported in your browser. You can download the certificate and share it manually.');
+            }
+        }
+
+        // Add event listeners for exam navigation
+        document.getElementById('next-question').addEventListener('click', nextQuestion);
+        document.getElementById('prev-question').addEventListener('click', prevQuestion);
+        document.getElementById('submit-exam').addEventListener('click', submitExam);
+    </script>
+</body>
+</html>

@@ -3,2238 +3,2729 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Gaming Platform</title>
+    <title>Brightrose Tech</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --secondary: #FF6584;
+            --dark: #2A2D43;
+            --light: #F7F9FC;
+            --gray: #8C8EA4;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        :root {
-            --primary: #0a2e5a; /* Deep Ocean Blue */
-            --secondary: #1a4789; /* Rich Navy */
-            --accent: #00a8d8; /* Ocean Cyan */
-            --accent-gradient: linear-gradient(to right, #00a8d8, #00d8e8); /* Bright Ocean Gradient */
-            --text-light: #ffffff;
-            --text-gray: #a0c1ed;
-            --card-bg: #1a3e75; /* Cool Blue Card */
-            --card-dark: #0f2b50;
-            --wordbet-primary: #0077be;
-            --wordbet-secondary: #005a8e;
-            --wordbet-accent: #00a8e8;
-            --wordbet-gradient: linear-gradient(to right, #0077be, #00a8e8);
-            --success: #00c8ff; /* Sky Blue */
-            --warning: #0088cc; /* Calm Blue */
-            --error: #e03e6e; /* Soft Red (kept for contrast) */
-            --pink: #ff4b8f; /* Pink for BET text */
-        }
+
         body {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text-light);
-            min-height: 100vh;
-            padding-bottom: 20px;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
         }
-        .container {
+
+        .app-container {
             max-width: 480px;
             margin: 0 auto;
-            padding: 0 15px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
+
         /* Header Styles */
-        header {
-            background: linear-gradient(to right, #0d3b78, var(--primary));
-            padding: 15px 10px;
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-right: 15px;
+        }
+
+        .profile-info h2 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation Styles */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
-        .logo {
+
+        .section-title span {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Hot Courses */
+        .hot-courses {
+            margin-bottom: 25px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 15px;
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease;
+            cursor: pointer;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .course-header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-        .logo-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+
+        .course-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .course-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .course-content {
+            padding: 15px;
+        }
+
+        .course-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
+        }
+
+        .btn-enroll {
+            background: var(--primary);
+            color: white;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .btn-live {
+            background: var(--secondary);
+            color: white;
+            flex: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Video Section */
+        .video-section {
+            margin-bottom: 25px;
+        }
+
+        .video-card {
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-            background: white; /* Added white background as requested */
-            padding: 0;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 15px;
         }
-        .logo-img img {
+
+        .video-thumbnail {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-        .logo-text {
+            height: 180px;
+            background: linear-gradient(45deg, #6C63FF, #FF6584);
+            position: relative;
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            font-weight: 800;
-            line-height: 1.1;
+            align-items: center;
+            justify-content: center;
         }
-        .logo-main {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .video-desc {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Image Carousel */
+        .image-carousel {
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Courses Page */
+        .courses-page, .community-page, .profile-page {
+            display: none;
+        }
+
+        .course-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .course-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .course-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .course-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .course-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .course-details {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .course-detail {
+            margin-right: 15px;
+            font-size: 0.85rem;
+            color: var(--gray);
             display: flex;
             align-items: center;
         }
-        .logo-engla {
-            color: #00a8d8; /* Ocean blue */
-            font-weight: 900;
+
+        .course-detail i {
+            margin-right: 5px;
         }
-        .logo-bet {
-            color: var(--pink); /* Pink */
-            font-weight: 900;
+
+        .course-status {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 15px;
         }
-        .logo-reg {
-            font-size: 10px;
+
+        .course-action {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-learn {
+            background: var(--primary);
             color: white;
-            vertical-align: super;
-            margin-left: 2px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-learn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Course Details Page */
+        .course-details-page {
+            display: none;
+        }
+
+        .course-hero {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-hero h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .course-hero p {
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .course-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .meta-item i {
+            margin-right: 5px;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .course-tabs {
+            display: flex;
+            background: var(--light);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .course-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
             font-weight: 500;
         }
-        .logo-tagline {
-            font-size: 10px;
-            color: var(--text-gray);
-            font-weight: 600;
-            letter-spacing: 0.5px;
+
+        .course-tab.active {
+            background: white;
+            box-shadow: var(--card-shadow);
         }
-        .user-profile {
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .module-list {
+            margin-bottom: 20px;
+        }
+
+        .module-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: var(--card-shadow);
             display: flex;
             align-items: center;
-            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .user-balance {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            text-align: right;
+
+        .module-item:hover {
+            transform: translateY(-2px);
         }
-        .balance-label {
-            font-size: 12px;
-            color: var(--text-gray);
-            margin-bottom: 2px;
-            text-align: right;
-        }
-        .balance-amount {
-            font-weight: bold;
-            font-size: 18px;
-            color: #00d8e8; /* Ocean Cyan */
-        }
-        .profile-icon {
+
+        .module-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--accent-gradient);
+            background: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            margin-right: 15px;
+            color: var(--primary);
         }
-        .profile-icon:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 3px rgba(0, 216, 232, 0.3);
-        }
-        /* Top Navigation */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            background: var(--card-dark);
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        .top-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+
+        .module-info {
             flex: 1;
         }
-        .top-nav-item:hover {
-            transform: translateY(-3px);
-        }
-        .top-nav-icon {
-            font-size: 20px;
+
+        .module-title {
+            font-weight: 600;
             margin-bottom: 5px;
-            color: #4a7cc2;
-            transition: all 0.3s ease;
         }
-        .top-nav-text {
-            font-size: 12px;
-            color: #4a7cc2;
-            transition: all 0.3s ease;
-            font-weight: 500;
+
+        .module-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
         }
-        .top-nav-active .top-nav-icon,
-        .top-nav-active .top-nav-text {
-            color: #00d8e8;
+
+        .module-status {
+            color: var(--success);
+            font-size: 0.9rem;
         }
-        /* Sports Navigation */
-        /* REMOVED AS PER USER REQUEST */
-        /* Game Types */
-        .game-types {
-            display: flex;
-            overflow-x: auto;
-            padding: 15px 0;
-            gap: 15px;
-            border-bottom: 1px solid #1e4a86;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .game-types::-webkit-scrollbar {
+
+        /* Exam Page */
+        .exam-page {
             display: none;
         }
-        .game-type {
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .exam-timer {
+            background: var(--primary);
+            color: white;
             padding: 8px 15px;
-            background: var(--card-bg);
             border-radius: 20px;
-            font-size: 14px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-gray);
+            font-weight: 600;
         }
-        .game-type:hover {
-            transform: translateY(-2px);
-            background: #1a507c;
+
+        .question-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
         }
-        .game-type-active {
-            background: var(--accent-gradient);
-            color: var(--primary);
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0, 168, 216, 0.4);
-        }
-        /* Featured Section */
-        .featured-section {
-            margin-top: 20px;
-            animation: fadeIn 0.5s ease;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #00d8e8;
-        }
-        .view-more {
-            font-size: 12px;
-            color: var(--accent);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .view-more:hover {
-            transform: translateX(3px);
-            color: #00d8f0;
-        }
-        /* Game Cards */
-        .game-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
-        }
-        .game-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            position: relative;
-        }
-        .game-status {
-            background: var(--accent);
-            color: var(--primary);
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .game-time {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-        .game-title {
-            font-weight: bold;
+
+        .question-number {
+            font-size: 0.9rem;
+            color: var(--gray);
             margin-bottom: 10px;
-            font-size: 16px;
-            color: #00d8e8;
         }
-        .game-details {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
         }
-        .team {
-            text-align: center;
-            font-size: 14px;
-        }
-        .vs {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-        .odds {
-            display: flex;
-            justify-content: space-between;
-            gap: 5px;
-        }
-        .odd-box {
-            background: var(--card-dark);
-            flex: 1;
-            text-align: center;
-            padding: 10px 5px;
-            border-radius: 5px;
+
+        .option-item {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
-        .odd-box:hover {
-            background: #1e4a86;
-            transform: translateY(-2px);
+
+        .option-item:hover {
+            border-color: var(--primary);
         }
-        .odd-value {
-            font-weight: bold;
-            font-size: 16px;
-            color: #00d8e8;
+
+        .option-item.selected {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.05);
         }
-        .odd-type {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-        /* Game Specific Styles */
-        .game-round {
+
+        .exam-navigation {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #a0c1ed;
+            margin-top: 20px;
         }
-        .round-info {
-            color: #00d8e8;
-            font-weight: bold;
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
-        .word-components {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 15px 0;
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
         }
-        .letter-box {
-            width: 40px;
-            height: 40px;
-            background: var(--card-dark);
-            border-radius: 5px;
+
+        .question-progress {
+            margin-top: 20px;
+        }
+
+        /* Results Page */
+        .results-page {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .results-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            animation: popIn 0.5s ease;
-            color: #a0c1ed;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
         }
-        .letter-box:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-        }
-        .key-letter {
-            background: var(--accent-gradient);
+
+        .results-score {
+            font-size: 3rem;
+            font-weight: 700;
             color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0, 168, 216, 0.4);
-        }
-        .game-rules {
-            background: var(--card-dark);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            font-size: 12px;
-            animation: fadeIn 0.5s ease;
-        }
-        .rule-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #00d8e8;
-        }
-        /* Promotional Banner */
-        .promo-banner {
-            background: var(--accent-gradient);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            color: var(--primary);
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-            animation: pulse 2s infinite;
-        }
-        .promo-title {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 5px;
-            color: var(--primary);
-        }
-        .promo-text {
-            font-size: 14px;
             margin-bottom: 10px;
-            color: var(--primary);
         }
-        .promo-btn {
+
+        .results-message {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-certificate {
+            background: var(--secondary);
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Certificate Page */
+        .certificate-page {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .certificate-container {
+            background: white;
+            border: 20px solid #f5f5f5;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .certificate-header {
+            margin-bottom: 20px;
+        }
+
+        .certificate-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .certificate-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .certificate-body {
+            margin-bottom: 30px;
+        }
+
+        .certificate-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .certificate-course {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .certificate-date {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 200px;
+            height: 1px;
+            background: var(--dark);
+            margin: 0 auto 10px;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        /* Community Page */
+        .post-form {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .post-input {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            min-height: 60px;
+            outline: none;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .media-options {
+            display: flex;
+        }
+
+        .media-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            color: var(--gray);
+            margin-right: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .media-option:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-post {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 20px;
             border-radius: 20px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            margin: 0 auto;
+            transition: var(--transition);
         }
-        .promo-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        .btn-post:hover {
+            background: var(--primary-dark);
         }
-        /* Live Games Section */
-        .live-indicator {
+
+        .feed {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .post {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .post-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        .live-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--success);
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 1.5s infinite;
+            object-fit: cover;
+            margin-right: 10px;
         }
+
+        .post-user {
+            font-weight: 600;
+        }
+
+        .post-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .post-image, .post-video {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .post-file {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .post-file i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .post-engagement {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 10px;
+        }
+
+        .engagement-btn {
+            display: flex;
+            align-items: center;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .engagement-btn:hover {
+            color: var(--primary);
+        }
+
+        .engagement-btn i {
+            margin-right: 5px;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: var(--card-shadow);
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .settings-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .setting-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item:hover {
+            background: var(--light);
+        }
+
+        .setting-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .setting-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .setting-arrow {
+            color: var(--gray);
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes shine {
-            0% { background-position: -100px; }
-            40%, 100% { background-position: 200px; }
-        }
-        /* Stats Section */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .stat-box {
-            background: var(--card-dark);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-value {
-            font-weight: bold;
-            font-size: 18px;
-            color: #00d8e8;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-        /* Quick Access Menu */
-        .quick-access {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); /* Changed from 4 to 5 columns */
-            gap: 5px; /* Reduced gap from 10px to 5px */
-            margin: 20px 0;
-        }
-        .quick-item {
-            background: var(--card-bg);
-            padding: 12px 5px; /* Reduced padding */
-            border-radius: 8px; /* Slightly smaller radius */
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .quick-item:hover {
-            transform: translateY(-3px);
-            background: var(--accent-gradient);
-            color: var(--primary);
-        }
-        .quick-icon {
-            font-size: 20px; /* Reduced icon size from 24px to 20px */
-            margin-bottom: 3px; /* Reduced margin */
-            color: var(--accent);
-        }
-        .quick-text {
-            font-size: 10px; /* Reduced text size from 12px to 10px */
-            font-weight: 500;
-        }
-        /* Notification Badge */
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--success);
-            color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 10px;
-        }
-        /* Scroll to Top Button */
-        .scroll-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: var(--accent-gradient);
-            color: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 99;
-            transition: all 0.3s ease;
-            display: none;
-        }
-        .scroll-top:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        /* WordBet Screen Specific Styles */
-        .wordbet-body {
-            background: linear-gradient(135deg, var(--wordbet-primary) 0%, var(--wordbet-secondary) 100%);
-        }
-        .wordbet-header {
-            background: linear-gradient(to right, #0066a1, var(--wordbet-primary));
-        }
-        .wordbet-nav-active .top-nav-icon,
-        .wordbet-nav-active .top-nav-text {
-            color: var(--wordbet-accent);
-        }
-        .wordbet-card {
-            background: #0e5e8c;
-        }
-        .wordbet-card-dark {
-            background: #09415f;
-        }
-        .wordbet-game-type-active {
-            background: var(--wordbet-gradient);
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 2px8px rgba(0, 168, 232, 0.4);
-        }
-        .wordbet-promo-banner {
-            background: var(--wordbet-gradient);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 168, 232, 0.4);
-        }
-        .wordbet-promo-btn {
-            background: white;
-            color: var(--wordbet-primary);
-        }
-        /* Schedule Styles */
-        .schedule-container {
-            margin-top: 20px;
-        }
-        .day-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0 15px;
-            color: #00d8e8;
-            text-align: center;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #00d8e8;
-        }
-        .schedule-item {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        .schedule-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .game-name {
-            font-weight: bold;
-            font-size: 16px;
-            text-align: left;
-        }
-        .game-time-slot {
-            color: #00d8e8;
-            font-weight: 600;
-            text-align: left;
-        }
-        .live-now {
-            background: var(--success);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-        .upcoming {
-            background: var(--accent-gradient);
-            color: var(--primary);
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        /* Profile Screen Styles */
-        .profile-screen {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        .profile-header {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: var(--accent-gradient);
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-        }
-        .profile-name {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .profile-level {
-            color: #00d8e8;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .profile-stat {
-            background: var(--card-bg);
-            padding: 15px 10px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00d8e8;
-            margin-bottom: 5px;
-        }
-        .stat-description {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-        .profile-menu {
-            margin-top: 30px;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: var(--card-bg);
-            margin-bottom: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .menu-item:hover {
-            background: var(--accent-gradient);
-            color: var(--primary);
-            transform: translateX(5px);
-        }
-        .menu-icon {
-            width: 30px;
-            font-size: 18px;
-        }
-        .menu-text {
-            flex: 1;
-            font-weight: 500;
-        }
-        .menu-arrow {
-            font-size: 14px;
-        }
-        /* Loading spinner */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: var(--accent);
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* WordBet Game Cards */
-        .wordbet-game-card {
-            background: var(--wordbet-card);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .wordbet-game-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .game-status-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 5px 10px;
-            border-bottom-left-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .status-active {
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        .status-upcoming {
-            background: var(--warning);
-        }
-        .status-offline {
-            background: var(--error);
-        }
-        .game-content {
-            margin-top: 25px;
-        }
-        .game-title-large {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-            color: white;
-        }
-        .game-description {
-            font-size: 14px;
-            color: var(--text-gray);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .game-time-display {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        .game-time-icon {
-            margin-right: 8px;
-            color: var(--wordbet-accent);
-        }
-        .play-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: var(--wordbet-gradient);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-size: 16px;
-        }
-        .play-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 168, 232, 0.4);
-        }
-        .play-button:disabled {
-            background: #7a7a7a;
-            cursor: not-allowed;
-        }
-        .play-button:disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        .active-indicator {
-            display: inline-flex;
-            align-items: center;
-            background: var(--success);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 8px;
-            animation: pulse 2s infinite;
-        }
-        .active-indicator i {
-            margin-right: 4px;
-            font-size: 10px;
-        }
-        .offline-indicator {
-            display: inline-flex;
-            align-items: center;
-            background: var(--error);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        .offline-indicator i {
-            margin-right: 4px;
-            font-size: 10px;
-        }
-        .next-session {
-            font-size: 12px;
-            color: var(--text-gray);
-            text-align: center;
-            margin-top: 8px;
-        }
-        .wordbet-hero {
-            text-align: center;
-            padding: 20px 0;
-            animation: fadeIn 0.8s ease;
-        }
-        .wordbet-hero-icon {
-            font-size: 50px;
-            color: var(--wordbet-accent);
-            margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-        .wordbet-hero-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: var(--wordbet-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .wordbet-hero-subtitle {
-            font-size: 16px;
-            color: var(--text-gray);
-            margin-bottom: 20px;
-        }
-        .shine-effect {
-            background: linear-gradient(90deg, var(--wordbet-card) 0%, var(--wordbet-primary) 30%, var(--wordbet-primary) 70%, var(--wordbet-card) 100%);
-            background-size: 200% 100%;
-            animation: shine 3s infinite;
-        }
-        /* Empty Screen Styles */
-        .empty-screen {
-            display: none;
-            text-align: center;
-            padding: 50px 20px;
-            animation: fadeIn 0.5s ease;
-        }
-        .empty-icon {
-            font-size: 60px;
-            color: var(--accent);
-            margin-bottom: 20px;
-        }
-        .empty-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .empty-text {
-            font-size: 16px;
-            color: var(--text-gray);
-            margin-bottom: 30px;
-        }
-        .empty-btn {
-            background: var(--accent-gradient);
-            color: var(--primary);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .empty-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-        }
-        
-        /* SyntaxBet Screen Styles */
-        .syntaxbet-body {
-            background: linear-gradient(135deg, #1a4789 0%, #0a2e5a 100%);
-        }
-        .syntaxbet-header {
-            background: linear-gradient(to right, #1a4789, #0a2e5a);
-        }
-        .syntaxbet-nav-active .top-nav-icon,
-        .syntaxbet-nav-active .top-nav-text {
-            color: #00a8d8;
-        }
-        .syntaxbet-game-card {
-            background: #1a3e75;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .syntaxbet-game-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .syntaxbet-game-card .game-status-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 5px 10px;
-            border-bottom-left-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        .syntaxbet-game-card .game-content {
-            margin-top: 25px;
-        }
-        .syntaxbet-game-card .game-title-large {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-            color: white;
-        }
-        .syntaxbet-game-card .game-description {
-            font-size: 14px;
-            color: var(--text-gray);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .syntaxbet-game-card .game-time-display {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        .syntaxbet-game-card .game-time-icon {
-            margin-right: 8px;
-            color: #00a8d8;
-        }
-        .syntaxbet-game-card .play-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(to right, #00a8d8, #00d8e8);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-size: 16px;
-        }
-        .syntaxbet-game-card .play-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-        }
-        .syntaxbet-hero {
-            text-align: center;
-            padding: 20px 0;
-            animation: fadeIn 0.8s ease;
-        }
-        .syntaxbet-hero-icon {
-            font-size: 50px;
-            color: #00a8d8;
-            margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-        .syntaxbet-hero-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #00a8d8, #00d8e8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .syntaxbet-hero-subtitle {
-            font-size: 16px;
-            color: var(--text-gray);
-            margin-bottom: 20px;
-        }
-        
-        /* Spelling Screen Styles */
-        .spelling-body {
-            background: linear-gradient(135deg, #1a4789 0%, #0a2e5a 100%);
-        }
-        .spelling-header {
-            background: linear-gradient(to right, #1a4789, #0a2e5a);
-        }
-        .spelling-nav-active .top-nav-icon,
-        .spelling-nav-active .top-nav-text {
-            color: #00a8d8;
-        }
-        .spelling-game-card {
-            background: #1a3e75;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .spelling-game-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .spelling-game-card .game-status-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 5px 10px;
-            border-bottom-left-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        .spelling-game-card .game-content {
-            margin-top: 25px;
-        }
-        .spelling-game-card .game-title-large {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-            color: white;
-        }
-        .spelling-game-card .game-description {
-            font-size: 14px;
-            color: var(--text-gray);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .spelling-game-card .game-time-display {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        .spelling-game-card .game-time-icon {
-            margin-right: 8px;
-            color: #00a8d8;
-        }
-        .spelling-game-card .play-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(to right, #00a8d8, #00d8e8);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-size: 16px;
-        }
-        .spelling-game-card .play-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 168, 216, 0.4);
-        }
-        .spelling-hero {
-            text-align: center;
-            padding: 20px 0;
-            animation: fadeIn 0.8s ease;
-        }
-        .spelling-hero-icon {
-            font-size: 50px;
-            color: #00a8d8;
-            margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-        .spelling-hero-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #00a8d8, #00d8e8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .spelling-hero-subtitle {
-            font-size: 16px;
-            color: var(--text-gray);
-            margin-bottom: 20px;
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        /* Footer Styles */
-        .footer {
-            margin-top: 40px;
-            padding: 20px 0;
-            border-top: 1px solid #1e4a86;
+        .fade-in {
+            animation: fadeIn 0.5s ease;
         }
-        .footer-section {
-            margin-bottom: 25px;
-        }
-        .footer-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #00d8e8;
-            text-align: center;
-        }
-        .footer-text {
-            font-size: 12px;
-            color: var(--text-gray);
-            text-align: center;
-            margin-top: 20px;
-            line-height: 1.6;
-        }
-        .footer-links {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .footer-link {
-            color: var(--text-gray);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 5px;
-            text-align: center;
-        }
-        .footer-link:hover {
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .social-link {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-gray);
-            transition: all 0.3s ease;
-        }
-        .social-link:hover {
-            background: var(--accent-gradient);
-            color: var(--primary);
-            transform: translateY(-3px);
-        }
-        .footer-bottom {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #1e4a86;
-        }
-        .footer-bottom-link {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .footer-bottom-link:hover {
-            color: #00d8e8;
-            background: rgba(0, 216, 232, 0.1);
-        }
-        
-        /* FAQ Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            animation: modalSlideIn 0.3s ease;
-        }
-        @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #1e4a86;
-        }
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #00d8e8;
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .modal-close:hover {
-            color: var(--accent);
-            transform: rotate(90deg);
-        }
-        .modal-body {
-            padding: 10px 0;
-        }
-        .accordion {
-            background: var(--card-dark);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-        .accordion-header {
-            padding: 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        .accordion-header:hover {
-            background: rgba(0, 216, 232, 0.1);
-        }
-        .accordion-title {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .accordion-icon {
-            transition: transform 0.3s ease;
-        }
-        .accordion-content {
-            padding: 0 15px;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .accordion.active .accordion-content {
-            padding: 15px;
-            max-height: 500px;
-        }
-        .accordion.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-        .accordion-content p {
-            margin-bottom: 10px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .accordion-content ul {
-            padding-left: 20px;
-            margin-bottom: 10px;
-        }
-        .accordion-content li {
-            margin-bottom: 8px;
-            font-size: 14px;
-            line-height: 1.5;
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header id="main-header">
-            <div class="logo">
-                <div class="logo-img">
-                    <img src="englabet.png" alt="EnglaBet Logo">
-                </div>
-                <div class="logo-text">
-                    <div class="logo-main">
-                        <span class="logo-engla">Engla</span><span class="logo-bet">Bet</span><sup class="logo-reg">®</sup>
-                    </div>
-                    <div class="logo-tagline">Learn While You Earn</div>
-                </div>
-            </div>
-            <div class="user-profile">
-                <div class="user-balance">
-                    <div class="balance-label">BALANCE</div>
-                    <div class="balance-amount" id="user-balance-display">₦ 0.00</div>
-                </div>
-                <div class="profile-icon" onclick="navigateTo('me')">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-        </header>
-        <!-- Top Navigation -->
-        <div class="top-nav">
-            <div class="top-nav-item top-nav-active" data-screen="home">
-                <div class="top-nav-icon"><i class="fas fa-home"></i></div>
-                <div class="top-nav-text">Home</div>
-            </div>
-            <div class="top-nav-item" onclick="window.location.href='wordbet.html'">
-                <div class="top-nav-icon"><i class="fas fa-font"></i></div>
-                <div class="top-nav-text">WordBet</div>
-            </div>
-            <div class="top-nav-item" onclick="window.location.href='virtual_spelling.html'">
-                <div class="top-nav-icon"><i class="fas fa-spell-check"></i></div>
-                <div class="top-nav-text">Spelling</div>
-            </div>
-            <div class="top-nav-item" onclick="window.location.href='syntaxbet.html'">
-                <div class="top-nav-icon"><i class="fas fa-code"></i></div>
-                <div class="top-nav-text">SyntaxBet</div>
-            </div>
-        </div>
-        <!-- REMOVED THE SECOND NAVIGATION BAR (sports-nav) AS PER USER REQUEST -->
-        <div id="game-types-container" class="game-types">
-            <!-- Game types will be dynamically populated based on day of week -->
-        </div>
-        <!-- Home Screen Content -->
-        <div id="home-screen" class="screen-content">
-            <!-- Promotional Banner -->
-            <div class="promo-banner">
-                <div class="promo-title">Welcome Bonus!</div>
-                <div class="promo-text">Get 200% bonus on your first deposit</div>
-                <button class="promo-btn" onclick="window.location.href='deposit.html'">Claim Now</button>
-            </div>
-            <!-- Quick Access Menu -->
-            <div class="quick-access">
-                <div class="quick-item" onclick="window.location.href='deposit.html'">
-                    <div class="quick-icon"><i class="fas fa-coins"></i></div>
-                    <div class="quick-text">Deposit</div>
-                </div>
-                <div class="quick-item" onclick="window.location.href='withdraw.html'">
-                    <div class="quick-icon"><i class="fas fa-wallet"></i></div>
-                    <div class="quick-text">Withdraw</div>
-                </div>
-                <div class="quick-item" onclick="window.location.href='dictionary.html'">
-                    <div class="quick-icon"><i class="fas fa-book"></i></div>
-                    <div class="quick-text">Dictionary</div>
-                </div>
-                <div class="quick-item" onclick="window.location.href='rules_clues.html'">
-                    <div class="quick-icon"><i class="fas fa-lightbulb"></i></div>
-                    <div class="quick-text">Rules & Clues</div>
-                </div>
-                <div class="quick-item" onclick="window.location.href='results.html'">
-                    <div class="quick-icon"><i class="fas fa-chart-bar"></i></div>
-                    <div class="quick-text">Results</div>
-                </div>
-            </div>
-            <!-- Today's Schedule Section -->
-            <div class="featured-section">
-                <div class="section-title">
-                    Today's Schedule <span id="current-date"></span>
-                </div>
-                <div id="todays-schedule" class="schedule-container">
-                    <!-- Today's schedule will be dynamically populated -->
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Brightrose Tech</h1>
+            <div class="profile-card">
+                <img id="header-profile-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Profile" class="profile-img">
+                <div class="profile-info">
+                    <h2 id="header-user-name">Loading...</h2>
+                    <p id="header-user-role">Student</p>
                 </div>
             </div>
         </div>
-        <!-- WordBet Screen Content -->
-        <div id="wordbet-screen" class="screen-content">
-            <div class="wordbet-hero">
-                <div class="wordbet-hero-icon">
-                    <i class="fas fa-font"></i>
-                </div>
-                <div class="wordbet-hero-title">WordBet Games</div>
-                <div class="wordbet-hero-subtitle">Test your vocabulary skills and win big!</div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    Active Games <span class="active-indicator"><i class="fas fa-check-circle"></i> LIVE</span>
-                </div>
-                <div id="active-games-container">
-                    <!-- Active games will be populated here -->
-                </div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    All WordBet Games
-                </div>
-                <div id="all-games-container">
-                    <!-- All games will be populated here -->
-                </div>
-            </div>
-        </div>
-        <!-- SyntaxBet Screen Content -->
-        <div id="syntaxbet-screen" class="screen-content">
-            <div class="syntaxbet-hero">
-                <div class="syntaxbet-hero-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <div class="syntaxbet-hero-title">SyntaxBet Games</div>
-                <div class="syntaxbet-hero-subtitle">Form meaningful sentences and test your syntax skills!</div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    Active Games <span class="active-indicator"><i class="fas fa-check-circle"></i> LIVE</span>
-                </div>
-                <!-- SyntaxBet Game Card -->
-                <div class="syntaxbet-game-card">
-                    <div class="game-status-indicator">ACTIVE</div>
-                    <div class="game-content">
-                        <div class="game-title-large">SyntaxBet Challenge</div>
-                        <div class="game-description">Form meaningful phrases, clauses, or sentences by selecting words in the rightward order. Challenge your syntax skills with our AI-powered evaluation system.</div>
-                        <div class="game-time-display">
-                            <i class="fas fa-clock game-time-icon"></i>
-                            <span>Always Available</span>
-                            <span class="active-indicator"><i class="fas fa-check-circle"></i> ACTIVE</span>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Home Page (Default) -->
+            <div class="home-page">
+                <!-- Hot Courses -->
+                <div class="hot-courses">
+                    <h2 class="section-title">Hot Courses <span>View All</span></h2>
+                    
+                    <div class="course-card" data-course="digital-sales">
+                        <div class="course-header">
+                            <div class="course-title">Digital Sales</div>
+                            <div class="course-badge">HOT</div>
                         </div>
-                        <button class="play-button" onclick="window.location.href='syntaxbet.html'">
-                            PLAY NOW
-                        </button>
-                        <div class="next-session">Available 24/7 - Play anytime!</div>
-                    </div>
-                </div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    How to Play
-                </div>
-                <div class="game-card">
-                    <div class="game-rules">
-                        <div class="rule-title">SyntaxBet Rules</div>
-                        <ul style="padding-left: 20px; margin-top: 10px;">
-                            <li style="margin-bottom: 8px;">Select between 3 and 10 words from the number grid</li>
-                            <li style="margin-bottom: 8px;">Drag the selected words to the sentence area to form a meaningful phrase, clause, or sentence</li>
-                            <li style="margin-bottom: 8px;">Words must be arranged in the correct grammatical order</li>
-                            <li style="margin-bottom: 8px;">Use the AI evaluation to check your sentence's correctness</li>
-                            <li style="margin-bottom: 8px;">Earn points based on the complexity and correctness of your sentences</li>
-                            <li>Challenge yourself to create more complex sentences for higher scores</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Spelling Screen Content -->
-        <div id="spelling-screen" class="screen-content">
-            <div class="spelling-hero">
-                <div class="spelling-hero-icon">
-                    <i class="fas fa-spell-check"></i>
-                </div>
-                <div class="spelling-hero-title">Spelling Games</div>
-                <div class="spelling-hero-subtitle">Test your spelling skills and compete with others!</div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    Active Games <span class="active-indicator"><i class="fas fa-check-circle"></i> LIVE</span>
-                </div>
-                <!-- Spelling Game Card -->
-                <div class="spelling-game-card">
-                    <div class="game-status-indicator">ACTIVE</div>
-                    <div class="game-content">
-                        <div class="game-title-large">Virtual Spelling Challenge</div>
-                        <div class="game-description">Test your spelling skills with our virtual spelling challenges. Compete with other players and improve your vocabulary!</div>
-                        <div class="game-time-display">
-                            <i class="fas fa-clock game-time-icon"></i>
-                            <span>Always Available</span>
-                            <span class="active-indicator"><i class="fas fa-check-circle"></i> ACTIVE</span>
-                        </div>
-                        <button class="play-button" onclick="window.location.href='virtual_spelling.html'">
-                            PLAY NOW
-                        </button>
-                        <div class="next-session">Available 24/7 - Play anytime!</div>
-                    </div>
-                </div>
-            </div>
-            <div class="featured-section">
-                <div class="section-title">
-                    How to Play
-                </div>
-                <div class="game-card">
-                    <div class="game-rules">
-                        <div class="rule-title">Spelling Game Rules</div>
-                        <ul style="padding-left: 20px; margin-top: 10px;">
-                            <li style="margin-bottom: 8px;">Listen to the word pronunciation or read the definition</li>
-                            <li style="margin-bottom: 8px;">Type the correct spelling of the word</li>
-                            <li style="margin-bottom: 8px;">Earn points for each correct answer</li>
-                            <li style="margin-bottom: 8px;">Compete with other players in real-time</li>
-                            <li style="margin-bottom: 8px;">Complete different levels of difficulty</li>
-                            <li>Challenge yourself to improve your spelling skills</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Empty Screens for Other Navigation Items -->
-        <div id="tournaments-screen" class="empty-screen">
-            <div class="empty-icon"><i class="fas fa-trophy"></i></div>
-            <div class="empty-title">Tournaments</div>
-            <div class="empty-text">This section is coming soon!</div>
-            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
-        </div>
-        <!-- Profile Screen Content -->
-        <div id="me-screen" class="profile-screen">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-name" id="profile-display-name">Loading...</div>
-                <div class="profile-level">Level 5 Word Master</div>
-            </div>
-            <div class="profile-stats">
-                <div class="profile-stat">
-                    <div class="stat-number">24</div>
-                    <div class="stat-description">Games Won</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="stat-number">87%</div>
-                    <div class="stat-description">Win Rate</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="stat-number">15</div>
-                    <div class="stat-description">Current Streak</div>
-                </div>
-            </div>
-            <div class="promo-banner">
-                <div class="promo-title">Complete Your Profile!</div>
-                <div class="promo-text">Earn 50 bonus points by completing your profile</div>
-                <button class="promo-btn" onclick="window.location.href='profile.html'">Complete Now</button>
-            </div>
-            <div class="profile-menu">
-                <div class="menu-item" onclick="window.location.href='profile.html'">
-                    <div class="menu-icon"><i class="fas fa-user-circle"></i></div>
-                    <div class="menu-text">My Profile</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-                <div class="menu-item" onclick="window.location.href='game_history.html'">
-                    <div class="menu-icon"><i class="fas fa-history"></i></div>
-                    <div class="menu-text">Game History</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-                <div class="menu-item" onclick="window.location.href='transactions.html'">
-                    <div class="menu-icon"><i class="fas fa-coins"></i></div>
-                    <div class="menu-text">Transactions</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-                <div class="menu-item" onclick="window.location.href='rewards.html'">
-                    <div class="menu-icon"><i class="fas fa-gift"></i></div>
-                    <div class="menu-text">Rewards</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-                <div class="menu-item" onclick="window.location.href='settings.html'">
-                    <div class="menu-icon"><i class="fas fa-cog"></i></div>
-                    <div class="menu-text">Settings</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-                <div class="menu-item" onclick="window.location.href='help_support.html'">
-                    <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
-                    <div class="menu-text">Help & Support</div>
-                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer Section -->
-        <div class="footer">
-            <!-- Footer Links -->
-            <div class="footer-section">
-                <div class="footer-links">
-                    <div class="footer-link" onclick="openModal('faq')">FAQ</div>
-                    <div class="footer-link" onclick="window.location.href='terms_condition.html'">Terms & Conditions</div>
-                    <div class="footer-link" onclick="window.location.href='privacy.html'">Privacy Policy</div>
-                    <div class="footer-link" onclick="window.location.href='help.html'">Help</div>
-                    <div class="footer-link" onclick="window.location.href='contact.html'">Contact Us</div>
-                    <div class="footer-link" onclick="window.location.href='support.html'">Customer Support</div>
-                </div>
-            </div>
-
-            <!-- Social Media Links -->
-            <div class="footer-section">
-                <div class="footer-title">Contact Us</div>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
-                </div>
-            </div>
-
-            <!-- Copyright Notice -->
-            <div class="footer-text">
-                <p>&copy; 2023 EnglaBet. All rights reserved. EnglaBet is a registered trademark.</p>
-                <p>This platform is intended for entertainment purposes only. Please gamble responsibly.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- FAQ Modal -->
-    <div id="faq-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Frequently Asked Questions</div>
-                <button class="modal-close" onclick="closeModal('faq')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <div class="accordion-title">How do I deposit funds?</div>
-                        <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="accordion-content">
-                        <p>You can deposit funds by clicking on the "Deposit" button in the quick access menu. We support various payment methods including bank transfers, credit/debit cards, and mobile money services.</p>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <div class="accordion-title">How do I withdraw my winnings?</div>
-                        <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="accordion-content">
-                        <p>To withdraw your winnings, go to the "Withdraw" section in the quick access menu. Enter the amount you wish to withdraw and select your preferred withdrawal method. Withdrawals are processed within 24-48 hours.</p>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <div class="accordion-title">What happens if I forget my password?</div>
-                        <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="accordion-content">
-                        <p>If you forget your password, click on the "Forgot Password" link on the login page. You will receive an email with instructions to reset your password.</p>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <div class="accordion-title">Are there any age restrictions?</div>
-                        <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="accordion-content">
-                        <p>Yes, you must be at least 18 years old to use our platform. We verify user age during the registration process to ensure compliance with legal requirements.</p>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <div class="accordion-title">How are winners determined?</div>
-                        <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="accordion-content">
-                        <p>Winners are determined based on the accuracy of their word selections and the complexity of their answers. Our AI-powered system evaluates all submissions and ranks them according to predefined criteria.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scroll to Top Button -->
-    <div class="scroll-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
-            authDomain: "englabet-ad1fe.firebaseapp.com",
-            projectId: "englabet-ad1fe",
-            storageBucket: "englabet-ad1fe.firebasestorage.app",
-            messagingSenderId: "124544822433",
-            appId: "1:124544822433:web:c77c980f28c99364c214e0",
-            measurementId: "G-JMYYM433R7"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        // Global user data variable
-        let userData = null;
-        // Day-based game types configuration - UPDATED TO MATCH CORRECTED SCHEDULE
-        const dayGameTypes = {
-            monday: ["DEWDROP", "EVOLUTION", "MIDDAY", "GENIUS", "FAST LANE", "ANGLOPHONES", "CHEETAH", "EXIT"],
-            tuesday: ["DEWDROP", "PEAK", "MIDDAY", "SKYLINE", "WORD BEST", "CHAMPION", "CROSSING", "EXIT"],
-            wednesday: ["DEWDROP", "BREAKFAST", "MIDDAY", "FUN BASE", "CHALLENGE", "SMART", "BRIDGE", "EXIT"],
-            thursday: ["DEWDROP", "STARTER", "MIDDAY", "FREE LUNCH", "ACCESS", "REMINDER", "EXIT"],
-            friday: ["DEWDROP", "INTRO", "MIDDAY", "TGIF", "FLUKE", "OXFORD 3000", "MASTERCLASS", "EXIT"],
-            saturday: ["DEWDROP", "WORDBASE", "MIDDAY", "FREE LUNCH", "AWL", "WEEKEND", "STRUCTURE", "EXIT"],
-            sunday: ["DEWDROP", "RELIEF", "MIDDAY", "WORDFINDER", "WEEKEND EXTRA", "GO-GETTER", "AMBITION", "EXIT"]
-        };
-        // Day-based schedule configuration - UPDATED TO MATCH CORRECTED SCHEDULE
-        const daySchedule = {
-            monday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "EVOLUTION", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "GENIUS", time: "02:00 pm - 04:00 pm" },
-                { name: "FAST LANE", time: "04:00 pm - 06:00 pm" },
-                { name: "ANGLOPHONES", time: "06:00 pm - 08:00 pm" },
-                { name: "CHEETAH", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ],
-            tuesday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "PEAK", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "SKYLINE", time: "02:00 pm - 04:00 pm" },
-                { name: "WORD BEST", time: "04:00 pm - 06:00 pm" },
-                { name: "CHAMPION", time: "06:00 pm - 08:00 pm" },
-                { name: "CROSSING", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ],
-            wednesday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "BREAKFAST", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "FUN BASE", time: "02:00 pm - 04:00 pm" },
-                { name: "CHALLENGE", time: "04:00 pm - 06:00 pm" },
-                { name: "SMART", time: "06:00 pm - 08:00 pm" },
-                { name: "BRIDGE", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ],
-            thursday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "STARTER", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "FREE LUNCH", time: "02:00 pm - 04:00 pm" },
-                { name: "ACCESS", time: "04:00 pm - 06:00 pm" },
-                { name: "REMINDER", time: "06:00 pm - 08:00 pm" },
-                { name: "EXIT", time: "08:00 pm - 10:00 pm" }
-            ],
-            friday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "INTRO", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "TGIF", time: "02:00 pm - 04:00 pm" },
-                { name: "FLUKE", time: "04:00 pm - 06:00 pm" },
-                { name: "OXFORD 3000", time: "06:00 pm - 08:00 pm" },
-                { name: "MASTERCLASS", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ],
-            saturday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "WORDBASE", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "FREE LUNCH", time: "02:00 pm - 04:00 pm" },
-                { name: "AWL", time: "04:00 pm - 06:00 pm" },
-                { name: "WEEKEND", time: "06:00 pm - 08:00 pm" },
-                { name: "STRUCTURE", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ],
-            sunday: [
-                { name: "DEWDROP", time: "08:00 am - 10:00 am" },
-                { name: "RELIEF", time: "10:00 am - 12:00 pm" },
-                { name: "MIDDAY", time: "12:00 pm - 02:00 pm" },
-                { name: "WORDFINDER", time: "02:00 pm - 04:00 pm" },
-                { name: "WEEKEND EXTRA", time: "04:00 pm - 06:00 pm" },
-                { name: "GO-GETTER", time: "06:00 pm - 08:00 pm" },
-                { name: "AMBITION", time: "08:00 pm - 10:00 pm" },
-                { name: "EXIT", time: "10:00 pm - 12:00 am" }
-            ]
-        };
-        // Game descriptions - UPDATED WITH NEW GAMES
-        const gameDescriptions = {
-            "DEWDROP": "Morning word challenge with easy to moderate difficulty. Perfect way to start your day!",
-            "EVOLUTION": "Progressively challenging words that evolve in complexity throughout the game.",
-            "MIDDAY": "Mid-day mental workout with balanced word difficulty to keep you sharp.",
-            "GENIUS": "For the word masters - extremely challenging vocabulary that will test your limits.",
-            "FAST LANE": "Quick-paced word game with time pressure. Think fast!",
-            "ANGLOPHONES": "Focus on English language words and their origins.",
-            "CHEETAH": "Super fast-paced game with rapid word challenges.",
-            "EXIT": "Evening word game to wind down your day with fun challenges.",
-            "PEAK": "Reach the peak of your vocabulary skills with this challenging game.",
-            "SKYLINE": "Words related to cities, architecture, and urban life.",
-            "WORD BEST": "Compete with players worldwide in this competitive word game.",
-            "CHAMPION": "Prove you're the champion of words in this competitive mode.",
-            "CROSSING": "Word crossing game that combines elements of crossword and word search.",
-            "BREAKFAST": "Light morning word game to enjoy with your breakfast.",
-            "FUN BASE": "Fun and casual word game with entertaining challenges.",
-            "CHALLENGE": "Take on special word challenges with unique constraints.",
-            "SMART": "Intelligent word game that adapts to your skill level.",
-            "BRIDGE": "Connect words and concepts in this bridge-building word game.",
-            "STARTER": "Perfect for beginners or as a warm-up game.",
-            "FREE LUNCH": "Noon-time word game with free entry and great rewards.",
-            "ACCESS": "Accessible word game for all skill levels.",
-            "REMINDER": "Game that helps you remember and recall words better.",
-            "INTRO": "Introductory word game for new players.",
-            "TGIF": "Thank God It's Friday! Weekend kickoff word game.",
-            "FLUKE": "Unexpected word challenges that might surprise you.",
-            "OXFORD 3000": "Based on the Oxford 3000 most important words to know in English.",
-            "MASTERCLASS": "Learn from the masters with advanced vocabulary and concepts.",
-            "WORDBASE": "Build your vocabulary foundation with this educational game.",
-            "AWL": "Academic Word List challenge for advanced learners.",
-            "WEEKEND": "Relaxed weekend word game with fun themes.",
-            "STRUCTURE": "Focus on word structure, prefixes, suffixes, and roots.",
-            "RELIEF": "Sunday relief game with easier challenges.",
-            "WORDFINDER": "Find hidden words in complex puzzles.",
-            "WEEKEND EXTRA": "Bonus weekend word challenge.",
-            "GO-GETTER": "For ambitious players who want to excel.",
-            "AMBITION": "Challenge your word ambition with this difficult game."
-        };
-        // Function to fetch user data from Firestore
-        async function fetchUserData() {
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists) {
-                    console.error('User data not found');
-                    return;
-                }
-                userData = userDoc.data();
-                updateUserUI();
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        }
-        // Update UI with user data
-        function updateUserUI() {
-            if (!userData) return;
-            const balanceElement = document.getElementById('user-balance-display');
-            if (balanceElement && userData.balance !== undefined) {
-                balanceElement.textContent = `₦ ${userData.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            }
-            const profileNameElement = document.getElementById('profile-display-name');
-            if (profileNameElement && userData.firstName && userData.lastName) {
-                profileNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
-            }
-        }
-        // Fixed: Convert time string to minutes with robust parsing
-        function convertTimeToMinutes(timeStr) {
-            const match = timeStr.trim().match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
-            if (!match) return 0;
-            let hours = parseInt(match[1]);
-            const minutes = parseInt(match[2]);
-            const modifier = match[3].toLowerCase();
-            if (hours === 12 && modifier === 'am') {
-                hours = 0;
-            } else if (hours !== 12 && modifier === 'pm') {
-                hours += 12;
-            }
-            return hours * 60 + minutes;
-        }
-        // Function to populate game types based on current day
-        function populateGameTypes() {
-            const today = new Date().getDay();
-            const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const currentDay = dayNames[today];
-            const gameTypes = dayGameTypes[currentDay] || dayGameTypes.monday;
-            const gameTypesContainer = document.getElementById('game-types-container');
-            gameTypesContainer.innerHTML = '';
-            gameTypes.forEach((type, index) => {
-                const gameTypeElement = document.createElement('div');
-                gameTypeElement.className = 'game-type' + (index === 0 ? ' game-type-active' : '');
-                gameTypeElement.textContent = type;
-                gameTypeElement.dataset.gameType = type;
-                gameTypeElement.onclick = function() {
-                    document.querySelectorAll('.game-type').forEach(el => el.classList.remove('game-type-active'));
-                    this.classList.add('game-type-active');
-                    const isActive = isGameActive(type);
-                    if (isActive) {
-                        const pageMap = {
-                            "DEWDROP": "dewdrop.html",
-                            "EVOLUTION": "evolution.html",
-                            "MIDDAY": "midday.html",
-                            "GENIUS": "genius.html",
-                            "FAST LANE": "fast_lane.html",
-                            "ANGLOPHONES": "anglophones.html",
-                            "CHEETAH": "cheetah.html",
-                            "EXIT": "exit.html",
-                            "PEAK": "peak.html",
-                            "SKYLINE": "skyline.html",
-                            "WORD BEST": "word_best.html",
-                            "CHAMPION": "champion.html",
-                            "CROSSING": "crossing.html",
-                            "BREAKFAST": "breakfast.html",
-                            "FUN BASE": "fun_base.html",
-                            "CHALLENGE": "challenge.html",
-                            "SMART": "smart.html",
-                            "BRIDGE": "bridge.html",
-                            "STARTER": "starter.html",
-                            "FREE LUNCH": "free_lunch.html",
-                            "ACCESS": "access.html",
-                            "REMINDER": "reminder.html",
-                            "INTRO": "intro.html",
-                            "TGIF": "tgif.html",
-                            "FLUKE": "fluke.html",
-                            "OXFORD 3000": "oxford_3000.html",
-                            "MASTERCLASS": "masterclass.html",
-                            "WORDBASE": "wordbase.html",
-                            "AWL": "awl.html",
-                            "WEEKEND": "weekend.html",
-                            "STRUCTURE": "structure.html",
-                            "RELIEF": "relief.html",
-                            "WORDFINDER": "wordfinder.html",
-                            "WEEKEND EXTRA": "weekend_extra.html",
-                            "GO-GETTER": "go_getter.html",
-                            "AMBITION": "ambition.html"
-                        };
-                        const targetPage = pageMap[type] || `${type.toLowerCase().replace(' ', '_')}.html`;
-                        window.location.href = targetPage;
-                    } else {
-                        alert(`${type} is not active right now. Please check the schedule for active times.`);
-                    }
-                };
-                gameTypesContainer.appendChild(gameTypeElement);
-            });
-        }
-        // Function to check if a game is currently active
-        function isGameActive(gameName) {
-            const today = new Date();
-            const dayIndex = today.getDay();
-            const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const currentDay = dayNames[dayIndex];
-            const schedule = daySchedule[currentDay] || daySchedule.monday;
-            const game = schedule.find(g => g.name === gameName);
-            if (!game) return false;
-            const [startStr, endStr] = game.time.split('-').map(s => s.trim());
-            const startTime = convertTimeToMinutes(startStr);
-            const endTime = convertTimeToMinutes(endStr);
-            const currentTime = today.getHours() * 60 + today.getMinutes();
-            return currentTime >= startTime && currentTime <= endTime;
-        }
-        // Function to get the currently active WordBet game
-        function getActiveWordBetGame() {
-            const today = new Date();
-            const dayIndex = today.getDay();
-            const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const currentDay = dayNames[dayIndex];
-            const schedule = daySchedule[currentDay] || daySchedule.monday;
-            const currentTime = today.getHours() * 60 + today.getMinutes();
-            
-            for (const game of schedule) {
-                const [startStr, endStr] = game.time.split('-').map(s => s.trim());
-                const startTime = convertTimeToMinutes(startStr);
-                const endTime = convertTimeToMinutes(endStr);
-                
-                if (currentTime >= startTime && currentTime <= endTime) {
-                    return game;
-                }
-            }
-            return null;
-        }
-        // Function to populate schedule based on current day
-        function populateSchedule() {
-            const today = new Date();
-            const dayIndex = today.getDay();
-            const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const dayNamesFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const currentDay = dayNames[dayIndex];
-            document.getElementById('current-date').textContent = `- ${dayNamesFull[dayIndex]}, ${today.toLocaleDateString()}`;
-            const schedule = daySchedule[currentDay] || daySchedule.monday;
-            const todaysScheduleContainer = document.getElementById('todays-schedule');
-            todaysScheduleContainer.innerHTML = '';
-            const currentTime = today.getHours() * 60 + today.getMinutes();
-            schedule.forEach(game => {
-                const [startStr, endStr] = game.time.split('-').map(s => s.trim());
-                const startTime = convertTimeToMinutes(startStr);
-                const endTime = convertTimeToMinutes(endStr);
-                let status = '';
-                if (currentTime >= startTime && currentTime <= endTime) {
-                    status = '<span class="live-now">ACTIVE</span>';  // Changed from "LIVE NOW"
-                } else if (currentTime < startTime) {
-                    status = '<span class="upcoming">UP NEXT</span>';  // Changed from "UPCOMING"
-                }
-                const scheduleItem = document.createElement('div');
-                scheduleItem.className = 'schedule-item';
-                scheduleItem.innerHTML = `
-                    <div>
-                        <div class="game-name">${game.name}</div>
-                        <div class="game-time-slot">${game.time}</div>
-                    </div>
-                    ${status}
-                `;
-                todaysScheduleContainer.appendChild(scheduleItem);
-            });
-        }
-        // Function to populate WordBet games
-        function populateWordBetGames() {
-            const today = new Date();
-            const dayIndex = today.getDay();
-            const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const currentDay = dayNames[dayIndex];
-            const schedule = daySchedule[currentDay] || daySchedule.monday;
-            const activeGamesContainer = document.getElementById('active-games-container');
-            const allGamesContainer = document.getElementById('all-games-container');
-            activeGamesContainer.innerHTML = '';
-            allGamesContainer.innerHTML = '';
-            const currentTime = today.getHours() * 60 + today.getMinutes();
-            let hasActiveGames = false;
-            schedule.forEach(game => {
-                const [startStr, endStr] = game.time.split('-').map(s => s.trim());
-                const startTime = convertTimeToMinutes(startStr);
-                const endTime = convertTimeToMinutes(endStr);
-                const isActive = currentTime >= startTime && currentTime <= endTime;
-                if (isActive) hasActiveGames = true;
-                const gameCard = document.createElement('div');
-                gameCard.className = `wordbet-game-card ${isActive ? 'shine-effect' : ''}`;
-                gameCard.innerHTML = `
-                    <div class="game-status-indicator ${isActive ? 'status-active' : (currentTime < startTime ? 'status-upcoming' : 'status-offline')}">
-                        ${isActive ? 'ACTIVE' : (currentTime < startTime ? 'UP NEXT' : 'OFFLINE')}
-                    </div>
-                    <div class="game-content">
-                        <div class="game-title-large">${game.name}</div>
-                        <div class="game-description">${gameDescriptions[game.name] || 'Word challenge game'}</div>
-                        <div class="game-time-display">
-                            <i class="fas fa-clock game-time-icon"></i>
-                            <span>${game.time}</span>
-                            ${isActive ? '<span class="active-indicator"><i class="fas fa-check-circle"></i> ACTIVE</span>' : 
-                              (currentTime > endTime ? '<span class="offline-indicator"><i class="fas fa-power-off"></i> OFFLINE</span>' : '')}
-                        </div>
-                        <button class="play-button" ${!isActive ? 'disabled' : ''} onclick="handlePlayGame('${game.name}', ${isActive})">
-                            ${isActive ? 'PLAY NOW' : 'GAME OFFLINE'}
-                        </button>
-                        ${!isActive && currentTime < startTime ? 
-                          `<div class="next-session">Next session: ${game.time}</div>` : ''}
-                        ${!isActive && currentTime > endTime ? 
-                          `<div class="next-session">Check tomorrow's schedule for next session</div>` : ''}
-                    </div>
-                `;
-                if (isActive) {
-                    activeGamesContainer.appendChild(gameCard);
-                } else {
-                    allGamesContainer.appendChild(gameCard);
-                }
-            });
-            if (!hasActiveGames) {
-                activeGamesContainer.innerHTML = `
-                    <div class="wordbet-game-card">
-                        <div class="game-content">
-                            <div class="game-title-large">No Active Games Right Now</div>
-                            <div class="game-description">Check the schedule below for upcoming games today</div>
-                            <div class="game-time-display">
-                                <i class="fas fa-clock game-time-icon"></i>
-                                <span>Current time: ${today.toLocaleTimeString()}</span>
+                        <div class="course-content">
+                            <p>Master the art of digital sales with our comprehensive course designed for modern professionals.</p>
+                            <div class="course-actions">
+                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-live">Live Session</button>
                             </div>
                         </div>
                     </div>
-                `;
+                    
+                    <div class="course-card" data-course="starter-bootcamp">
+                        <div class="course-header">
+                            <div class="course-title">Starter Bootcamp</div>
+                            <div class="course-badge">NEW</div>
+                        </div>
+                        <div class="course-content">
+                            <p>Kickstart your tech career with our intensive bootcamp covering essential skills.</p>
+                            <div class="course-actions">
+                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-live">Live Session</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="course-card" data-course="virtual-assistance">
+                        <div class="course-header">
+                            <div class="course-title">Virtual Assistance</div>
+                            <div class="course-badge">POPULAR</div>
+                        </div>
+                        <div class="course-content">
+                            <p>Learn how to become a successful virtual assistant with our specialized training program.</p>
+                            <div class="course-actions">
+                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-live">Live Session</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Lesson -->
+                <div class="video-section">
+                    <h2 class="section-title">Today's Lesson</h2>
+                    
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Introduction to Digital Marketing</div>
+                            <div class="video-desc">Learn the fundamentals of digital marketing in this comprehensive lesson.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hot Lessons -->
+                <div class="video-section">
+                    <h2 class="section-title">Hot Lessons</h2>
+                    
+                    <div class="video-card">
+                        <div class="video-thumbnail" style="background: linear-gradient(45deg, #FF6584, #6C63FF);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Advanced Sales Techniques</div>
+                            <div class="video-desc">Master advanced strategies to boost your sales performance.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Carousel -->
+                <div class="image-carousel">
+                    <div class="carousel-track">
+                        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80');"></div>
+                        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80');"></div>
+                        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80');"></div>
+                    </div>
+                    <div class="carousel-nav">
+                        <div class="carousel-dot active"></div>
+                        <div class="carousel-dot"></div>
+                        <div class="carousel-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courses Page -->
+            <div class="courses-page">
+                <h2 class="section-title">Available Courses</h2>
+                
+                <div class="course-list">
+                    <div class="course-item" data-course="starter-bootcamp">
+                        <div class="course-item-header">
+                            <div class="course-name">Starter Bootcamp</div>
+                            <div class="course-price">FREE</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 1 Week</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile</div>
+                        </div>
+                        <div class="course-status">Complete beginner-friendly tech introduction</div>
+                        <div class="course-action">
+                            <button class="btn-learn">Start Course</button>
+                        </div>
+                    </div>
+                    
+                    <div class="course-item" data-course="remote-work">
+                        <div class="course-item-header">
+                            <div class="course-name">Remote Work Mastery</div>
+                            <div class="course-price">FREE</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 2 Weeks</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile</div>
+                        </div>
+                        <div class="course-status">Master remote work skills and productivity</div>
+                        <div class="course-action">
+                            <button class="btn-learn" id="remote-work-btn">Start Course</button>
+                        </div>
+                    </div>
+                    
+                    <div class="course-item" data-course="digital-sales">
+                        <div class="course-item-header">
+                            <div class="course-name">Digital Sales</div>
+                            <div class="course-price">$69</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 2 Weeks</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile</div>
+                        </div>
+                        <div class="course-status">Master digital sales strategies and techniques</div>
+                        <div class="course-action">
+                            <button class="btn-learn">Start Course</button>
+                        </div>
+                    </div>
+                    
+                    <div class="course-item" data-course="tech-support">
+                        <div class="course-item-header">
+                            <div class="course-name">Tech Support (M365)</div>
+                            <div class="course-price">$99</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 4 Weeks</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile + PC</div>
+                        </div>
+                        <div class="course-status">Become a certified Microsoft 365 support specialist</div>
+                        <div class="course-action">
+                            <button class="btn-learn">Start Course</button>
+                        </div>
+                    </div>
+                    
+                    <div class="course-item" data-course="ai-prompting">
+                        <div class="course-item-header">
+                            <div class="course-name">Intro to AI & Prompting</div>
+                            <div class="course-price">$39</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 1 Week</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile</div>
+                        </div>
+                        <div class="course-status">Learn AI fundamentals and effective prompting</div>
+                        <div class="course-action">
+                            <button class="btn-learn">Start Course</button>
+                        </div>
+                    </div>
+                    
+                    <div class="course-item" data-course="virtual-assistance">
+                        <div class="course-item-header">
+                            <div class="course-name">Virtual Assistance</div>
+                            <div class="course-price">$79</div>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-detail"><i class="far fa-clock"></i> 2 Weeks</div>
+                            <div class="course-detail"><i class="fas fa-mobile-alt"></i> Mobile</div>
+                        </div>
+                        <div class="course-status">Become a professional virtual assistant</div>
+                        <div class="course-action">
+                            <button class="btn-learn">Start Course</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="why-choose" style="margin-top: 30px; text-align: center; padding: 20px; background: white; border-radius: 16px; box-shadow: var(--card-shadow);">
+                    <h2 style="margin-bottom: 15px;">Why Choose Brightrose Tech?</h2>
+                    <p style="margin-bottom: 20px; color: var(--gray);">We provide industry-leading courses with practical skills and expert guidance to help you succeed in the digital world.</p>
+                    <button class="btn btn-enroll" style="width: 100%;">Enroll Now</button>
+                </div>
+            </div>
+
+            <!-- Course Details Page -->
+            <div class="course-details-page">
+                <div class="course-hero">
+                    <h1 id="course-details-title">Digital Sales</h1>
+                    <p id="course-details-desc">Master the art of digital sales with our comprehensive course designed for modern professionals.</p>
+                    <div class="course-meta">
+                        <div class="meta-item"><i class="far fa-clock"></i> <span id="course-duration">2 Weeks</span></div>
+                        <div class="meta-item"><i class="fas fa-layer-group"></i> <span id="course-modules">5 Modules</span></div>
+                        <div class="meta-item"><i class="fas fa-trophy"></i> Certificate</div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="course-progress"></div>
+                    </div>
+                    <div class="progress-text">Progress: <span id="progress-percentage">0%</span></div>
+                </div>
+                
+                <div class="course-tabs">
+                    <div class="course-tab active" data-tab="modules">Modules</div>
+                    <div class="course-tab" data-tab="resources">Resources</div>
+                    <div class="course-tab" data-tab="discussions">Discussions</div>
+                </div>
+                
+                <div class="tab-content active" id="modules-tab">
+                    <div class="module-list" id="module-list">
+                        <!-- Modules will be dynamically populated -->
+                    </div>
+                    <button class="btn btn-primary" id="start-exam-btn" style="width: 100%;">Take Final Exam</button>
+                </div>
+                
+                <div class="tab-content" id="resources-tab">
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="module-info">
+                                <div class="module-title">Course Syllabus</div>
+                                <div class="module-desc">Detailed outline of the course content</div>
+                            </div>
+                            <div class="module-status">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="module-info">
+                                <div class="module-title">Workbook</div>
+                                <div class="module-desc">Exercises and activities to practice</div>
+                            </div>
+                            <div class="module-status">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="module-info">
+                                <div class="module-title">Video Resources</div>
+                                <div class="module-desc">Additional video content</div>
+                            </div>
+                            <div class="module-status">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="discussions-tab">
+                    <div class="post-form">
+                        <textarea class="post-input" placeholder="Ask a question or share your thoughts..."></textarea>
+                        <div class="post-actions">
+                            <button class="btn-post">Post</button>
+                        </div>
+                    </div>
+                    
+                    <div class="feed">
+                        <div class="post">
+                            <div class="post-header">
+                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="User" class="post-avatar">
+                                <div>
+                                    <div class="post-user">Sarah Johnson</div>
+                                    <div class="post-time">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                Can someone explain the difference between inbound and outbound sales strategies?
+                            </div>
+                            <div class="post-engagement">
+                                <div class="engagement-btn"><i class="far fa-heart"></i> 5</div>
+                                <div class="engagement-btn"><i class="far fa-comment"></i> 3</div>
+                            </div>
+                        </div>
+                        
+                        <div class="post">
+                            <div class="post-header">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="User" class="post-avatar">
+                                <div>
+                                    <div class="post-user">Michael Chen</div>
+                                    <div class="post-time">5 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                I found the CRM integration section really helpful. Any recommendations for CRM tools for small businesses?
+                            </div>
+                            <div class="post-engagement">
+                                <div class="engagement-btn"><i class="far fa-heart"></i> 8</div>
+                                <div class="engagement-btn"><i class="far fa-comment"></i> 7</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Page -->
+            <div class="exam-page">
+                <div class="exam-header">
+                    <h2 id="exam-title">Digital Sales Final Exam</h2>
+                    <div class="exam-timer" id="exam-timer">30:00</div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-number">Question <span id="current-question">1</span> of <span id="total-questions">10</span></div>
+                    <div class="question-text" id="question-text">What is the primary goal of digital sales?</div>
+                    
+                    <div class="options-list" id="options-list">
+                        <!-- Options will be dynamically populated -->
+                    </div>
+                    
+                    <div class="exam-navigation">
+                        <button class="btn btn-secondary" id="prev-question">Previous</button>
+                        <button class="btn btn-primary" id="next-question">Next</button>
+                    </div>
+                </div>
+                
+                <div class="question-progress">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="exam-progress"></div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="submit-exam" style="width: 100%; margin-top: 20px; display: none;">Submit Exam</button>
+            </div>
+
+            <!-- Results Page -->
+            <div class="results-page">
+                <div class="results-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="results-score" id="results-score">85%</div>
+                <div class="results-message" id="results-message">Congratulations! You passed the exam.</div>
+                <div class="results-details">
+                    <p>Correct Answers: <span id="correct-answers">8</span>/<span id="total-answers">10</span></p>
+                    <p>Time Taken: <span id="time-taken">25:30</span></p>
+                </div>
+                <button class="btn btn-certificate" id="generate-certificate">Generate Certificate</button>
+            </div>
+
+            <!-- Certificate Page -->
+            <div class="certificate-page">
+                <div class="certificate-container" id="certificate-container">
+                    <div class="certificate-header">
+                        <div class="certificate-title">Certificate of Completion</div>
+                        <div class="certificate-subtitle">This certifies that</div>
+                    </div>
+                    <div class="certificate-body">
+                        <div class="certificate-name" id="certificate-name">Alex Morgan</div>
+                        <div class="certificate-course" id="certificate-course">Digital Sales</div>
+                        <div class="certificate-date" id="certificate-date">Completed on October 15, 2023</div>
+                        <p>has successfully completed all requirements and demonstrated proficiency in the course material.</p>
+                    </div>
+                    <div class="certificate-footer">
+                        <div class="signature">
+                            <div class="signature-line"></div>
+                            <div>Nmegwa Denis Bright</div>
+                            <div>Founder & Tutor</div>
+                        </div>
+                        <div class="signature">
+                            <div class="signature-line"></div>
+                            <div>Brightrose Tech</div>
+                            <div>Date</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-download" id="download-certificate">Download Certificate</button>
+            </div>
+
+            <!-- Community Page -->
+            <div class="community-page">
+                <h2 class="section-title">Community</h2>
+                
+                <div class="post-form">
+                    <textarea class="post-input" id="post-content" placeholder="Share something with the community..."></textarea>
+                    <div class="post-actions">
+                        <div class="media-options">
+                            <div class="media-option" id="image-upload">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="media-option" id="video-upload">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="media-option" id="file-upload">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                        </div>
+                        <button class="btn-post" id="submit-post">Post</button>
+                    </div>
+                    <div id="upload-preview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div class="feed" id="community-feed">
+                    <!-- Posts will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="profile-page">
+                <div class="profile-header">
+                    <img id="profile-picture" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Profile" class="profile-picture">
+                    <div class="profile-name" id="profile-fullname">Loading...</div>
+                    <div class="profile-email" id="profile-email">Loading...</div>
+                </div>
+                
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Edit Profile</div>
+                            <div class="setting-desc">Update your personal information</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Notifications</div>
+                            <div class="setting-desc">Manage your notification preferences</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Privacy & Security</div>
+                            <div class="setting-desc">Control your privacy settings</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Help & Support</div>
+                            <div class="setting-desc">Get help and contact support</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Settings</div>
+                            <div class="setting-desc">App and account settings</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="setting-info">
+                            <div class="setting-title">Logout</div>
+                            <div class="setting-desc">Sign out of your account</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-page="home">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" data-page="courses">
+                <div class="nav-icon"><i class="fas fa-book-open"></i></div>
+                <div class="nav-label">Courses</div>
+            </div>
+            <div class="nav-item" data-page="community">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <div class="nav-label">Community</div>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div class="nav-label">Me</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDOTkG_q_qqrD9SeIFMaIpvXmnfNtNktY",
+            authDomain: "brightrose-e594b.firebaseapp.com",
+            projectId: "brightrose-e594b",
+            storageBucket: "brightrose-e594b.firebasestorage.app",
+            messagingSenderId: "495303509160",
+            appId: "1:495303509160:web:1e945ec888138ff0d2ae9d",
+            measurementId: "G-NFQP67NQ45"
+        };
+
+        // Cloudinary configuration
+        const cloudName = 'dhoa1mdew';
+        const unsignedUploadPreset = 'unigned';
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const storage = firebase.storage();
+
+        // Course data structure
+        const courses = {
+            "digital-sales": {
+                title: "Digital Sales",
+                description: "Master the art of digital sales with our comprehensive course designed for modern professionals.",
+                duration: "2 Weeks",
+                modules: 5,
+                progress: 60,
+                modulesList: [
+                    {
+                        title: "Introduction to Digital Sales",
+                        description: "Understanding the fundamentals of digital sales",
+                        duration: "2 hours",
+                        completed: true
+                    },
+                    {
+                        title: "Sales Funnel Optimization",
+                        description: "Creating and optimizing effective sales funnels",
+                        duration: "3 hours",
+                        completed: true
+                    },
+                    {
+                        title: "CRM Implementation",
+                        description: "Setting up and using CRM systems effectively",
+                        duration: "4 hours",
+                        completed: true
+                    },
+                    {
+                        title: "Social Media Selling",
+                        description: "Leveraging social media for sales success",
+                        duration: "3 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Closing Techniques",
+                        description: "Advanced techniques for closing digital sales",
+                        duration: "2 hours",
+                        completed: false
+                    }
+                ],
+                exam: {
+                    title: "Digital Sales Final Exam",
+                    duration: 30, // minutes
+                    questions: [
+                        {
+                            question: "What is the primary goal of digital sales?",
+                            options: [
+                                "To increase website traffic",
+                                "To generate qualified leads and convert them into customers",
+                                "To improve social media engagement",
+                                "To reduce marketing costs"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            question: "Which of the following is NOT a key component of a sales funnel?",
+                            options: [
+                                "Awareness",
+                                "Consideration",
+                                "Conversion",
+                                "Elimination"
+                            ],
+                            correctAnswer: 3
+                        },
+                        {
+                            question: "What does CRM stand for in sales?",
+                            options: [
+                                "Customer Relationship Management",
+                                "Customer Retention Model",
+                                "Client Response Mechanism",
+                                "Corporate Revenue Management"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which social media platform is most effective for B2B sales?",
+                            options: [
+                                "Instagram",
+                                "TikTok",
+                                "LinkedIn",
+                                "Snapchat"
+                            ],
+                            correctAnswer: 2
+                        },
+                        {
+                            question: "What is the purpose of a call-to-action (CTA) in digital sales?",
+                            options: [
+                                "To make the website look more professional",
+                                "To guide users toward the next step in the sales process",
+                                "To increase page loading speed",
+                                "To improve search engine rankings"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            question: "Which metric is most important for measuring sales performance?",
+                            options: [
+                                "Website visitors",
+                                "Conversion rate",
+                                "Social media followers",
+                                "Email open rate"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            question: "What is 'lead nurturing' in digital sales?",
+                            options: [
+                                "Developing relationships with potential customers at every stage of the sales funnel",
+                                "Creating more leads through advertising",
+                                "Training new sales team members",
+                                "Automating the sales process completely"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which tool is commonly used for email marketing in sales?",
+                            options: [
+                                "Salesforce",
+                                "Mailchimp",
+                                "Google Analytics",
+                                "Trello"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            question: "What is the '80/20 rule' in sales?",
+                            options: [
+                                "80% of sales come from 20% of customers",
+                                "80% of time should be spent on administrative tasks",
+                                "80% of marketing budget should go to digital channels",
+                                "80% of leads will convert without follow-up"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which closing technique involves presenting two positive options?",
+                            options: [
+                                "The Assumptive Close",
+                                "The Alternative Close",
+                                "The Summary Close",
+                                "The Urgency Close"
+                            ],
+                            correctAnswer: 1
+                        }
+                    ]
+                }
+            },
+            "starter-bootcamp": {
+                title: "Starter Bootcamp",
+                description: "Kickstart your tech career with our intensive bootcamp covering essential skills.",
+                duration: "1 Week",
+                modules: 4,
+                progress: 25,
+                modulesList: [
+                    {
+                        title: "Introduction to Tech Careers",
+                        description: "Exploring different paths in the tech industry",
+                        duration: "2 hours",
+                        completed: true
+                    },
+                    {
+                        title: "Essential Digital Tools",
+                        description: "Mastering the tools every tech professional needs",
+                        duration: "3 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Basic Coding Concepts",
+                        description: "Understanding the fundamentals of programming",
+                        duration: "4 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Building Your Portfolio",
+                        description: "Creating a standout portfolio to showcase your skills",
+                        duration: "2 hours",
+                        completed: false
+                    }
+                ],
+                exam: {
+                    title: "Starter Bootcamp Final Exam",
+                    duration: 20,
+                    questions: [
+                        {
+                            question: "What is the most important skill for a tech professional?",
+                            options: [
+                                "Problem-solving",
+                                "Memorization",
+                                "Typing speed",
+                                "Social media presence"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which programming language is best for beginners?",
+                            options: [
+                                "Python",
+                                "C++",
+                                "Assembly",
+                                "HTML"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "What does HTML stand for?",
+                            options: [
+                                "HyperText Markup Language",
+                                "HighTech Modern Language",
+                                "HyperTransfer Markup Language",
+                                "HighText Modern Layout"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which of these is a version control system?",
+                            options: [
+                                "Git",
+                                "Java",
+                                "Photoshop",
+                                "Excel"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "What is the purpose of CSS?",
+                            options: [
+                                "To style web pages",
+                                "To create database queries",
+                                "To handle server logic",
+                                "To manage user authentication"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which of these is NOT a programming language?",
+                            options: [
+                                "JavaScript",
+                                "Python",
+                                "HTML",
+                                "Java"
+                            ],
+                            correctAnswer: 2
+                        },
+                        {
+                            question: "What is an API?",
+                            options: [
+                                "Application Programming Interface",
+                                "Advanced Programming Instruction",
+                                "Automated Program Integration",
+                                "Application Process Interface"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which tool is used for project management in tech teams?",
+                            options: [
+                                "Trello",
+                                "Photoshop",
+                                "Microsoft Word",
+                                "Google Search"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "What is the purpose of a database?",
+                            options: [
+                                "To store and organize data",
+                                "To design user interfaces",
+                                "To write code faster",
+                                "To test applications"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which of these is a frontend framework?",
+                            options: [
+                                "React",
+                                "Node.js",
+                                "Django",
+                                "Spring"
+                            ],
+                            correctAnswer: 0
+                        }
+                    ]
+                }
+            },
+            "virtual-assistance": {
+                title: "Virtual Assistance",
+                description: "Learn how to become a successful virtual assistant with our specialized training program.",
+                duration: "2 Weeks",
+                modules: 6,
+                progress: 40,
+                modulesList: [
+                    {
+                        title: "Introduction to Virtual Assistance",
+                        description: "Understanding the role and opportunities",
+                        duration: "2 hours",
+                        completed: true
+                    },
+                    {
+                        title: "Essential Tools and Software",
+                        description: "Mastering the tools for virtual work",
+                        duration: "3 hours",
+                        completed: true
+                    },
+                    {
+                        title: "Communication Skills",
+                        description: "Effective communication with clients",
+                        duration: "2 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Time Management",
+                        description: "Managing multiple clients and tasks",
+                        duration: "2 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Specialized Services",
+                        description: "Offering niche virtual assistance services",
+                        duration: "3 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Building Your Business",
+                        description: "Finding clients and growing your VA business",
+                        duration: "2 hours",
+                        completed: false
+                    }
+                ],
+                exam: {
+                    title: "Virtual Assistance Final Exam",
+                    duration: 25,
+                    questions: [
+                        {
+                            question: "What is the primary advantage of being a virtual assistant?",
+                            options: [
+                                "Flexibility and location independence",
+                                "Guaranteed high income",
+                                "No need for specialized skills",
+                                "Limited working hours"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            question: "Which tool is essential for project management as a VA?",
+                            options: [
+                                "Trello or Asana",
+                                "Photoshop",
+                                "QuickBooks",
+                                "Google Ads"
+                            ],
+                            correctAnswer: 0
+                        }
+                    ]
+                }
+            },
+            "remote-work": {
+                title: "Remote Work Mastery",
+                description: "Master the skills and strategies needed to excel in remote work environments.",
+                duration: "2 Weeks",
+                modules: 6,
+                progress: 0,
+                modulesList: [
+                    {
+                        title: "Remote Work Fundamentals",
+                        description: "Understanding the core principles of remote work",
+                        duration: "2 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Setting Up Your Workspace",
+                        description: "Creating an effective home office environment",
+                        duration: "1.5 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Communication & Collaboration",
+                        description: "Mastering remote communication tools and techniques",
+                        duration: "3 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Productivity & Time Management",
+                        description: "Staying focused and productive while working remotely",
+                        duration: "2.5 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Work-Life Balance",
+                        description: "Maintaining healthy boundaries and avoiding burnout",
+                        duration: "2 hours",
+                        completed: false
+                    },
+                    {
+                        title: "Remote Career Advancement",
+                        description: "Growing your career in a remote environment",
+                        duration: "1.5 hours",
+                        completed: false
+                    }
+                ],
+                exam: {
+                    title: "Remote Work Mastery Final Exam",
+                    duration: 30,
+                    questions: [
+                        {
+                            question: "What is the most important factor for successful remote work?",
+                            options: [
+                                "Having the fastest internet connection",
+                                "Maintaining clear communication with your team",
+                                "Working longer hours than everyone else",
+                                "Having an expensive home office setup"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            question: "Which of these is NOT a recommended practice for virtual meetings?",
+                            options: [
+                                "Setting a clear agenda beforehand",
+                                "Turning on your camera when possible",
+                                "Multitasking during the meeting",
+                                "Muting your microphone when not speaking"
+                            ],
+                            correctAnswer: 2
+                        }
+                    ]
+                }
             }
-        }
-        // Handle play game button click
-        function handlePlayGame(gameName, isActive) {
-            if (!isActive) {
-                alert(`Sorry, ${gameName} is not active right now. Please check the schedule for active times.`);
-                return;
-            }
-            const gamePageMap = {
-                "DEWDROP": "dewdrop.html",
-                "EVOLUTION": "evolution.html",
-                "MIDDAY": "midday.html",
-                "GENIUS": "genius.html",
-                "FAST LANE": "fast_lane.html",
-                "ANGLOPHONES": "anglophones.html",
-                "CHEETAH": "cheetah.html",
-                "EXIT": "exit.html",
-                "PEAK": "peak.html",
-                "SKYLINE": "skyline.html",
-                "WORD BEST": "word_best.html",
-                "CHAMPION": "champion.html",
-                "CROSSING": "crossing.html",
-                "BREAKFAST": "breakfast.html",
-                "FUN BASE": "fun_base.html",
-                "CHALLENGE": "challenge.html",
-                "SMART": "smart.html",
-                "BRIDGE": "bridge.html",
-                "STARTER": "starter.html",
-                "FREE LUNCH": "free_lunch.html",
-                "ACCESS": "access.html",
-                "REMINDER": "reminder.html",
-                "INTRO": "intro.html",
-                "TGIF": "tgif.html",
-                "FLUKE": "fluke.html",
-                "OXFORD 3000": "oxford_3000.html",
-                "MASTERCLASS": "masterclass.html",
-                "WORDBASE": "wordbase.html",
-                "AWL": "awl.html",
-                "WEEKEND": "weekend.html",
-                "STRUCTURE": "structure.html",
-                "RELIEF": "relief.html",
-                "WORDFINDER": "wordfinder.html",
-                "WEEKEND EXTRA": "weekend_extra.html",
-                "GO-GETTER": "go_getter.html",
-                "AMBITION": "ambition.html"
-            };
-            const targetPage = gamePageMap[gameName] || `${gameName.toLowerCase().replace(' ', '_')}.html`;
-            window.location.href = targetPage;
-        }
+        };
+
+        // Global variables
+        let currentCourse = null;
+        let currentExam = null;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let examTimer = null;
+        let timeRemaining = 0;
+        let examStartTime = null;
+        let currentUser = null;
+        let userData = null;
+        let uploadedMedia = null;
+
+        // DOM elements
+        const homePage = document.querySelector('.home-page');
+        const coursesPage = document.querySelector('.courses-page');
+        const courseDetailsPage = document.querySelector('.course-details-page');
+        const examPage = document.querySelector('.exam-page');
+        const resultsPage = document.querySelector('.results-page');
+        const certificatePage = document.querySelector('.certificate-page');
+        const communityPage = document.querySelector('.community-page');
+        const profilePage = document.querySelector('.profile-page');
+
         // Navigation functionality
-        function navigateTo(screenId) {
-            document.querySelectorAll('.screen-content, .empty-screen, .profile-screen').forEach(screen => {
-                screen.style.display = 'none';
-            });
-            // Update top navigation
-            document.querySelectorAll('.top-nav-item').forEach(item => {
-                item.classList.remove('top-nav-active', 'wordbet-nav-active', 'syntaxbet-nav-active', 'spelling-nav-active');
-            });
-            if (screenId === 'wordbet') {
-                document.body.classList.add('wordbet-body');
-                document.getElementById('main-header').classList.add('wordbet-header');
-                document.querySelectorAll(`.top-nav-item[data-screen="${screenId}"]`).forEach(item => {
-                    item.classList.add('wordbet-nav-active');
-                });
-                populateWordBetGames();
-            } else if (screenId === 'syntaxbet') {
-                document.body.classList.add('syntaxbet-body');
-                document.getElementById('main-header').classList.add('syntaxbet-header');
-                document.querySelectorAll(`.top-nav-item[data-screen="${screenId}"]`).forEach(item => {
-                    item.classList.add('syntaxbet-nav-active');
-                });
-            } else if (screenId === 'spelling') {
-                document.body.classList.add('spelling-body');
-                document.getElementById('main-header').classList.add('spelling-header');
-                document.querySelectorAll(`.top-nav-item[data-screen="${screenId}"]`).forEach(item => {
-                    item.classList.add('spelling-nav-active');
-                });
-            } else {
-                document.body.classList.remove('wordbet-body', 'syntaxbet-body', 'spelling-body');
-                document.getElementById('main-header').classList.remove('wordbet-header', 'syntaxbet-header', 'spelling-header');
-                document.querySelectorAll(`.top-nav-item[data-screen="${screenId}"]`).forEach(item => {
-                    item.classList.add('top-nav-active');
-                });
-            }
-            // Show the correct screen
-            if (screenId === 'home') {
-                document.getElementById('home-screen').style.display = 'block';
-            } else if (screenId === 'me') {
-                document.getElementById('me-screen').style.display = 'block';
-            } else {
-                document.getElementById(`${screenId}-screen`).style.display = 'block';
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        // Add event listeners to navigation items (only top-nav-item, not sport-item)
-        document.querySelectorAll('.top-nav-item').forEach(item => {
-            // Skip WordBet, SyntaxBet and Spelling items as they now have custom navigation
-            if (item.getAttribute('data-screen') !== 'wordbet' && 
-                item.getAttribute('data-screen') !== 'syntaxbet' && 
-                item.getAttribute('data-screen') !== 'spelling') {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Firebase Auth
+            initAuth();
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page');
+            
+            navItems.forEach(item => {
                 item.addEventListener('click', function() {
-                    const screenId = this.getAttribute('data-screen');
-                    navigateTo(screenId);
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target page
+                    pages.forEach(page => {
+                        page.style.display = 'none';
+                    });
+                    
+                    document.querySelector(`.${targetPage}-page`).style.display = 'block';
+                    
+                    // Load community posts if navigating to community page
+                    if (targetPage === 'community') {
+                        loadCommunityPosts();
+                    }
                 });
-            }
+            });
+            
+            // Course card click handlers
+            document.querySelectorAll('.course-card, .course-item').forEach(card => {
+                card.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-course');
+                    if (courseId && courses[courseId]) {
+                        showCourseDetails(courseId);
+                    }
+                });
+            });
+            
+            // Course details tab functionality
+            document.querySelectorAll('.course-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    document.querySelectorAll('.course-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Start exam button
+            document.getElementById('start-exam-btn').addEventListener('click', function() {
+                startExam(currentCourse);
+            });
+            
+            // Exam navigation
+            document.getElementById('next-question').addEventListener('click', nextQuestion);
+            document.getElementById('prev-question').addEventListener('click', prevQuestion);
+            document.getElementById('submit-exam').addEventListener('click', submitExam);
+            
+            // Certificate generation
+            document.getElementById('generate-certificate').addEventListener('click', generateCertificate);
+            document.getElementById('download-certificate').addEventListener('click', downloadCertificate);
+            
+            // Remote Work Mastery button
+            document.getElementById('remote-work-btn').addEventListener('click', function() {
+                window.location.href = 'remoteworkmastery.html';
+            });
+            
+            // Community functionality
+            document.getElementById('submit-post').addEventListener('click', submitPost);
+            document.getElementById('image-upload').addEventListener('click', () => openCloudinaryWidget('image'));
+            document.getElementById('video-upload').addEventListener('click', () => openCloudinaryWidget('video'));
+            document.getElementById('file-upload').addEventListener('click', () => openCloudinaryWidget('raw'));
+            
+            // Initialize carousel
+            initCarousel();
+            
+            // Button animations
+            const buttons = document.querySelectorAll('.btn, .btn-learn, .btn-post');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
         });
-        function updateCountdowns() {
-            // This function is kept for compatibility but no longer needed
-        }
-        // Modal functionality
-        function openModal(modalId) {
-            document.getElementById(`${modalId}-modal`).style.display = 'flex';
-        }
-        function closeModal(modalId) {
-            document.getElementById(`${modalId}-modal`).style.display = 'none';
-        }
-        // Accordion functionality for FAQ and Terms
-        function toggleAccordion(element) {
-            const accordion = element.parentElement;
-            accordion.classList.toggle('active');
-        }
-        window.addEventListener('scroll', function() {
-            const scrollTop = document.querySelector('.scroll-top');
-            if (window.pageYOffset > 300) {
-                scrollTop.style.display = 'flex';
-            } else {
-                scrollTop.style.display = 'none';
-            }
-        });
-        window.onload = function() {
+
+        // Initialize Firebase Authentication
+        function initAuth() {
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    fetchUserData();
+                    currentUser = user;
+                    loadUserData(user.uid);
                 } else {
-                    window.location.href = 'login.html';
+                    // If no user is logged in, use demo data
+                    currentUser = null;
+                    userData = {
+                        firstName: "Anointing",
+                        lastName: "Ese",
+                        email: "eseanointing7@gmail.com",
+                        profileImage: "https://res.cloudinary.com/dhoa1mdew/image/upload/v1694465430/profile.jpg"
+                    };
+                    updateUserUI();
                 }
             });
-            populateGameTypes();
-            populateSchedule();
-            navigateTo('home');
-            setInterval(populateSchedule, 60000);
-            setInterval(function() {
-                if (document.body.classList.contains('wordbet-body')) {
-                    populateWordBetGames();
+        }
+
+        // Load user data from Firestore
+        function loadUserData(userId) {
+            db.collection('users').doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        userData = doc.data();
+                        updateUserUI();
+                    } else {
+                        console.log("No user data found");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading user data:", error);
+                });
+        }
+
+        // Update UI with user data
+        function updateUserUI() {
+            if (userData) {
+                // Update header
+                document.getElementById('header-user-name').textContent = `${userData.firstName} ${userData.lastName}`;
+                if (userData.profileImage) {
+                    document.getElementById('header-profile-img').src = userData.profileImage;
                 }
-            }, 60000);
-        };
+                
+                // Update profile page
+                document.getElementById('profile-fullname').textContent = `${userData.firstName} ${userData.lastName}`;
+                document.getElementById('profile-email').textContent = userData.email;
+                if (userData.profileImage) {
+                    document.getElementById('profile-picture').src = userData.profileImage;
+                }
+                
+                // Update certificate name
+                document.getElementById('certificate-name').textContent = `${userData.firstName} ${userData.lastName}`;
+            }
+        }
+
+        // Show course details
+        function showCourseDetails(courseId) {
+            currentCourse = courseId;
+            const course = courses[courseId];
+            
+            // Update course details
+            document.getElementById('course-details-title').textContent = course.title;
+            document.getElementById('course-details-desc').textContent = course.description;
+            document.getElementById('course-duration').textContent = course.duration;
+            document.getElementById('course-modules').textContent = `${course.modules} Modules`;
+            
+            // Update progress
+            const progressBar = document.getElementById('course-progress');
+            const progressPercentage = document.getElementById('progress-percentage');
+            progressBar.style.width = `${course.progress}%`;
+            progressPercentage.textContent = `${course.progress}%`;
+            
+            // Populate modules
+            const moduleList = document.getElementById('module-list');
+            moduleList.innerHTML = '';
+            
+            course.modulesList.forEach((module, index) => {
+                const moduleItem = document.createElement('div');
+                moduleItem.className = 'module-item';
+                moduleItem.innerHTML = `
+                    <div class="module-icon">
+                        <i class="fas ${module.completed ? 'fa-check' : 'fa-play'}"></i>
+                    </div>
+                    <div class="module-info">
+                        <div class="module-title">${module.title}</div>
+                        <div class="module-desc">${module.description} • ${module.duration}</div>
+                    </div>
+                    <div class="module-status">
+                        ${module.completed ? '<i class="fas fa-check-circle" style="color: var(--success);"></i>' : '<i class="far fa-circle" style="color: var(--gray);"></i>'}
+                    </div>
+                `;
+                moduleList.appendChild(moduleItem);
+            });
+            
+            // Show course details page
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            courseDetailsPage.style.display = 'block';
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        }
+
+        // Start exam
+        function startExam(courseId) {
+            currentExam = courses[courseId].exam;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            timeRemaining = currentExam.duration * 60; // Convert to seconds
+            examStartTime = new Date();
+            
+            // Show exam page
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            examPage.style.display = 'block';
+            
+            // Update exam title
+            document.getElementById('exam-title').textContent = currentExam.title;
+            
+            // Start timer
+            startTimer();
+            
+            // Display first question
+            displayQuestion();
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const question = currentExam.questions[currentQuestionIndex];
+            
+            // Update question number
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            document.getElementById('total-questions').textContent = currentExam.questions.length;
+            
+            // Update question text
+            document.getElementById('question-text').textContent = question.question;
+            
+            // Update options
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionItem.classList.add('selected');
+                }
+                optionItem.textContent = option;
+                optionItem.addEventListener('click', () => selectOption(index));
+                optionsList.appendChild(optionItem);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prev-question').style.display = currentQuestionIndex === 0 ? 'none' : 'flex';
+            document.getElementById('next-question').style.display = currentQuestionIndex === currentExam.questions.length - 1 ? 'none' : 'flex';
+            document.getElementById('submit-exam').style.display = currentQuestionIndex === currentExam.questions.length - 1 ? 'block' : 'none';
+            
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / currentExam.questions.length) * 100;
+            document.getElementById('exam-progress').style.width = `${progress}%`;
+        }
+
+        // Select an option
+        function selectOption(optionIndex) {
+            userAnswers[currentQuestionIndex] = optionIndex;
+            
+            // Update UI
+            document.querySelectorAll('.option-item').forEach((item, index) => {
+                if (index === optionIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // Next question
+        function nextQuestion() {
+            if (currentQuestionIndex < currentExam.questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        // Previous question
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        // Start exam timer
+        function startTimer() {
+            updateTimerDisplay();
+            
+            examTimer = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(examTimer);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('exam-timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Change color when time is running out
+            if (timeRemaining < 300) { // 5 minutes
+                document.getElementById('exam-timer').style.background = 'var(--secondary)';
+            }
+        }
+
+        // Submit exam
+        function submitExam() {
+            clearInterval(examTimer);
+            
+            // Calculate score
+            let correctAnswers = 0;
+            currentExam.questions.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    correctAnswers++;
+                }
+            });
+            
+            const score = Math.round((correctAnswers / currentExam.questions.length) * 100);
+            const timeTaken = Math.round((new Date() - examStartTime) / 1000);
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+            const timeTakenFormatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Save results to Firebase
+            saveExamResults(currentCourse, score, correctAnswers, currentExam.questions.length, timeTakenFormatted);
+            
+            // Show results
+            showResults(score, correctAnswers, currentExam.questions.length, timeTakenFormatted);
+        }
+
+        // Save exam results to Firebase
+        function saveExamResults(courseId, score, correctAnswers, totalQuestions, timeTaken) {
+            const user = auth.currentUser;
+            if (user) {
+                db.collection('examResults').add({
+                    userId: user.uid,
+                    courseId: courseId,
+                    score: score,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: totalQuestions,
+                    timeTaken: timeTaken,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    console.log('Exam results saved to Firebase');
+                }).catch((error) => {
+                    console.error('Error saving exam results: ', error);
+                });
+            } else {
+                // If user is not logged in, store locally
+                const results = JSON.parse(localStorage.getItem('examResults') || '[]');
+                results.push({
+                    courseId: courseId,
+                    score: score,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: totalQuestions,
+                    timeTaken: timeTaken,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('examResults', JSON.stringify(results));
+            }
+        }
+
+        // Show exam results
+        function showResults(score, correctAnswers, totalQuestions, timeTaken) {
+            // Update results page
+            document.getElementById('results-score').textContent = `${score}%`;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+            document.getElementById('total-answers').textContent = totalQuestions;
+            document.getElementById('time-taken').textContent = timeTaken;
+            
+            // Update message based on score
+            let message = '';
+            if (score >= 80) {
+                message = 'Excellent! You have a strong understanding of the material.';
+            } else if (score >= 70) {
+                message = 'Good job! You passed the exam.';
+            } else if (score >= 60) {
+                message = 'You passed, but consider reviewing the material.';
+            } else {
+                message = 'You did not pass. Please review the course material and try again.';
+            }
+            document.getElementById('results-message').textContent = message;
+            
+            // Show results page
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            resultsPage.style.display = 'block';
+        }
+
+        // Generate certificate
+        function generateCertificate() {
+            const course = courses[currentCourse];
+            const userName = userData ? `${userData.firstName} ${userData.lastName}` : 'Student';
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Update certificate details
+            document.getElementById('certificate-name').textContent = userName;
+            document.getElementById('certificate-course').textContent = course.title;
+            document.getElementById('certificate-date').textContent = `Completed on ${currentDate}`;
+            
+            // Save certificate to Firebase
+            if (currentUser) {
+                db.collection('certificates').add({
+                    userId: currentUser.uid,
+                    courseId: currentCourse,
+                    courseName: course.title,
+                    userName: userName,
+                    issueDate: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    console.log('Certificate saved to Firebase');
+                }).catch((error) => {
+                    console.error('Error saving certificate: ', error);
+                });
+            }
+            
+            // Show certificate page
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            certificatePage.style.display = 'block';
+        }
+
+        // Download certificate
+        function downloadCertificate() {
+            // In a real implementation, this would generate a PDF
+            // For this demo, we'll just show an alert
+            alert('Certificate download functionality would be implemented here. In a real application, this would generate a PDF file.');
+            
+            // Example of how to implement PDF generation with a library like jsPDF:
+            /*
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add certificate content
+            doc.setFontSize(24);
+            doc.text('Certificate of Completion', 105, 30, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('This certifies that', 105, 50, { align: 'center' });
+            doc.setFontSize(20);
+            doc.text(document.getElementById('certificate-name').textContent, 105, 70, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('has successfully completed the course', 105, 85, { align: 'center' });
+            doc.setFontSize(18);
+            doc.text(document.getElementById('certificate-course').textContent, 105, 100, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(document.getElementById('certificate-date').textContent, 105, 115, { align: 'center' });
+            
+            // Save the PDF
+            doc.save('certificate.pdf');
+            */
+        }
+
+        // Community functionality
+
+        // Open Cloudinary upload widget
+        function openCloudinaryWidget(resourceType) {
+            const widget = cloudinary.createUploadWidget({
+                cloudName: cloudName,
+                uploadPreset: unsignedUploadPreset,
+                sources: ['local', 'url', 'camera'],
+                resourceType: resourceType,
+                multiple: false,
+                maxFileSize: 15000000, // 15MB
+                clientAllowedFormats: resourceType === 'image' ? ['jpg', 'jpeg', 'png', 'gif', 'webp'] : 
+                                    resourceType === 'video' ? ['mp4', 'mov', 'avi', 'wmv'] : 
+                                    ['pdf', 'doc', 'docx', 'txt', 'zip']
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    uploadedMedia = {
+                        url: result.info.secure_url,
+                        type: resourceType,
+                        publicId: result.info.public_id
+                    };
+                    
+                    // Show preview
+                    const preview = document.getElementById('upload-preview');
+                    if (resourceType === 'image') {
+                        preview.innerHTML = `<img src="${uploadedMedia.url}" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-right: 10px;">`;
+                    } else if (resourceType === 'video') {
+                        preview.innerHTML = `<video controls style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-right: 10px;">
+                            <source src="${uploadedMedia.url}" type="video/mp4">
+                        </video>`;
+                    } else {
+                        preview.innerHTML = `<div style="display: flex; align-items: center; padding: 10px; background: var(--light); border-radius: 8px;">
+                            <i class="fas fa-file" style="margin-right: 10px; color: var(--primary);"></i>
+                            <span>File uploaded</span>
+                        </div>`;
+                    }
+                }
+            });
+            
+            widget.open();
+        }
+
+        // Submit post to community
+        function submitPost() {
+            const content = document.getElementById('post-content').value.trim();
+            
+            if (!content && !uploadedMedia) {
+                alert('Please add some content or media to your post');
+                return;
+            }
+            
+            const postData = {
+                content: content,
+                userId: currentUser ? currentUser.uid : 'demo-user',
+                userName: userData ? `${userData.firstName} ${userData.lastName}` : 'Demo User',
+                userAvatar: userData ? userData.profileImage : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
+                comments: []
+            };
+            
+            // Add media if uploaded
+            if (uploadedMedia) {
+                postData.media = uploadedMedia;
+            }
+            
+            // Save to Firestore
+            db.collection('posts').add(postData)
+                .then(() => {
+                    console.log('Post saved to Firebase');
+                    document.getElementById('post-content').value = '';
+                    document.getElementById('upload-preview').innerHTML = '';
+                    uploadedMedia = null;
+                    loadCommunityPosts();
+                })
+                .catch((error) => {
+                    console.error('Error saving post: ', error);
+                    alert('Error posting. Please try again.');
+                });
+        }
+
+        // Load community posts
+        function loadCommunityPosts() {
+            const feed = document.getElementById('community-feed');
+            feed.innerHTML = '<p style="text-align: center; color: var(--gray);">Loading posts...</p>';
+            
+            db.collection('posts')
+                .orderBy('timestamp', 'desc')
+                .limit(10)
+                .get()
+                .then((querySnapshot) => {
+                    feed.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        feed.innerHTML = '<p style="text-align: center; color: var(--gray);">No posts yet. Be the first to share!</p>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const post = doc.data();
+                        const postElement = createPostElement(post);
+                        feed.appendChild(postElement);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error loading posts: ', error);
+                    feed.innerHTML = '<p style="text-align: center; color: var(--gray);">Error loading posts. Please try again.</p>';
+                });
+        }
+
+        // Create post element
+        function createPostElement(post) {
+            const postElement = document.createElement('div');
+            postElement.className = 'post';
+            
+            // Format timestamp
+            let timeText = 'Just now';
+            if (post.timestamp && post.timestamp.toDate) {
+                const postDate = post.timestamp.toDate();
+                const now = new Date();
+                const diffMs = now - postDate;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffMins < 1) {
+                    timeText = 'Just now';
+                } else if (diffMins < 60) {
+                    timeText = `${diffMins} min ago`;
+                } else if (diffHours < 24) {
+                    timeText = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                } else {
+                    timeText = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                }
+            }
+            
+            let mediaHtml = '';
+            if (post.media) {
+                if (post.media.type === 'image') {
+                    mediaHtml = `<img src="${post.media.url}" class="post-image" alt="Post image">`;
+                } else if (post.media.type === 'video') {
+                    mediaHtml = `<video controls class="post-video">
+                        <source src="${post.media.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>`;
+                } else {
+                    mediaHtml = `<div class="post-file">
+                        <i class="fas fa-file"></i>
+                        <a href="${post.media.url}" target="_blank">Download file</a>
+                    </div>`;
+                }
+            }
+            
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.userAvatar}" alt="User" class="post-avatar">
+                    <div>
+                        <div class="post-user">${post.userName}</div>
+                        <div class="post-time">${timeText}</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    ${post.content}
+                </div>
+                ${mediaHtml}
+                <div class="post-engagement">
+                    <div class="engagement-btn"><i class="far fa-heart"></i> ${post.likes || 0}</div>
+                    <div class="engagement-btn"><i class="far fa-comment"></i> ${post.comments ? post.comments.length : 0}</div>
+                    <div class="engagement-btn"><i class="far fa-share-square"></i> Share</div>
+                </div>
+            `;
+            
+            return postElement;
+        }
+
+        // Initialize carousel
+        function initCarousel() {
+            const carouselTrack = document.querySelector('.carousel-track');
+            const carouselDots = document.querySelectorAll('.carousel-dot');
+            let currentSlide = 0;
+            
+            function updateCarousel() {
+                carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+                
+                carouselDots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSlide);
+                });
+            }
+            
+            // Auto slide every 5 seconds
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % carouselDots.length;
+                updateCarousel();
+            }, 5000);
+            
+            // Dot click functionality
+            carouselDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    updateCarousel();
+                });
+            });
+        }
     </script>
 </body>
 </html>
