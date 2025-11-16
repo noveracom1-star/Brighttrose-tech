@@ -56,6 +56,7 @@
     html, body { 
       height: 100%;
       scroll-behavior: smooth;
+      overflow-x: hidden;
     }
     body {
       font-family: 'Inter', 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
@@ -66,6 +67,8 @@
       transition: background-color 0.5s ease, color 0.5s ease;
       -webkit-text-size-adjust: 100%;
       -webkit-font-smoothing: antialiased;
+      width: 100%;
+      max-width: 100vw;
     }
     /* ========= Utility Classes ========= */
     .container { 
@@ -1860,6 +1863,45 @@
       transition: all 0.2s ease;
       opacity: 0.5;
     }
+    /* ========= Enrollment Modal ========= */
+    .enrollment-form {
+      text-align: left;
+    }
+    .enrollment-form .form-group {
+      margin-bottom: 16px;
+    }
+    .enrollment-form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    body.dark .enrollment-form label {
+      color: var(--light);
+    }
+    .enrollment-form input,
+    .enrollment-form select,
+    .enrollment-form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--muted-2);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: var(--transition-smooth);
+      background: transparent;
+    }
+    .enrollment-form input:focus,
+    .enrollment-form select:focus,
+    .enrollment-form textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+    .enrollment-form textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
     /* ========= Responsive Styles ========= */
     @media (min-width: 640px) {
       .container {
@@ -1981,6 +2023,22 @@
       .cursor-outline {
         display: none;
       }
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      .hero-actions .btn {
+        width: 100%;
+      }
+      .contact-detail {
+        justify-content: flex-start;
+      }
+      .footer-social {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -2006,6 +2064,21 @@
       </div>
       <div class="course-preview" id="coursePreviewContent">
         <!-- Content will be dynamically inserted -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enrollment Modal -->
+  <div class="modal-overlay" id="enrollmentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="enrollmentTitle">Enroll in Course</h3>
+        <button class="modal-close" id="enrollmentModalClose">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="enrollment-form" id="enrollmentForm">
+        <!-- Enrollment form will be dynamically inserted -->
       </div>
     </div>
   </div>
@@ -2177,7 +2250,7 @@
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
               <div class="bootcamp-price">FREE</div>
-              <button class="btn outline learn-more-btn" data-course="starter">Learn More</button>
+              <button class="btn outline enroll-btn" data-course="starter">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2194,8 +2267,8 @@
             </div>
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
-              <div class="bootcamp-price">$49</div>
-              <button class="btn outline learn-more-btn" data-course="remote">Learn More</button>
+              <div class="bootcamp-price">FREE</div>
+              <button class="btn outline enroll-btn" data-course="remote">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2212,8 +2285,8 @@
             </div>
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
-              <div class="bootcamp-price">$69</div>
-              <button class="btn outline learn-more-btn" data-course="sales">Learn More</button>
+              <div class="bootcamp-price">FREE</div>
+              <button class="btn outline enroll-btn" data-course="sales">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2230,8 +2303,8 @@
             </div>
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
-              <div class="bootcamp-price">$99</div>
-              <button class="btn outline learn-more-btn" data-course="tech">Learn More</button>
+              <div class="bootcamp-price">FREE</div>
+              <button class="btn outline enroll-btn" data-course="tech">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2248,8 +2321,8 @@
             </div>
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
-              <div class="bootcamp-price">$39</div>
-              <button class="btn outline learn-more-btn" data-course="ai">Learn More</button>
+              <div class="bootcamp-price">FREE</div>
+              <button class="btn outline enroll-btn" data-course="ai">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2266,8 +2339,8 @@
             </div>
             <p class="bootcamp-description">This course will launch shortly.</p>
             <div class="bootcamp-actions">
-              <div class="bootcamp-price">$79</div>
-              <button class="btn outline learn-more-btn" data-course="virtual">Learn More</button>
+              <div class="bootcamp-price">FREE</div>
+              <button class="btn outline enroll-btn" data-course="virtual">Enroll Now</button>
             </div>
           </div>
         </div>
@@ -2433,10 +2506,12 @@
           </div>
           <p>Under Denis's leadership, Brightrose Tech is pioneering mobile-first learning solutions that break down barriers to digital skills education.</p>
           <div class="founder-social">
-            <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
-            <a href="#"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-solid fa-envelope"></i></a>
+            <a href="https://tiktok.com/@brightrosetech" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://youtube.com/@brightrose-tech?si=jGjQMi1nnVBUurAy" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.instagram.com/brightrosetech?utm_source=qr&igsh=d3h2MzBkc3p2aG9m" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.facebook.com/brightrosetech" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://github.com/brightrode" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="https://wa.me/message/PMHVS5UG6OE7E1" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
           </div>
         </div>
       </div>
@@ -2519,6 +2594,14 @@
               <span>Mon - Fri: 9AM - 5PM WAT</span>
             </div>
           </div>
+          <div class="footer-social" style="margin-top: 30px; justify-content: flex-start;">
+            <a href="https://tiktok.com/@brightrosetech" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://youtube.com/@brightrose-tech?si=jGjQMi1nnVBUurAy" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.instagram.com/brightrosetech?utm_source=qr&igsh=d3h2MzBkc3p2aG9m" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.facebook.com/brightrosetech" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://github.com/brightrode" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="https://wa.me/message/PMHVS5UG6OE7E1" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          </div>
         </div>
         <div class="contact-form">
           <form id="contactForm">
@@ -2555,11 +2638,12 @@
           </div>
           <p>Mobile-friendly bootcamps designed to launch your digital career quickly. Learn from your phone, build portfolio projects, and get job-ready fast.</p>
           <div class="footer-social">
-            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
-            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.facebook.com/brightrosetech" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://tiktok.com/@brightrosetech" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.instagram.com/brightrosetech?utm_source=qr&igsh=d3h2MzBkc3p2aG9m" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://youtube.com/@brightrose-tech?si=jGjQMi1nnVBUurAy" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://github.com/brightrode" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="https://wa.me/message/PMHVS5UG6OE7E1" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
           </div>
         </div>
         <div class="footer-links">
@@ -2645,6 +2729,10 @@
     const modalClose = document.getElementById('modalClose');
     const coursePreviewContent = document.getElementById('coursePreviewContent');
     const scrollContainer = document.getElementById('scrollContainer');
+    const enrollmentModal = document.getElementById('enrollmentModal');
+    const enrollmentModalClose = document.getElementById('enrollmentModalClose');
+    const enrollmentTitle = document.getElementById('enrollmentTitle');
+    const enrollmentForm = document.getElementById('enrollmentForm');
     
     // Course data for modal
     const courses = {
@@ -2675,7 +2763,7 @@
         ],
         duration: "2 Weeks",
         format: "Mobile",
-        price: "$49",
+        price: "FREE",
         color: "pink"
       },
       sales: {
@@ -2690,7 +2778,7 @@
         ],
         duration: "2 Weeks",
         format: "Mobile",
-        price: "$69",
+        price: "FREE",
         color: "blue"
       },
       tech: {
@@ -2705,7 +2793,7 @@
         ],
         duration: "4 Weeks",
         format: "Mobile + PC",
-        price: "$99",
+        price: "FREE",
         color: "pink"
       },
       ai: {
@@ -2720,7 +2808,7 @@
         ],
         duration: "1 Week",
         format: "Mobile",
-        price: "$39",
+        price: "FREE",
         color: "blue"
       },
       virtual: {
@@ -2735,7 +2823,7 @@
         ],
         duration: "2 Weeks",
         format: "Mobile",
-        price: "$79",
+        price: "FREE",
         color: "pink"
       }
     };
@@ -2757,35 +2845,46 @@
       window.location.href = 'signup.html';
     });
     
-    // Add event listeners to all "Learn More" buttons
-    document.querySelectorAll('.learn-more-btn').forEach(button => {
+    // Add event listeners to all "Enroll Now" buttons
+    document.querySelectorAll('.enroll-btn').forEach(button => {
       button.addEventListener('click', (e) => {
+        e.stopPropagation();
         const courseId = e.target.getAttribute('data-course');
-        showCourseModal(courseId);
+        showEnrollmentModal(courseId);
       });
     });
     
     // Course card click handlers
     document.querySelectorAll('.bootcamp-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Don't trigger if clicking on the learn more button
-        if (!e.target.classList.contains('learn-more-btn') && 
-            !e.target.closest('.learn-more-btn')) {
+        // Don't trigger if clicking on the enroll button
+        if (!e.target.classList.contains('enroll-btn') && 
+            !e.target.closest('.enroll-btn')) {
           const courseId = card.getAttribute('data-course');
           showCourseModal(courseId);
         }
       });
     });
     
-    // Modal close handler
+    // Modal close handlers
     modalClose.addEventListener('click', () => {
       courseModal.classList.remove('active');
+    });
+    
+    enrollmentModalClose.addEventListener('click', () => {
+      enrollmentModal.classList.remove('active');
     });
     
     // Close modal when clicking outside
     courseModal.addEventListener('click', (e) => {
       if (e.target === courseModal) {
         courseModal.classList.remove('active');
+      }
+    });
+    
+    enrollmentModal.addEventListener('click', (e) => {
+      if (e.target === enrollmentModal) {
+        enrollmentModal.classList.remove('active');
       }
     });
     
@@ -2814,13 +2913,89 @@
           <span><i class="fa-solid fa-mobile-screen"></i> ${course.format}</span>
         </div>
         <div class="bootcamp-price" style="text-align: center; font-size: 1.3rem; margin-bottom: 16px;">${course.price}</div>
-        <button class="btn ${course.color === 'blue' ? 'primary' : 'secondary'}" style="width: 100%;">
+        <button class="btn ${course.color === 'blue' ? 'primary' : 'secondary'} enroll-from-modal" data-course="${courseId}" style="width: 100%;">
           <i class="fa-solid fa-cart-plus"></i>
           Enroll Now
         </button>
       `;
       
+      // Add event listener to the enroll button in the modal
+      coursePreviewContent.querySelector('.enroll-from-modal').addEventListener('click', (e) => {
+        const courseId = e.target.getAttribute('data-course');
+        courseModal.classList.remove('active');
+        showEnrollmentModal(courseId);
+      });
+      
       courseModal.classList.add('active');
+    }
+    
+    // Function to show enrollment modal
+    function showEnrollmentModal(courseId) {
+      const course = courses[courseId];
+      if (!course) return;
+      
+      enrollmentTitle.textContent = `Enroll in ${course.title}`;
+      enrollmentForm.innerHTML = `
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="experience">Previous Experience</label>
+          <select id="experience" required>
+            <option value="">Select your experience level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="goals">What are your learning goals?</label>
+          <textarea id="goals" placeholder="Tell us about your career goals and what you hope to achieve from this course"></textarea>
+        </div>
+        <button type="submit" class="btn ${course.color === 'blue' ? 'primary' : 'secondary'}" style="width: 100%;" id="submitEnrollment">
+          <i class="fa-solid fa-user-plus"></i>
+          Enroll Now
+        </button>
+      `;
+      
+      // Add event listener to the enrollment form
+      const submitBtn = enrollmentForm.querySelector('#submitEnrollment');
+      submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        submitEnrollmentForm(course);
+      });
+      
+      enrollmentModal.classList.add('active');
+    }
+    
+    // Function to submit enrollment form
+    function submitEnrollmentForm(course) {
+      const submitBtn = enrollmentForm.querySelector('#submitEnrollment');
+      const originalText = submitBtn.innerHTML;
+      
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+      submitBtn.disabled = true;
+      
+      // Simulate form submission
+      setTimeout(() => {
+        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Enrolled Successfully!';
+        
+        setTimeout(() => {
+          enrollmentModal.classList.remove('active');
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          showNotification('success', 'Enrollment Successful', `You've been successfully enrolled in ${course.title}! We'll contact you shortly with further details.`);
+        }, 1500);
+      }, 2000);
     }
     
     // Function to show notification
