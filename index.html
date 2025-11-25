@@ -2039,6 +2039,26 @@
       .footer-social {
         justify-content: center;
       }
+      /* Fix for mobile header actions */
+      .header-actions {
+        gap: 0.5rem;
+      }
+      .header-actions .btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .header-actions {
+        gap: 0.3rem;
+      }
+      .header-actions .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+      .header-actions .btn:last-child {
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -3534,6 +3554,11 @@
     
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', () => {
+      // Make all content visible immediately
+      document.body.style.visibility = 'visible';
+      document.body.style.opacity = '1';
+      
+      // Load media from Firestore
       loadMediaFromFirestore();
       initCustomCursor();
       initHorizontalScroll();
