@@ -352,7 +352,7 @@
         }
 
         /* Courses Page */
-        .courses-page, .community-page, .profile-page {
+        .courses-page, .community-page, .profile-page, .terms-page {
             display: none;
         }
 
@@ -433,6 +433,104 @@
 
         .btn-learn:hover {
             background: var(--primary-dark);
+        }
+
+        /* Terms & Conditions Page */
+        .terms-page {
+            padding: 20px;
+            background: white;
+        }
+
+        .terms-container {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terms-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .terms-subtitle {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 0 10px 0;
+            color: var(--dark);
+        }
+
+        .terms-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--gray);
+        }
+
+        .terms-content p {
+            margin-bottom: 10px;
+        }
+
+        .terms-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .terms-content li {
+            margin-bottom: 8px;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .terms-checkbox input {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .terms-checkbox label {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .terms-checkbox a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .terms-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-decline {
+            background: var(--light);
+            color: var(--dark);
+            flex: 1;
+        }
+
+        .btn-accept {
+            background: var(--primary);
+            color: white;
+            flex: 1;
         }
 
         /* Course Details Page */
@@ -1061,7 +1159,7 @@
                         <div class="course-content">
                             <p>Master the art of digital sales with our comprehensive course designed for modern professionals.</p>
                             <div class="course-actions">
-                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-enroll" onclick="navigateToCourse('digital_sales')">Enroll Now</button>
                                 <button class="btn btn-live">Live Session</button>
                             </div>
                         </div>
@@ -1075,7 +1173,7 @@
                         <div class="course-content">
                             <p>Kickstart your tech career with our intensive bootcamp covering essential skills.</p>
                             <div class="course-actions">
-                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-enroll" onclick="showTermsForCourse('starter_bootcamp')">Enroll Now</button>
                                 <button class="btn btn-live">Live Session</button>
                             </div>
                         </div>
@@ -1089,7 +1187,7 @@
                         <div class="course-content">
                             <p>Learn how to become a successful virtual assistant with our specialized training program.</p>
                             <div class="course-actions">
-                                <button class="btn btn-enroll">Enroll Now</button>
+                                <button class="btn btn-enroll" onclick="navigateToCourse('virtual_assistance')">Enroll Now</button>
                                 <button class="btn btn-live">Live Session</button>
                             </div>
                         </div>
@@ -1161,7 +1259,7 @@
                         </div>
                         <div class="course-status">Complete beginner-friendly tech introduction</div>
                         <div class="course-action">
-                            <button class="btn-learn">Start Course</button>
+                            <button class="btn-learn" onclick="showTermsForCourse('starter_bootcamp')">Start Course</button>
                         </div>
                     </div>
                     
@@ -1176,7 +1274,7 @@
                         </div>
                         <div class="course-status">Master remote work skills and productivity</div>
                         <div class="course-action">
-                            <button class="btn-learn" id="remote-work-btn">Start Course</button>
+                            <button class="btn-learn" onclick="navigateToCourse('remote_work_mastery')">Start Course</button>
                         </div>
                     </div>
                     
@@ -1191,7 +1289,7 @@
                         </div>
                         <div class="course-status">Master digital sales strategies and techniques</div>
                         <div class="course-action">
-                            <button class="btn-learn">Start Course</button>
+                            <button class="btn-learn" onclick="navigateToCourse('digital_sales')">Start Course</button>
                         </div>
                     </div>
                     
@@ -1206,7 +1304,7 @@
                         </div>
                         <div class="course-status">Become a certified Microsoft 365 support specialist</div>
                         <div class="course-action">
-                            <button class="btn-learn">Start Course</button>
+                            <button class="btn-learn" onclick="navigateToCourse('tech_support')">Start Course</button>
                         </div>
                     </div>
                     
@@ -1221,7 +1319,7 @@
                         </div>
                         <div class="course-status">Learn AI fundamentals and effective prompting</div>
                         <div class="course-action">
-                            <button class="btn-learn">Start Course</button>
+                            <button class="btn-learn" onclick="navigateToCourse('ai_prompting')">Start Course</button>
                         </div>
                     </div>
                     
@@ -1236,7 +1334,7 @@
                         </div>
                         <div class="course-status">Become a professional virtual assistant</div>
                         <div class="course-action">
-                            <button class="btn-learn">Start Course</button>
+                            <button class="btn-learn" onclick="navigateToCourse('virtual_assistance')">Start Course</button>
                         </div>
                     </div>
                 </div>
@@ -1244,7 +1342,103 @@
                 <div class="why-choose" style="margin-top: 30px; text-align: center; padding: 20px; background: white; border-radius: 16px; box-shadow: var(--card-shadow);">
                     <h2 style="margin-bottom: 15px;">Why Choose Brightrose Tech?</h2>
                     <p style="margin-bottom: 20px; color: var(--gray);">We provide industry-leading courses with practical skills and expert guidance to help you succeed in the digital world.</p>
-                    <button class="btn btn-enroll" style="width: 100%;">Enroll Now</button>
+                    <button class="btn btn-enroll" onclick="navigateToCourse('all_courses')" style="width: 100%;">Enroll Now</button>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions Page -->
+            <div class="terms-page">
+                <div class="terms-container">
+                    <div class="terms-title">Starter Bootcamp - Terms & Conditions</div>
+                    
+                    <div class="terms-content">
+                        <p>Welcome to Brightrose Tech's Starter Bootcamp! Before you begin your learning journey, please read and agree to the following terms and conditions:</p>
+                        
+                        <div class="terms-subtitle">1. Course Enrollment</div>
+                        <p>By enrolling in this course, you agree to:</p>
+                        <ul>
+                            <li>Complete all modules in sequential order</li>
+                            <li>Participate in course activities and assignments</li>
+                            <li>Complete the final exam to receive your certificate</li>
+                            <li>Use the course materials for personal learning only</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">2. Time Commitment</div>
+                        <p>The Starter Bootcamp is a 1-week intensive course requiring:</p>
+                        <ul>
+                            <li>Minimum 2-3 hours per day of study time</li>
+                            <li>Active participation in live sessions (if available)</li>
+                            <li>Completion of all assignments within deadlines</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">3. Certificate Requirements</div>
+                        <p>To receive your certificate of completion, you must:</p>
+                        <ul>
+                            <li>Complete all course modules (100% completion)</li>
+                            <li>Pass the final exam with a score of 70% or higher</li>
+                            <li>Submit all required assignments</li>
+                            <li>Participate in course discussions</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">4. Code of Conduct</div>
+                        <p>As a Brightrose Tech student, you agree to:</p>
+                        <ul>
+                            <li>Maintain academic integrity (no cheating or plagiarism)</li>
+                            <li>Respect instructors and fellow students</li>
+                            <li>Use appropriate language in discussions</li>
+                            <li>Report any technical issues promptly</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">5. Technical Requirements</div>
+                        <p>You are responsible for ensuring you have:</p>
+                        <ul>
+                            <li>Stable internet connection</li>
+                            <li>Updated web browser (Chrome, Firefox, or Safari)</li>
+                            <li>Required software installed (as specified in each module)</li>
+                            <li>Mobile device or computer for course access</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">6. Privacy & Data Usage</div>
+                        <p>Brightrose Tech respects your privacy. We will:</p>
+                        <ul>
+                            <li>Only use your data for course administration</li>
+                            <li>Never share your personal information with third parties</li>
+                            <li>Secure your data with industry-standard encryption</li>
+                            <li>Allow you to delete your account and data upon request</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">7. Refund Policy</div>
+                        <p>Since this course is FREE, no refunds apply. However, you may:</p>
+                        <ul>
+                            <li>Request to restart the course at any time</li>
+                            <li>Access course materials for 6 months after enrollment</li>
+                            <li>Contact support for technical assistance</li>
+                        </ul>
+                        
+                        <div class="terms-subtitle">8. Support & Assistance</div>
+                        <p>Our support team is available to help you:</p>
+                        <ul>
+                            <li>Email: support@brightrosetech.com</li>
+                            <li>Live chat: Available during business hours</li>
+                            <li>Community forum: 24/7 peer support</li>
+                        </ul>
+                        
+                        <p style="margin-top: 20px; font-weight: 600; color: var(--dark);">
+                            By proceeding, you acknowledge that you have read, understood, and agree to all the terms and conditions outlined above.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="agree-terms">
+                    <label for="agree-terms">
+                        I have read and agree to the Terms & Conditions. I understand that I must complete all requirements to receive my certificate.
+                    </label>
+                </div>
+                
+                <div class="terms-buttons">
+                    <button class="btn btn-decline" id="decline-terms">Decline</button>
+                    <button class="btn btn-accept" id="accept-terms" disabled>Accept & Proceed</button>
                 </div>
             </div>
 
@@ -2039,10 +2233,12 @@
         let currentUser = null;
         let userData = null;
         let uploadedMedia = null;
+        let selectedCourseForTerms = null;
 
         // DOM elements
         const homePage = document.querySelector('.home-page');
         const coursesPage = document.querySelector('.courses-page');
+        const termsPage = document.querySelector('.terms-page');
         const courseDetailsPage = document.querySelector('.course-details-page');
         const examPage = document.querySelector('.exam-page');
         const resultsPage = document.querySelector('.results-page');
@@ -2050,13 +2246,59 @@
         const communityPage = document.querySelector('.community-page');
         const profilePage = document.querySelector('.profile-page');
 
+        // Course navigation mapping
+        const coursePages = {
+            'starter_bootcamp': 'starter_bootcamp1.html',
+            'remote_work_mastery': 'remote_work_mastery.html',
+            'digital_sales': 'digital_sales.html',
+            'tech_support': 'tech_support.html',
+            'ai_prompting': 'ai_prompting.html',
+            'virtual_assistance': 'virtual_assistance.html',
+            'all_courses': 'courses.html'
+        };
+
+        // Function to show terms and conditions for starter bootcamp
+        function showTermsForCourse(courseName) {
+            selectedCourseForTerms = courseName;
+            
+            // Hide all pages
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show terms page
+            termsPage.style.display = 'block';
+            
+            // Reset checkbox
+            document.getElementById('agree-terms').checked = false;
+            document.getElementById('accept-terms').disabled = true;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        }
+
+        // Function to navigate to course pages
+        function navigateToCourse(courseName) {
+            const page = coursePages[courseName];
+            if (page) {
+                window.location.href = page;
+            } else {
+                // Fallback to showing course details if page doesn't exist
+                if (courses[courseName.replace('_', '-')]) {
+                    showCourseDetails(courseName.replace('_', '-'));
+                } else {
+                    alert('Course page is coming soon!');
+                }
+            }
+        }
+
         // Navigation functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Firebase Auth
             initAuth();
             
             const navItems = document.querySelectorAll('.nav-item');
-            const pages = document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page');
+            const pages = document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page');
             
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
@@ -2082,12 +2324,44 @@
             
             // Course card click handlers
             document.querySelectorAll('.course-card, .course-item').forEach(card => {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function(e) {
+                    // Don't trigger if button was clicked
+                    if (e.target.tagName === 'BUTTON') return;
+                    
                     const courseId = this.getAttribute('data-course');
                     if (courseId && courses[courseId]) {
                         showCourseDetails(courseId);
                     }
                 });
+            });
+            
+            // Terms and Conditions functionality
+            const agreeCheckbox = document.getElementById('agree-terms');
+            const acceptButton = document.getElementById('accept-terms');
+            const declineButton = document.getElementById('decline-terms');
+            
+            agreeCheckbox.addEventListener('change', function() {
+                acceptButton.disabled = !this.checked;
+            });
+            
+            acceptButton.addEventListener('click', function() {
+                if (selectedCourseForTerms === 'starter_bootcamp') {
+                    // Save user acceptance to Firebase
+                    saveTermsAcceptance();
+                    
+                    // Navigate to starter bootcamp page
+                    window.location.href = 'starter_bootcamp1.html';
+                }
+            });
+            
+            declineButton.addEventListener('click', function() {
+                // Go back to courses page
+                document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
+                    page.style.display = 'none';
+                });
+                coursesPage.style.display = 'block';
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                document.querySelector('.nav-item[data-page="courses"]').classList.add('active');
             });
             
             // Course details tab functionality
@@ -2121,11 +2395,6 @@
             document.getElementById('generate-certificate').addEventListener('click', generateCertificate);
             document.getElementById('download-certificate').addEventListener('click', downloadCertificate);
             
-            // Remote Work Mastery button
-            document.getElementById('remote-work-btn').addEventListener('click', function() {
-                window.location.href = 'remoteworkmastery.html';
-            });
-            
             // Community functionality
             document.getElementById('submit-post').addEventListener('click', submitPost);
             document.getElementById('image-upload').addEventListener('click', () => openCloudinaryWidget('image'));
@@ -2146,6 +2415,32 @@
                 });
             });
         });
+
+        // Save terms acceptance to Firebase
+        function saveTermsAcceptance() {
+            const user = auth.currentUser;
+            if (user) {
+                db.collection('termsAcceptance').add({
+                    userId: user.uid,
+                    courseId: 'starter_bootcamp',
+                    accepted: true,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    console.log('Terms acceptance saved to Firebase');
+                }).catch((error) => {
+                    console.error('Error saving terms acceptance: ', error);
+                });
+            } else {
+                // Store locally if user is not logged in
+                const acceptances = JSON.parse(localStorage.getItem('termsAcceptance') || '[]');
+                acceptances.push({
+                    courseId: 'starter_bootcamp',
+                    accepted: true,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('termsAcceptance', JSON.stringify(acceptances));
+            }
+        }
 
         // Initialize Firebase Authentication
         function initAuth() {
@@ -2244,7 +2539,7 @@
             });
             
             // Show course details page
-            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
                 page.style.display = 'none';
             });
             courseDetailsPage.style.display = 'block';
@@ -2262,7 +2557,7 @@
             examStartTime = new Date();
             
             // Show exam page
-            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
                 page.style.display = 'none';
             });
             examPage.style.display = 'block';
@@ -2449,7 +2744,7 @@
             document.getElementById('results-message').textContent = message;
             
             // Show results page
-            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
                 page.style.display = 'none';
             });
             resultsPage.style.display = 'block';
@@ -2487,7 +2782,7 @@
             }
             
             // Show certificate page
-            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page').forEach(page => {
+            document.querySelectorAll('.home-page, .courses-page, .course-details-page, .exam-page, .results-page, .certificate-page, .community-page, .profile-page, .terms-page').forEach(page => {
                 page.style.display = 'none';
             });
             certificatePage.style.display = 'block';
@@ -2498,29 +2793,6 @@
             // In a real implementation, this would generate a PDF
             // For this demo, we'll just show an alert
             alert('Certificate download functionality would be implemented here. In a real application, this would generate a PDF file.');
-            
-            // Example of how to implement PDF generation with a library like jsPDF:
-            /*
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Add certificate content
-            doc.setFontSize(24);
-            doc.text('Certificate of Completion', 105, 30, { align: 'center' });
-            doc.setFontSize(16);
-            doc.text('This certifies that', 105, 50, { align: 'center' });
-            doc.setFontSize(20);
-            doc.text(document.getElementById('certificate-name').textContent, 105, 70, { align: 'center' });
-            doc.setFontSize(16);
-            doc.text('has successfully completed the course', 105, 85, { align: 'center' });
-            doc.setFontSize(18);
-            doc.text(document.getElementById('certificate-course').textContent, 105, 100, { align: 'center' });
-            doc.setFontSize(12);
-            doc.text(document.getElementById('certificate-date').textContent, 105, 115, { align: 'center' });
-            
-            // Save the PDF
-            doc.save('certificate.pdf');
-            */
         }
 
         // Community functionality
