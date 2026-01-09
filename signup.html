@@ -665,7 +665,7 @@
       }
       
       .signup-header h1 {
-        font-size: 2.2rem;
+        fontSize: 2.2rem;
       }
       
       .upload-preview {
@@ -778,7 +778,7 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label">Profile Picture</label>
+          <label class="form-label">Profile Picture (Optional)</label>
           <div class="profile-upload">
             <div class="upload-container">
               <div class="upload-preview" id="profilePreview">
@@ -795,7 +795,7 @@
                 <button type="button" class="remove-btn" id="removePhoto">Remove</button>
               </div>
             </div>
-            <p class="form-hint">Recommended: Square image, at least 200x200 pixels</p>
+            <p class="form-hint">Recommended: Square image, at least 200x200 pixels (Max: 5MB)</p>
           </div>
         </div>
         
@@ -828,6 +828,7 @@
         <h3>Check Your Email!</h3>
         <p>We've sent a verification link to your email address. Please click the link to confirm your account and complete the registration process.</p>
         <p><small>Didn't receive the email? Check your spam folder or <a href="#" style="color: white; text-decoration: underline;" id="resendEmail">click here to resend</a>.</small></p>
+        <button class="btn outline" style="margin-top: 20px; color: white; border-color: white;" id="returnToForm">Back to Sign Up</button>
       </div>
       
       <div class="signin-redirect">
@@ -857,6 +858,7 @@
     const submitBtn = document.getElementById('submitBtn');
     const successMessage = document.getElementById('successMessage');
     const resendEmailBtn = document.getElementById('resendEmail');
+    const returnToFormBtn = document.getElementById('returnToForm');
     
     // Profile picture handling
     let profileImageFile = null;
@@ -891,7 +893,7 @@
       profileImageFile = null;
     });
     
-    // Upload image to Supabase Storage
+    // Upload image to Supabase Storage (AFTER user is created)
     async function uploadProfileImage(userId) {
       if (!profileImageFile) return null;
       
@@ -903,19 +905,23 @@
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
           .from('user-profiles')
-          .upload(fileName, profileImageFile);
+          .upload(fileName, profileImageFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
         
         if (error) {
           console.warn('Profile image upload failed:', error.message);
+          // Don't throw error - profile picture is optional
           return null;
         }
         
         // Get public URL
-        const { data: urlData } = supabase.storage
+        const { data: { publicUrl } } = supabase.storage
           .from('user-profiles')
           .getPublicUrl(fileName);
         
-        return urlData.publicUrl;
+        return publicUrl;
         
       } catch (error) {
         console.warn('Error uploading image:', error);
@@ -1013,13 +1019,6 @@
       submitBtn.disabled = true;
       
       try {
-        // Upload profile image first (if exists)
-        let profileImageUrl = null;
-        if (profileImageFile) {
-          const tempUserId = `temp_${Date.now()}`;
-          profileImageUrl = await uploadProfileImage(tempUserId);
-        }
-        
         // Create user with Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
@@ -1029,8 +1028,7 @@
               first_name: firstName,
               last_name: lastName,
               newsletter: subscribeToNewsletter,
-              full_name: `${firstName} ${lastName}`,
-              profile_image: profileImageUrl
+              full_name: `${firstName} ${lastName}`
             },
             emailRedirectTo: `${window.location.origin}/login.html?verified=true`
           }
@@ -1045,6 +1043,12 @@
           throw new Error('User creation failed - no user data returned');
         }
         
+        // Upload profile image AFTER user is created
+        let profileImageUrl = null;
+        if (profileImageFile && authData.user.id) {
+          profileImageUrl = await uploadProfileImage(authData.user.id);
+        }
+        
         // Save user data to brightrose_users table
         const { error: dbError } = await supabase
           .from('brightrose_users')
@@ -1055,14 +1059,16 @@
             email: email,
             profile_image: profileImageUrl,
             newsletter: subscribeToNewsletter,
-            email_verified: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            email_verified: false
           });
         
         if (dbError) {
-          console.warn('Database insert warning:', dbError.message);
-          // Continue even if database insert fails - auth is primary
+          console.error('Database insert error:', dbError);
+          
+          // If it's a duplicate key error, it's okay - user already exists in table
+          if (!dbError.message.includes('duplicate key')) {
+            throw new Error(`Database error: ${dbError.message}`);
+          }
         }
         
         // SUCCESS: Show success message and hide form
@@ -1094,6 +1100,10 @@
           errorMessage = 'Password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
         } else if (error.message.includes('network')) {
           errorMessage = 'Network error. Please check your internet connection and try again.';
+        } else if (error.message.includes('Storage bucket not found')) {
+          errorMessage = 'Profile picture upload is temporarily unavailable. Your account was created without a profile picture.';
+        } else if (error.message.includes('JWT expired')) {
+          errorMessage = 'Session expired. Please refresh the page and try again.';
         }
         
         showNotification('Error', errorMessage, 'error');
@@ -1132,9 +1142,33 @@
       }
     });
     
+    // Return to form button
+    returnToFormBtn.addEventListener('click', function() {
+      successMessage.classList.remove('show');
+      signupForm.style.display = 'grid';
+      signupForm.reset();
+      
+      // Reset profile picture
+      profilePhoto.value = '';
+      profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
+      profileImageFile = null;
+      
+      // Reset form validation
+      passwordMatchText.textContent = '';
+      passwordStrength.className = 'password-strength';
+      passwordStrengthText.textContent = 'Password strength';
+      passwordStrengthText.style.color = '';
+    });
+    
     // Notification system
     function showNotification(title, message, type = 'info') {
       const notificationContainer = document.getElementById('notificationContainer');
+      
+      // Remove old notifications if too many
+      if (notificationContainer.children.length > 3) {
+        notificationContainer.removeChild(notificationContainer.children[0]);
+      }
+      
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
       
@@ -1168,7 +1202,9 @@
       notification.querySelector('.notification-close').addEventListener('click', () => {
         notification.classList.remove('show');
         setTimeout(() => {
-          notification.remove();
+          if (notification.parentNode) {
+            notification.remove();
+          }
         }, 400);
       });
       
@@ -1196,6 +1232,12 @@
             this.style.borderColor = '';
           }
         });
+        
+        input.addEventListener('input', function() {
+          if (this.value.trim()) {
+            this.style.borderColor = '';
+          }
+        });
       });
     }
     
@@ -1212,6 +1254,12 @@
           }, 2000);
         }
       });
+      
+      // Check for URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('verified') && urlParams.get('verified') === 'true') {
+        showNotification('Success', 'Email verified successfully! You can now sign in.', 'success');
+      }
     });
   </script>
 </body>
