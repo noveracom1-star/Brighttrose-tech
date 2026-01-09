@@ -12,1429 +12,556 @@
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   
-  <style>
-    /* [All your existing CSS styles remain the same] */
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --primary-light: #3b82f6;
-      --secondary: #ec4899;
-      --accent: #f59e0b;
-      --success: #10B981;
-      --warning: #F59E0B;
-      --danger: #EF4444;
-      --dark: #0F172A;
-      --dark-2: #1E293B;
-      --light: #FFFFFF;
-      --muted: #64748b;
-      --muted-2: #94a3b8;
-      --surface: #f8fafc;
-      --glass: rgba(255, 255, 255, 0.08);
-      --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.1);
-      --shadow-2: 0 20px 50px rgba(0, 0, 0, 0.2);
-      --radius-xl: 16px;
-      --radius-2xl: 24px;
-      --grad-1: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 45%, var(--secondary) 100%);
-      --grad-2: linear-gradient(135deg, var(--secondary) 0%, var(--primary-light) 50%, var(--accent) 100%);
-      --grad-3: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      --grad-glass: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(236, 72, 153, 0.1));
-      --blur: saturate(1.3) blur(8px);
-    }
-
-    * { 
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    html, body { 
-      height: 100%;
-      scroll-behavior: smooth;
-    }
-    
-    body {
-      font-family: 'Inter', 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: var(--surface);
-      color: var(--dark);
-      overflow-x: hidden;
-      line-height: 1.6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
-
-    .container { 
-      max-width: 1280px; 
-      margin: 0 auto; 
-      padding: 0 16px; 
-      width: 100%; 
-    }
-    
-    .btn { 
-      cursor: pointer; 
-      border: 0; 
-      padding: 16px 28px; 
-      font-weight: 600; 
-      border-radius: 999px; 
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-      font-size: 16px;
-    }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-    
-    .btn:hover::before {
-      left: 100%;
-    }
-    
-    .btn.primary { 
-      background: var(--grad-1); 
-      color: var(--light); 
-      box-shadow: var(--shadow-1); 
-    }
-    
-    .btn.primary:hover { 
-      transform: translateY(-3px) scale(1.02); 
-      box-shadow: var(--shadow-2); 
-    }
-    
-    .btn.secondary { 
-      background: var(--grad-2); 
-      color: var(--light); 
-      box-shadow: var(--shadow-1); 
-    }
-    
-    .btn.secondary:hover { 
-      transform: translateY(-3px) scale(1.02); 
-      box-shadow: var(--shadow-2); 
-    }
-    
-    .btn.outline { 
-      background: transparent; 
-      border: 2px solid var(--primary); 
-      color: var(--primary); 
-    }
-    
-    .btn.outline:hover { 
-      background: var(--primary); 
-      color: white; 
-      transform: translateY(-2px);
-    }
-    
-    .notification-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 400px;
-      width: calc(100% - 40px);
-    }
-    
-    .notification {
-      background: white;
-      border-radius: var(--radius-xl);
-      padding: 16px 20px;
-      box-shadow: var(--shadow-2);
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      transform: translateX(100%);
-      opacity: 0;
-      transition: all 0.4s ease;
-      border-left: 4px solid var(--primary);
-    }
-    
-    body.dark .notification {
-      background: var(--dark-2);
-      color: #e2e8f0;
-    }
-    
-    .notification.show {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    
-    .notification.error {
-      border-left-color: var(--danger);
-    }
-    
-    .notification.success {
-      border-left-color: var(--success);
-    }
-    
-    .notification.warning {
-      border-left-color: var(--warning);
-    }
-    
-    .notification-icon {
-      font-size: 1.2rem;
-      margin-top: 2px;
-    }
-    
-    .notification.error .notification-icon {
-      color: var(--danger);
-    }
-    
-    .notification.success .notification-icon {
-      color: var(--success);
-    }
-    
-    .notification.warning .notification-icon {
-      color: var(--warning);
-    }
-    
-    .notification-content {
-      flex: 1;
-    }
-    
-    .notification-title {
-      font-weight: 700;
-      margin: 0 0 4px;
-      font-size: 1rem;
-    }
-    
-    .notification-message {
-      margin: 0;
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-    
-    .notification-close {
-      background: none;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-      opacity: 0.7;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .notification-close:hover {
-      opacity: 1;
-    }
-
-    .signup-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: 500px;
-      min-height: auto;
-      border-radius: var(--radius-2xl);
-      overflow: hidden;
-      box-shadow: var(--shadow-2);
-    }
-    
-    .signup-visual {
-      background: var(--grad-1);
-      color: white;
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .signup-visual::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80') center/cover;
-      opacity: 0.15;
-    }
-    
-    .signup-visual-content {
-      position: relative;
-      z-index: 2;
-    }
-    
-    .signup-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      font-size: 1.5rem;
-      margin-bottom: 24px;
-    }
-    
-    .signup-logo img {
-      height: 40px;
-      width: 40px;
-      object-fit: contain;
-      border-radius: 12px;
-      background: white;
-      padding: 5px;
-      box-shadow: var(--shadow-1);
-    }
-    
-    .signup-visual h2 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-      line-height: 1.3;
-    }
-    
-    .signup-visual p {
-      font-size: 1rem;
-      margin-bottom: 24px;
-      opacity: 0.9;
-      line-height: 1.5;
-    }
-    
-    .signup-features {
-      list-style: none;
-    }
-    
-    .signup-features li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-weight: 500;
-      font-size: 0.95rem;
-    }
-    
-    .signup-features i {
-      color: var(--accent);
-      font-size: 1.1rem;
-    }
-    
-    .signup-form-container {
-      background: var(--light);
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    
-    body.dark .signup-form-container {
-      background: var(--dark-2);
-    }
-    
-    .signup-header {
-      margin-bottom: 30px;
-    }
-    
-    .signup-header h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      color: var(--dark);
-      background: var(--grad-3);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    
-    body.dark .signup-header h1 {
-      color: var(--light);
-    }
-    
-    .signup-header p {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    
-    body.dark .signup-header p {
-      color: var(--muted-2);
-    }
-    
-    .signup-form {
-      display: grid;
-      gap: 18px;
-    }
-    
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .form-label {
-      font-weight: 600;
-      color: var(--dark);
-      font-size: 0.95rem;
-    }
-    
-    body.dark .form-label {
-      color: var(--light);
-    }
-    
-    .form-control {
-      padding: 16px;
-      border: 1px solid var(--muted-2);
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      background: var(--light);
-      width: 100%;
-    }
-    
-    body.dark .form-control {
-      background: var(--dark);
-      color: var(--light);
-      border-color: var(--dark-2);
-    }
-    
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    
-    .form-hint {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.4;
-    }
-    
-    body.dark .form-hint {
-      color: var(--muted-2);
-    }
-    
-    .profile-upload {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
-    .upload-container {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    
-    .upload-preview {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 3px solid var(--primary-light);
-      position: relative;
-      background: var(--muted-2);
-      flex-shrink: 0;
-    }
-    
-    .upload-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .upload-preview .placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      background: var(--muted-2);
-      color: var(--muted);
-    }
-    
-    .upload-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-    }
-    
-    .upload-btn {
-      display: inline-block;
-      padding: 12px 16px;
-      background: var(--primary-light);
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-    
-    .upload-btn:hover {
-      background: var(--primary);
-    }
-    
-    .upload-btn input {
-      display: none;
-    }
-    
-    .remove-btn {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 0;
-      text-align: left;
-    }
-    
-    .terms-group {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    
-    .terms-group input {
-      margin-top: 4px;
-      flex-shrink: 0;
-    }
-    
-    .terms-group label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-    
-    body.dark .terms-group label {
-      color: var(--muted-2);
-    }
-    
-    .terms-group a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-    
-    .terms-group a:hover {
-      text-decoration: underline;
-    }
-    
-    .form-submit {
-      margin-top: 20px;
-    }
-    
-    .signin-redirect {
-      text-align: center;
-      margin-top: 30px;
-      color: var(--muted);
-    }
-    
-    body.dark .signin-redirect {
-      color: var(--muted-2);
-    }
-    
-    .signin-redirect a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    
-    .signin-redirect a:hover {
-      text-decoration: underline;
-    }
-    
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-      display: inline-block;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .password-strength {
-      margin-top: 8px;
-      height: 6px;
-      background: var(--muted-2);
-      border-radius: 3px;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .password-strength-meter {
-      height: 100%;
-      width: 0;
-      border-radius: 3px;
-      transition: width 0.3s ease, background 0.3s ease;
-    }
-    
-    .password-strength.weak .password-strength-meter {
-      width: 33%;
-      background: var(--danger);
-    }
-    
-    .password-strength.medium .password-strength-meter {
-      width: 66%;
-      background: var(--warning);
-    }
-    
-    .password-strength.strong .password-strength-meter {
-      width: 100%;
-      background: var(--success);
-    }
-    
-    .password-strength-text {
-      font-size: 0.8rem;
-      margin-top: 4px;
-      color: var(--muted);
-    }
-    
-    .success-message {
-      display: none;
-      background: var(--success);
-      color: white;
-      padding: 20px;
-      border-radius: var(--radius-xl);
-      text-align: center;
-      margin-top: 20px;
-    }
-    
-    .success-message.show {
-      display: block;
-    }
-    
-    .success-icon {
-      font-size: 3rem;
-      margin-bottom: 15px;
-    }
-    
-    @media (min-width: 768px) {
-      .signup-container {
-        grid-template-columns: 1fr 1.2fr;
-        max-width: 1000px;
-        min-height: 700px;
-        display: grid;
-      }
+ <script>
+  // Supabase configuration
+  const SUPABASE_URL = 'https://ekhanvqqylomkatamfqs.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraGFudnFxeWxvbWthdGFtZnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQyMTQzNzMsImV4cCI6MjAzOTc5MDM3M30.Sb-ozUBDdM8j7Q31x36zGSHqHAnQpxil_NGcW_AdlHo';
+  
+  // Initialize Supabase
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+  // Debug logging
+  function debugLog(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[${timestamp}] ${message}`);
+    
+    // Also show in debug panel
+    const debugPanel = document.getElementById('debugPanel');
+    if (debugPanel) {
+      debugPanel.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      debugPanel.scrollTop = debugPanel.scrollHeight;
+    }
+    
+    // Show notification for important messages
+    if (type === 'error') {
+      showNotification('Error', message, 'error');
+    } else if (type === 'success') {
+      showNotification('Success', message, 'success');
+    }
+  }
+  
+  // Toggle debug panel
+  document.getElementById('debugToggle').addEventListener('click', function() {
+    document.getElementById('debugPanel').classList.toggle('show');
+  });
+  
+  // DOM Elements
+  const signupForm = document.getElementById('signupForm');
+  const profilePhoto = document.getElementById('profilePhoto');
+  const profilePreview = document.getElementById('profilePreview');
+  const removePhoto = document.getElementById('removePhoto');
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const passwordMatchText = document.getElementById('passwordMatchText');
+  const passwordStrength = document.getElementById('passwordStrength');
+  const passwordStrengthText = document.getElementById('passwordStrengthText');
+  const submitBtn = document.getElementById('submitBtn');
+  const successMessage = document.getElementById('successMessage');
+  const resendEmailBtn = document.getElementById('resendEmail');
+  const returnToFormBtn = document.getElementById('returnToForm');
+  
+  // Profile picture handling
+  let profileImageFile = null;
+  
+  profilePhoto.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.match('image.*')) {
+      debugLog('Please select an image file (JPEG, PNG, etc.)', 'error');
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+      debugLog('Image must be less than 5MB', 'error');
+      return;
+    }
+    
+    profileImageFile = file;
+    debugLog(`Profile image selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+    
+    // Preview image
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      profilePreview.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  removePhoto.addEventListener('click', function() {
+    profilePhoto.value = '';
+    profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
+    profileImageFile = null;
+    debugLog('Profile image removed');
+  });
+  
+  // Upload image to Supabase Storage
+  async function uploadProfileImage(userId) {
+    if (!profileImageFile) {
+      debugLog('No profile image to upload');
+      return null;
+    }
+    
+    try {
+      debugLog('Starting profile image upload...');
       
-      .form-row {
-        grid-template-columns: 1fr 1fr;
-      }
+      const fileExt = profileImageFile.name.split('.').pop();
+      const fileName = `${userId}-${Date.now()}.${fileExt}`;
       
-      .signup-visual {
-        padding: 60px;
-      }
+      debugLog(`Uploading file: ${fileName}`);
       
-      .signup-form-container {
-        padding: 60px;
-      }
-      
-      .signup-visual h2 {
-        font-size: 2.2rem;
-      }
-      
-      .signup-header h1 {
-        font-size: 2.2rem;
-      }
-      
-      .upload-preview {
-        width: 100px;
-        height: 100px;
-      }
-    }
-    
-    @media (max-width: 576px) {
-      .upload-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-      
-      .upload-actions {
-        width: 100%;
-      }
-      
-      .upload-btn {
-        width: 100%;
-      }
-      
-      .notification-container {
-        max-width: calc(100% - 32px);
-        right: 16px;
-        left: 16px;
-      }
-    }
-
-    /* Debug Panel */
-    .debug-panel {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.9);
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 12px;
-      max-width: 300px;
-      max-height: 200px;
-      overflow: auto;
-      z-index: 9998;
-      display: none;
-    }
-    
-    .debug-panel.show {
-      display: block;
-    }
-    
-    .debug-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
-</head>
-<body>
-  <!-- Notification Container -->
-  <div class="notification-container" id="notificationContainer"></div>
-
-  <!-- Debug Panel (Hidden by default) -->
-  <div class="debug-panel" id="debugPanel"></div>
-  <button class="debug-toggle" id="debugToggle">
-    <i class="fa-solid fa-bug"></i>
-  </button>
-
-  <div class="signup-container">
-    <!-- Visual Section -->
-    <div class="signup-visual">
-      <div class="signup-visual-content">
-        <div class="signup-logo">
-          <img src="brightrose.png" alt="Brightrose Tech Logo">
-          <span>Brightrose Tech</span>
-        </div>
-        
-        <h2>Start Your Digital Career Journey</h2>
-        <p>Join thousands of students who have transformed their careers with our mobile-first bootcamps</p>
-        
-        <ul class="signup-features">
-          <li>
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Access to all mobile-friendly courses</span>
-          </li>
-          <li>
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Build portfolio projects as you learn</span>
-          </li>
-          <li>
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Join our supportive community</span>
-          </li>
-          <li>
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Get job-ready in weeks, not years</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- Form Section -->
-    <div class="signup-form-container">
-      <div class="signup-header">
-        <h1>Create Account</h1>
-        <p>Join Brightrose Tech to start your digital skills journey</p>
-      </div>
-      
-      <form class="signup-form" id="signupForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName" class="form-label">First Name</label>
-            <input type="text" id="firstName" class="form-control" placeholder="Enter your first name" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="lastName" class="form-label">Last Name</label>
-            <input type="text" id="lastName" class="form-control" placeholder="Enter your last name" required>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="email" class="form-label">Email Address</label>
-          <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
-          <p class="form-hint">We'll send a verification link to this email</p>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" class="form-control" placeholder="Create a strong password" required minlength="8">
-            <div class="password-strength" id="passwordStrength">
-              <div class="password-strength-meter"></div>
-            </div>
-            <p class="password-strength-text" id="passwordStrengthText">Password strength</p>
-          </div>
-          
-          <div class="form-group">
-            <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-            <p class="form-hint" id="passwordMatchText"></p>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Profile Picture (Optional)</label>
-          <div class="profile-upload">
-            <div class="upload-container">
-              <div class="upload-preview" id="profilePreview">
-                <div class="placeholder">
-                  <i class="fa-solid fa-user fa-2x"></i>
-                </div>
-              </div>
-              
-              <div class="upload-actions">
-                <label class="upload-btn">
-                  <i class="fa-solid fa-upload"></i> Upload Photo
-                  <input type="file" id="profilePhoto" accept="image/*" hidden>
-                </label>
-                <button type="button" class="remove-btn" id="removePhoto">Remove</button>
-              </div>
-            </div>
-            <p class="form-hint">Recommended: Square image, at least 200x200 pixels (Max: 5MB)</p>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <div class="terms-group">
-            <input type="checkbox" id="terms" required>
-            <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand that Brightrose Tech may send me communications about my account and courses.</label>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <div class="terms-group">
-            <input type="checkbox" id="newsletter">
-            <label for="newsletter">Yes, I'd like to receive occasional emails about new bootcamps, features, and learning tips. I can unsubscribe at any time.</label>
-          </div>
-        </div>
-        
-        <div class="form-submit">
-          <button type="submit" class="btn primary" style="width: 100%;" id="submitBtn">
-            <span>Create Account</span>
-          </button>
-        </div>
-      </form>
-      
-      <!-- Success Message (Hidden by default) -->
-      <div class="success-message" id="successMessage">
-        <div class="success-icon">
-          <i class="fa-solid fa-envelope-circle-check"></i>
-        </div>
-        <h3>Check Your Email!</h3>
-        <p>We've sent a verification link to your email address. Please click the link to confirm your account and complete the registration process.</p>
-        <p><small>Didn't receive the email? Check your spam folder or <a href="#" style="color: white; text-decoration: underline;" id="resendEmail">click here to resend</a>.</small></p>
-        <button class="btn outline" style="margin-top: 20px; color: white; border-color: white;" id="returnToForm">Back to Sign Up</button>
-      </div>
-      
-      <div class="signin-redirect">
-        <p>Already have an account? <a href="login.html">Sign in here</a></p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Supabase configuration
-    const SUPABASE_URL = 'https://ekhanvqqylomkatamfqs.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraGFudnFxeWxvbWthdGFtZnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQyMTQzNzMsImV4cCI6MjAzOTc5MDM3M30.Sb-ozUBDdM8j7Q31x36zGSHqHAnQpxil_NGcW_AdlHo';
-    
-    // Initialize Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // Debug logging
-    function debugLog(message) {
-      console.log('[DEBUG]', message);
-      const debugPanel = document.getElementById('debugPanel');
-      if (debugPanel) {
-        const timestamp = new Date().toLocaleTimeString();
-        debugPanel.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-        debugPanel.scrollTop = debugPanel.scrollHeight;
-      }
-    }
-    
-    // Toggle debug panel
-    document.getElementById('debugToggle').addEventListener('click', function() {
-      document.getElementById('debugPanel').classList.toggle('show');
-    });
-    
-    // DOM Elements
-    const signupForm = document.getElementById('signupForm');
-    const profilePhoto = document.getElementById('profilePhoto');
-    const profilePreview = document.getElementById('profilePreview');
-    const removePhoto = document.getElementById('removePhoto');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const passwordMatchText = document.getElementById('passwordMatchText');
-    const passwordStrength = document.getElementById('passwordStrength');
-    const passwordStrengthText = document.getElementById('passwordStrengthText');
-    const submitBtn = document.getElementById('submitBtn');
-    const successMessage = document.getElementById('successMessage');
-    const resendEmailBtn = document.getElementById('resendEmail');
-    const returnToFormBtn = document.getElementById('returnToForm');
-    
-    // Profile picture handling
-    let profileImageFile = null;
-    
-    profilePhoto.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      if (!file.type.match('image.*')) {
-        showNotification('Error', 'Please select an image file (JPEG, PNG, etc.)', 'error');
-        return;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        showNotification('Error', 'Image must be less than 5MB', 'error');
-        return;
-      }
-      
-      profileImageFile = file;
-      debugLog(`Profile image selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
-      
-      // Preview image
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        profilePreview.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
-      };
-      reader.readAsDataURL(file);
-    });
-    
-    removePhoto.addEventListener('click', function() {
-      profilePhoto.value = '';
-      profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
-      profileImageFile = null;
-      debugLog('Profile image removed');
-    });
-    
-    // Upload image to Supabase Storage
-    async function uploadProfileImage(userId) {
-      if (!profileImageFile) {
-        debugLog('No profile image to upload');
-        return null;
-      }
-      
-      try {
-        debugLog('Starting profile image upload...');
-        
-        // Check if storage bucket exists
-        const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-        if (bucketError) {
-          debugLog(`Bucket check error: ${bucketError.message}`);
-          return null;
-        }
-        
-        const bucketExists = buckets.some(b => b.name === 'user-profiles');
-        if (!bucketExists) {
-          debugLog('Storage bucket "user-profiles" not found');
-          showNotification('Warning', 'Profile picture storage not configured', 'warning');
-          return null;
-        }
-        
-        debugLog('Storage bucket found');
-        
-        // Create unique filename
-        const fileExt = profileImageFile.name.split('.').pop();
-        const fileName = `${userId}-${Date.now()}.${fileExt}`;
-        
-        debugLog(`Uploading file: ${fileName}`);
-        
-        // Upload to Supabase Storage
-        const { data, error } = await supabase.storage
-          .from('user-profiles')
-          .upload(fileName, profileImageFile, {
-            cacheControl: '3600',
-            upsert: false
-          });
-        
-        if (error) {
-          debugLog(`Upload failed: ${error.message}`);
-          // Don't throw error - profile picture is optional
-          return null;
-        }
-        
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('user-profiles')
-          .getPublicUrl(fileName);
-        
-        debugLog(`Upload successful: ${publicUrl}`);
-        return publicUrl;
-        
-      } catch (error) {
-        debugLog(`Upload error: ${error.message}`);
-        return null;
-      }
-    }
-    
-    // Password strength checker
-    passwordInput.addEventListener('input', function() {
-      const password = passwordInput.value;
-      let strength = 0;
-      
-      if (password.length >= 8) strength++;
-      if (password.match(/[a-z]+/)) strength++;
-      if (password.match(/[A-Z]+/)) strength++;
-      if (password.match(/[0-9]+/)) strength++;
-      if (password.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength++;
-      
-      // Update strength meter
-      passwordStrength.className = 'password-strength';
-      if (password.length === 0) {
-        passwordStrengthText.textContent = 'Password strength';
-        passwordStrengthText.style.color = '';
-      } else if (strength <= 2) {
-        passwordStrength.classList.add('weak');
-        passwordStrengthText.textContent = 'Weak password';
-        passwordStrengthText.style.color = 'var(--danger)';
-      } else if (strength <= 4) {
-        passwordStrength.classList.add('medium');
-        passwordStrengthText.textContent = 'Medium strength password';
-        passwordStrengthText.style.color = 'var(--warning)';
-      } else {
-        passwordStrength.classList.add('strong');
-        passwordStrengthText.textContent = 'Strong password';
-        passwordStrengthText.style.color = 'var(--success)';
-      }
-    });
-    
-    // Password confirmation check
-    confirmPasswordInput.addEventListener('input', function() {
-      if (confirmPasswordInput.value === '') {
-        passwordMatchText.textContent = '';
-      } else if (confirmPasswordInput.value !== passwordInput.value) {
-        passwordMatchText.textContent = 'Passwords do not match';
-        passwordMatchText.style.color = 'var(--danger)';
-      } else {
-        passwordMatchText.textContent = 'Passwords match';
-        passwordMatchText.style.color = 'var(--success)';
-      }
-    });
-    
-    // Form submission
-    signupForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      debugLog('Form submission started');
-      
-      // Basic validation
-      if (passwordInput.value !== confirmPasswordInput.value) {
-        showNotification('Error', 'Passwords do not match', 'error');
-        return;
-      }
-      
-      if (passwordInput.value.length < 8) {
-        showNotification('Error', 'Password must be at least 8 characters long', 'error');
-        return;
-      }
-      
-      // Check if terms are accepted
-      if (!document.getElementById('terms').checked) {
-        showNotification('Error', 'You must accept the Terms of Service to continue', 'error');
-        return;
-      }
-      
-      // Get form values
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const email = document.getElementById('email').value.trim().toLowerCase();
-      const password = passwordInput.value;
-      const subscribeToNewsletter = document.getElementById('newsletter').checked;
-      
-      if (!firstName || !lastName || !email) {
-        showNotification('Error', 'Please fill in all required fields', 'error');
-        return;
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showNotification('Error', 'Please enter a valid email address', 'error');
-        return;
-      }
-      
-      // Update button to show loading state
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
-      submitBtn.disabled = true;
-      
-      debugLog(`Attempting signup for: ${email}`);
-      debugLog(`Name: ${firstName} ${lastName}`);
-      debugLog(`Newsletter: ${subscribeToNewsletter}`);
-      
-      try {
-        // Step 1: Create user with Supabase Auth
-        debugLog('Step 1: Creating auth user...');
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              newsletter: subscribeToNewsletter,
-              full_name: `${firstName} ${lastName}`
-            },
-            emailRedirectTo: `${window.location.origin}/verify-success.html`
-          }
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('user-profiles')
+        .upload(fileName, profileImageFile, {
+          cacheControl: '3600',
+          upsert: false
         });
-        
-        if (authError) {
-          debugLog(`Auth error: ${authError.message}`);
-          throw authError;
-        }
-        
-        debugLog('Auth user created successfully');
-        debugLog(`User ID: ${authData.user?.id}`);
-        debugLog(`Email confirmed: ${authData.user?.email_confirmed_at ? 'Yes' : 'No'}`);
-        
-        // Check if user was created successfully
-        if (!authData.user) {
-          throw new Error('User creation failed - no user data returned');
-        }
-        
-        // Step 2: Upload profile image (if any)
-        let profileImageUrl = null;
-        if (profileImageFile && authData.user.id) {
-          debugLog('Step 2: Uploading profile image...');
-          profileImageUrl = await uploadProfileImage(authData.user.id);
-          debugLog(`Profile image URL: ${profileImageUrl || 'None'}`);
-        } else {
-          debugLog('Step 2: No profile image to upload');
-        }
-        
-        // Step 3: Save user data to brightrose_users table
-        debugLog('Step 3: Saving to database...');
-        
-        const userData = {
-          id: authData.user.id,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          profile_image: profileImageUrl,
-          newsletter: subscribeToNewsletter,
-          email_verified: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        
-        debugLog('User data to insert:', JSON.stringify(userData));
-        
-        const { data: dbData, error: dbError } = await supabase
-          .from('brightrose_users')
-          .insert(userData)
-          .select();
-        
-        if (dbError) {
-          debugLog(`Database error: ${dbError.message}`);
-          debugLog(`Error code: ${dbError.code}`);
-          debugLog(`Error details: ${JSON.stringify(dbError.details)}`);
-          
-          // If it's a duplicate key error, try updating instead
-          if (dbError.code === '23505') {
-            debugLog('Duplicate key detected, updating existing record...');
-            const { error: updateError } = await supabase
-              .from('brightrose_users')
-              .update(userData)
-              .eq('id', authData.user.id);
-            
-            if (updateError) {
-              debugLog(`Update error: ${updateError.message}`);
-              throw updateError;
-            }
-            debugLog('Existing record updated successfully');
-          } else {
-            throw new Error(`Database error: ${dbError.message}`);
+      
+      if (error) {
+        debugLog(`Upload failed: ${error.message}`);
+        // Don't throw error - profile picture is optional
+        return null;
+      }
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('user-profiles')
+        .getPublicUrl(fileName);
+      
+      debugLog(`Upload successful: ${publicUrl}`);
+      return publicUrl;
+      
+    } catch (error) {
+      debugLog(`Upload error: ${error.message}`);
+      return null;
+    }
+  }
+  
+  // Password strength checker
+  passwordInput.addEventListener('input', function() {
+    const password = passwordInput.value;
+    let strength = 0;
+    
+    if (password.length >= 8) strength++;
+    if (password.match(/[a-z]+/)) strength++;
+    if (password.match(/[A-Z]+/)) strength++;
+    if (password.match(/[0-9]+/)) strength++;
+    if (password.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength++;
+    
+    // Update strength meter
+    passwordStrength.className = 'password-strength';
+    if (password.length === 0) {
+      passwordStrengthText.textContent = 'Password strength';
+      passwordStrengthText.style.color = '';
+    } else if (strength <= 2) {
+      passwordStrength.classList.add('weak');
+      passwordStrengthText.textContent = 'Weak password';
+      passwordStrengthText.style.color = 'var(--danger)';
+    } else if (strength <= 4) {
+      passwordStrength.classList.add('medium');
+      passwordStrengthText.textContent = 'Medium strength password';
+      passwordStrengthText.style.color = 'var(--warning)';
+    } else {
+      passwordStrength.classList.add('strong');
+      passwordStrengthText.textContent = 'Strong password';
+      passwordStrengthText.style.color = 'var(--success)';
+    }
+  });
+  
+  // Password confirmation check
+  confirmPasswordInput.addEventListener('input', function() {
+    if (confirmPasswordInput.value === '') {
+      passwordMatchText.textContent = '';
+    } else if (confirmPasswordInput.value !== passwordInput.value) {
+      passwordMatchText.textContent = 'Passwords do not match';
+      passwordMatchText.style.color = 'var(--danger)';
+    } else {
+      passwordMatchText.textContent = 'Passwords match';
+      passwordMatchText.style.color = 'var(--success)';
+    }
+  });
+  
+  // SIMPLE SIGNUP FUNCTION - This is the key fix!
+  async function signupUser(firstName, lastName, email, password, newsletter) {
+    debugLog('Starting SIMPLE signup process...');
+    
+    try {
+      // Step 1: Create auth user
+      debugLog('1. Creating auth user...');
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            newsletter: newsletter
           }
-        } else {
-          debugLog('Database insert successful');
-          debugLog('Inserted data:', JSON.stringify(dbData));
         }
+      });
+      
+      if (authError) {
+        debugLog(`Auth error: ${authError.message}`, 'error');
+        throw authError;
+      }
+      
+      if (!authData.user) {
+        throw new Error('No user data returned from auth');
+      }
+      
+      debugLog(`✅ Auth user created: ${authData.user.id}`);
+      
+      // Step 2: Upload profile image (optional)
+      let profileImageUrl = null;
+      if (profileImageFile && authData.user.id) {
+        debugLog('2. Uploading profile image...');
+        profileImageUrl = await uploadProfileImage(authData.user.id);
+        debugLog(`Profile image: ${profileImageUrl || 'None'}`);
+      }
+      
+      // Step 3: Insert into database
+      debugLog('3. Inserting into brightrose_users...');
+      
+      const userData = {
+        id: authData.user.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        profile_image: profileImageUrl,
+        newsletter: newsletter,
+        email_verified: false
+        // created_at and updated_at will use DEFAULT values
+      };
+      
+      debugLog('Inserting data:', JSON.stringify(userData));
+      
+      const { data: dbData, error: dbError } = await supabase
+        .from('brightrose_users')
+        .insert(userData)
+        .select();
+      
+      if (dbError) {
+        debugLog(`Database error: ${dbError.message}`, 'error');
+        debugLog(`Error code: ${dbError.code}`, 'error');
         
+        // If duplicate, just update
+        if (dbError.code === '23505') {
+          debugLog('User already exists in table, updating...');
+          const { error: updateError } = await supabase
+            .from('brightrose_users')
+            .update(userData)
+            .eq('id', authData.user.id);
+          
+          if (updateError) {
+            throw updateError;
+          }
+          debugLog('✅ Updated existing record');
+        } else {
+          throw dbError;
+        }
+      } else {
+        debugLog('✅ Database insert successful');
+      }
+      
+      return {
+        success: true,
+        userId: authData.user.id,
+        email: email
+      };
+      
+    } catch (error) {
+      debugLog(`Signup failed: ${error.message}`, 'error');
+      throw error;
+    }
+  }
+  
+  // Form submission
+  signupForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Basic validation
+    if (passwordInput.value !== confirmPasswordInput.value) {
+      debugLog('Passwords do not match', 'error');
+      return;
+    }
+    
+    if (passwordInput.value.length < 8) {
+      debugLog('Password must be at least 8 characters long', 'error');
+      return;
+    }
+    
+    if (!document.getElementById('terms').checked) {
+      debugLog('You must accept the Terms of Service', 'error');
+      return;
+    }
+    
+    // Get form values
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const password = passwordInput.value;
+    const subscribeToNewsletter = document.getElementById('newsletter').checked;
+    
+    if (!firstName || !lastName || !email) {
+      debugLog('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      debugLog('Please enter a valid email address', 'error');
+      return;
+    }
+    
+    // Update button to show loading state
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+    submitBtn.disabled = true;
+    
+    try {
+      debugLog(`Starting signup for: ${email}`);
+      
+      const result = await signupUser(firstName, lastName, email, password, subscribeToNewsletter);
+      
+      if (result.success) {
         // SUCCESS: Show success message and hide form
         signupForm.style.display = 'none';
         successMessage.classList.add('show');
         
-        debugLog('Signup process completed successfully');
-        showNotification('Success', 'Account created! Check your email for verification link.', 'success');
+        debugLog('✅ Account created successfully!', 'success');
         
         // Store email for potential resend
         localStorage.setItem('lastSignupEmail', email);
-        
-      } catch (error) {
-        console.error('Signup Error:', error);
-        debugLog(`Signup failed: ${error.message}`);
-        debugLog(`Full error: ${JSON.stringify(error)}`);
-        
-        // User-friendly error messages
-        let errorMessage = 'An error occurred during signup. Please try again.';
-        
-        if (error.message.includes('User already registered')) {
-          errorMessage = 'An account with this email already exists. Please sign in instead.';
-        } else if (error.message.includes('already exists')) {
-          errorMessage = 'This email is already registered. Please use a different email or try signing in.';
-        } else if (error.message.includes('Password should be at least')) {
-          errorMessage = 'Password is too weak. Please choose a stronger password.';
-        } else if (error.message.includes('Invalid email')) {
-          errorMessage = 'Invalid email address. Please check your email and try again.';
-        } else if (error.message.includes('Email rate limit exceeded')) {
-          errorMessage = 'Too many signup attempts. Please try again in a few minutes.';
-        } else if (error.message.includes('auth.weak-password')) {
-          errorMessage = 'Password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
-        } else if (error.message.includes('network')) {
-          errorMessage = 'Network error. Please check your internet connection and try again.';
-        } else if (error.message.includes('Storage bucket not found')) {
-          errorMessage = 'Profile picture upload is temporarily unavailable. Your account was created without a profile picture.';
-        } else if (error.message.includes('JWT expired')) {
-          errorMessage = 'Session expired. Please refresh the page and try again.';
-        } else if (error.message.includes('does not exist')) {
-          errorMessage = 'Database table not found. Please contact support.';
-        } else if (error.message.includes('permission denied')) {
-          errorMessage = 'Permission denied. Please check RLS policies.';
-        } else if (error.message.includes('23505')) {
-          errorMessage = 'This email is already registered. Please sign in instead.';
-        } else if (error.message.includes('new row violates row-level security policy')) {
-          errorMessage = 'Security policy error. Please contact support.';
-        }
-        
-        showNotification('Error', errorMessage, 'error');
-        
-        // Reset button state
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-    
-    // Resend verification email
-    resendEmailBtn.addEventListener('click', async function(e) {
-      e.preventDefault();
-      debugLog('Resending verification email...');
-      
-      const email = localStorage.getItem('lastSignupEmail');
-      if (!email) {
-        showNotification('Error', 'No email found. Please sign up again.', 'error');
-        return;
       }
       
-      try {
-        const { error } = await supabase.auth.resend({
-          type: 'signup',
-          email: email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/verify-success.html`
-          }
-        });
-        
-        if (error) throw error;
-        
-        debugLog('Verification email resent');
-        showNotification('Success', 'Verification email resent! Check your inbox.', 'success');
-      } catch (error) {
-        console.error('Resend Error:', error);
-        debugLog(`Resend error: ${error.message}`);
-        showNotification('Error', 'Failed to resend verification email. Please try again later.', 'error');
+    } catch (error) {
+      console.error('Signup Error:', error);
+      
+      // User-friendly error messages
+      let errorMessage = 'An error occurred during signup. Please try again.';
+      
+      if (error.message.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      } else if (error.message.includes('already exists')) {
+        errorMessage = 'This email is already registered. Please use a different email or try signing in.';
+      } else if (error.message.includes('Password should be at least')) {
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      } else if (error.message.includes('Invalid email')) {
+        errorMessage = 'Invalid email address. Please check your email and try again.';
+      } else if (error.message.includes('Email rate limit exceeded')) {
+        errorMessage = 'Too many signup attempts. Please try again in a few minutes.';
+      } else if (error.message.includes('does not exist')) {
+        errorMessage = 'Database table not found. Please run the SQL setup first.';
+      } else if (error.message.includes('permission denied')) {
+        errorMessage = 'Permission denied. Please check RLS policies.';
+      } else if (error.message.includes('23505')) {
+        errorMessage = 'This email is already registered. Please sign in instead.';
       }
-    });
-    
-    // Return to form button
-    returnToFormBtn.addEventListener('click', function() {
-      debugLog('Returning to form');
-      successMessage.classList.remove('show');
-      signupForm.style.display = 'grid';
-      signupForm.reset();
       
-      // Reset profile picture
-      profilePhoto.value = '';
-      profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
-      profileImageFile = null;
+      debugLog(errorMessage, 'error');
       
-      // Reset form validation
-      passwordMatchText.textContent = '';
-      passwordStrength.className = 'password-strength';
-      passwordStrengthText.textContent = 'Password strength';
-      passwordStrengthText.style.color = '';
-      
-      // Reset button
+      // Reset button state
+      submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>Create Account</span>';
+    }
+  });
+  
+  // Resend verification email
+  resendEmailBtn.addEventListener('click', async function(e) {
+    e.preventDefault();
+    
+    const email = localStorage.getItem('lastSignupEmail');
+    if (!email) {
+      debugLog('No email found. Please sign up again.', 'error');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      });
+      
+      if (error) throw error;
+      
+      debugLog('Verification email resent! Check your inbox.', 'success');
+    } catch (error) {
+      console.error('Resend Error:', error);
+      debugLog('Failed to resend verification email. Please try again later.', 'error');
+    }
+  });
+  
+  // Return to form button
+  returnToFormBtn.addEventListener('click', function() {
+    successMessage.classList.remove('show');
+    signupForm.style.display = 'grid';
+    signupForm.reset();
+    
+    // Reset profile picture
+    profilePhoto.value = '';
+    profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
+    profileImageFile = null;
+    
+    // Reset form validation
+    passwordMatchText.textContent = '';
+    passwordStrength.className = 'password-strength';
+    passwordStrengthText.textContent = 'Password strength';
+    passwordStrengthText.style.color = '';
+    
+    // Reset button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span>Create Account</span>';
+  });
+  
+  // Notification system
+  function showNotification(title, message, type = 'info') {
+    const notificationContainer = document.getElementById('notificationContainer');
+    
+    // Remove old notifications if too many
+    if (notificationContainer.children.length > 3) {
+      notificationContainer.removeChild(notificationContainer.children[0]);
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    let icon = 'fa-info-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+    if (type === 'info') icon = 'fa-info-circle';
+    
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="fa-solid ${icon}"></i>
+      </div>
+      <div class="notification-content">
+        <h3 class="notification-title">${title}</h3>
+        <p class="notification-message">${message}</p>
+      </div>
+      <button class="notification-close">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    `;
+    
+    notificationContainer.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    // Close notification on button click
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 400);
     });
     
-    // Notification system
-    function showNotification(title, message, type = 'info') {
-      const notificationContainer = document.getElementById('notificationContainer');
-      
-      // Remove old notifications if too many
-      if (notificationContainer.children.length > 3) {
-        notificationContainer.removeChild(notificationContainer.children[0]);
-      }
-      
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      
-      let icon = 'fa-info-circle';
-      if (type === 'error') icon = 'fa-exclamation-circle';
-      if (type === 'success') icon = 'fa-check-circle';
-      if (type === 'warning') icon = 'fa-exclamation-triangle';
-      if (type === 'info') icon = 'fa-info-circle';
-      
-      notification.innerHTML = `
-        <div class="notification-icon">
-          <i class="fa-solid ${icon}"></i>
-        </div>
-        <div class="notification-content">
-          <h3 class="notification-title">${title}</h3>
-          <p class="notification-message">${message}</p>
-        </div>
-        <button class="notification-close">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      `;
-      
-      notificationContainer.appendChild(notification);
-      
-      // Show notification
-      setTimeout(() => {
-        notification.classList.add('show');
-      }, 10);
-      
-      // Close notification on button click
-      notification.querySelector('.notification-close').addEventListener('click', () => {
+    // Auto-remove notification after 5 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
         notification.classList.remove('show');
         setTimeout(() => {
           if (notification.parentNode) {
             notification.remove();
           }
         }, 400);
-      });
+      }
+    }, 5000);
+  }
+  
+  // Test database connection on page load
+  async function testDatabaseConnection() {
+    try {
+      debugLog('Testing database connection...');
       
-      // Auto-remove notification after 5 seconds
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.classList.remove('show');
-          setTimeout(() => {
-            if (notification.parentNode) {
-              notification.remove();
-            }
-          }, 400);
-        }
-      }, 5000);
-    }
-    
-    // Test Supabase connection
-    async function testSupabaseConnection() {
-      try {
-        debugLog('Testing Supabase connection...');
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          debugLog(`Connection test failed: ${error.message}`);
+      // Test if table exists
+      const { data, error } = await supabase
+        .from('brightrose_users')
+        .select('count')
+        .limit(1);
+      
+      if (error) {
+        if (error.message.includes('does not exist')) {
+          debugLog('❌ brightrose_users table does not exist!', 'error');
+          debugLog('Please run the SQL setup script in Supabase SQL Editor:', 'error');
+          debugLog('1. Go to Supabase Dashboard → SQL Editor', 'error');
+          debugLog('2. Run the CREATE TABLE SQL script', 'error');
+          debugLog('3. Refresh this page', 'error');
+          return false;
+        } else if (error.message.includes('permission denied')) {
+          debugLog('❌ Permission denied. Check RLS policies.', 'error');
           return false;
         }
-        
-        debugLog('Supabase connection successful');
-        return true;
-      } catch (error) {
-        debugLog(`Connection test error: ${error.message}`);
+        debugLog(`❌ Database error: ${error.message}`, 'error');
         return false;
       }
-    }
-    
-    // Initialize form validation
-    function initializeFormValidation() {
-      const inputs = signupForm.querySelectorAll('input[required]');
-      inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-          if (!this.value.trim()) {
-            this.style.borderColor = 'var(--danger)';
-          } else {
-            this.style.borderColor = '';
-          }
-        });
-        
-        input.addEventListener('input', function() {
-          if (this.value.trim()) {
-            this.style.borderColor = '';
-          }
-        });
-      });
-    }
-    
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', async function() {
-      debugLog('Page loaded');
-      initializeFormValidation();
       
-      // Test connection
-      const connected = await testSupabaseConnection();
-      if (!connected) {
-        showNotification('Warning', 'Unable to connect to server. Some features may not work.', 'warning');
-      }
+      debugLog('✅ Database connection successful! Table exists.');
+      return true;
       
-      // Check if user is already logged in
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          debugLog('User already logged in, redirecting...');
-          showNotification('Info', 'You are already logged in. Redirecting to dashboard...', 'info');
-          setTimeout(() => {
-            window.location.href = 'dashboard.html';
-          }, 2000);
+    } catch (error) {
+      debugLog(`❌ Database test failed: ${error.message}`, 'error');
+      return false;
+    }
+  }
+  
+  // Initialize form validation
+  function initializeFormValidation() {
+    const inputs = signupForm.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+          this.style.borderColor = 'var(--danger)';
+        } else {
+          this.style.borderColor = '';
         }
       });
       
-      // Check for URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('verified') && urlParams.get('verified') === 'true') {
-        showNotification('Success', 'Email verified successfully! You can now sign in.', 'success');
-      }
-      
-      // Listen for auth state changes
-      supabase.auth.onAuthStateChange((event, session) => {
-        debugLog(`Auth state changed: ${event}`);
-        if (session) {
-          debugLog(`User: ${session.user.email}`);
+      input.addEventListener('input', function() {
+        if (this.value.trim()) {
+          this.style.borderColor = '';
         }
       });
     });
-  </script>
+  }
+  
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', async function() {
+    debugLog('Page loaded');
+    initializeFormValidation();
+    
+    // Test database connection
+    const dbConnected = await testDatabaseConnection();
+    
+    if (!dbConnected) {
+      debugLog('Signup will not work until database is set up.', 'error');
+    } else {
+      debugLog('Ready for signup!', 'success');
+    }
+    
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        debugLog('You are already logged in. Redirecting to dashboard...', 'info');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 2000);
+      }
+    });
+    
+    // Check for URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('verified') && urlParams.get('verified') === 'true') {
+      debugLog('Email verified successfully! You can now sign in.', 'success');
+    }
+  });
+</script>
 </body>
 </html>
