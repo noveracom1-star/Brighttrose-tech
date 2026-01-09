@@ -86,7 +86,7 @@
       gap: 8px;
       position: relative;
       overflow: hidden;
-      font-size: 16px; /* Ensure readable tap targets */
+      font-size: 16px;
     }
     
     .btn::before {
@@ -402,7 +402,7 @@
       border: 1px solid var(--muted-2);
       border-radius: 10px;
       font-family: inherit;
-      font-size: 16px; /* Prevent zoom on iOS */
+      font-size: 16px;
       transition: all 0.3s ease;
       background: var(--light);
       width: 100%;
@@ -619,6 +619,26 @@
       color: var(--muted);
     }
     
+    /* Success Message */
+    .success-message {
+      display: none;
+      background: var(--success);
+      color: white;
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .success-message.show {
+      display: block;
+    }
+    
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    
     /* ========= Responsive Styles ========= */
     @media (min-width: 768px) {
       .signup-container {
@@ -800,6 +820,16 @@
         </div>
       </form>
       
+      <!-- Success Message (Hidden by default) -->
+      <div class="success-message" id="successMessage">
+        <div class="success-icon">
+          <i class="fa-solid fa-envelope-circle-check"></i>
+        </div>
+        <h3>Check Your Email!</h3>
+        <p>We've sent a verification link to your email address. Please click the link to confirm your account and complete the registration process.</p>
+        <p><small>Didn't receive the email? Check your spam folder or <a href="#" style="color: white; text-decoration: underline;" id="resendEmail">click here to resend</a>.</small></p>
+      </div>
+      
       <div class="signin-redirect">
         <p>Already have an account? <a href="login.html">Sign in here</a></p>
       </div>
@@ -825,6 +855,8 @@
     const passwordStrength = document.getElementById('passwordStrength');
     const passwordStrengthText = document.getElementById('passwordStrengthText');
     const submitBtn = document.getElementById('submitBtn');
+    const successMessage = document.getElementById('successMessage');
+    const resendEmailBtn = document.getElementById('resendEmail');
     
     // Profile picture handling
     let profileImageFile = null;
@@ -864,8 +896,6 @@
       if (!profileImageFile) return null;
       
       try {
-        showNotification('Info', 'Uploading profile picture...', 'info');
-        
         // Create unique filename
         const fileExt = profileImageFile.name.split('.').pop();
         const fileName = `${userId}-${Date.now()}.${fileExt}`;
@@ -875,19 +905,20 @@
           .from('user-profiles')
           .upload(fileName, profileImageFile);
         
-        if (error) throw error;
+        if (error) {
+          console.warn('Profile image upload failed:', error.message);
+          return null;
+        }
         
         // Get public URL
         const { data: urlData } = supabase.storage
           .from('user-profiles')
           .getPublicUrl(fileName);
         
-        showNotification('Success', 'Profile picture uploaded successfully', 'success');
         return urlData.publicUrl;
         
       } catch (error) {
-        console.error('Error uploading image:', error);
-        showNotification('Warning', 'Failed to upload profile picture, using default', 'warning');
+        console.warn('Error uploading image:', error);
         return null;
       }
     }
@@ -951,15 +982,28 @@
         return;
       }
       
+      // Check if terms are accepted
+      if (!document.getElementById('terms').checked) {
+        showNotification('Error', 'You must accept the Terms of Service to continue', 'error');
+        return;
+      }
+      
       // Get form values
       const firstName = document.getElementById('firstName').value.trim();
       const lastName = document.getElementById('lastName').value.trim();
-      const email = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
       const password = passwordInput.value;
       const subscribeToNewsletter = document.getElementById('newsletter').checked;
       
       if (!firstName || !lastName || !email) {
         showNotification('Error', 'Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showNotification('Error', 'Please enter a valid email address', 'error');
         return;
       }
       
@@ -969,7 +1013,14 @@
       submitBtn.disabled = true;
       
       try {
-        // Step 1: Create user with Supabase Auth
+        // Upload profile image first (if exists)
+        let profileImageUrl = null;
+        if (profileImageFile) {
+          const tempUserId = `temp_${Date.now()}`;
+          profileImageUrl = await uploadProfileImage(tempUserId);
+        }
+        
+        // Create user with Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -978,28 +1029,23 @@
               first_name: firstName,
               last_name: lastName,
               newsletter: subscribeToNewsletter,
-              full_name: `${firstName} ${lastName}`
+              full_name: `${firstName} ${lastName}`,
+              profile_image: profileImageUrl
             },
             emailRedirectTo: `${window.location.origin}/login.html?verified=true`
           }
         });
         
         if (authError) {
-          console.error('Auth Error:', authError);
           throw authError;
         }
         
+        // Check if user was created successfully
         if (!authData.user) {
-          throw new Error('No user data returned from authentication');
+          throw new Error('User creation failed - no user data returned');
         }
         
-        // Step 2: Upload profile image if exists
-        let profileImageUrl = null;
-        if (profileImageFile) {
-          profileImageUrl = await uploadProfileImage(authData.user.id);
-        }
-        
-        // Step 3: Save user data to brightrose_users table
+        // Save user data to brightrose_users table
         const { error: dbError } = await supabase
           .from('brightrose_users')
           .insert({
@@ -1015,41 +1061,28 @@
           });
         
         if (dbError) {
-          console.error('Database Error:', dbError);
-          
-          // If it's a duplicate error, we still consider it success because auth worked
-          if (dbError.code === '23505') {
-            showNotification('Info', 'Account already exists. Please check your email for verification.', 'info');
-          } else {
-            throw dbError;
-          }
-        } else {
-          showNotification('Success', 'Account created successfully! Please check your email to verify your account.', 'success');
+          console.warn('Database insert warning:', dbError.message);
+          // Continue even if database insert fails - auth is primary
         }
         
-        // Clear form
-        signupForm.reset();
-        profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
-        profileImageFile = null;
+        // SUCCESS: Show success message and hide form
+        signupForm.style.display = 'none';
+        successMessage.classList.add('show');
         
-        // Reset password strength indicators
-        passwordStrength.className = 'password-strength';
-        passwordStrengthText.textContent = 'Password strength';
-        passwordStrengthText.style.color = '';
-        passwordMatchText.textContent = '';
+        showNotification('Success', 'Account created! Check your email for verification link.', 'success');
         
-        // Optional: Redirect to login page after success
-        setTimeout(() => {
-          window.location.href = 'login.html?signup=success';
-        }, 3000);
+        // Store email for potential resend
+        localStorage.setItem('lastSignupEmail', email);
         
       } catch (error) {
-        console.error('Full Error:', error);
+        console.error('Signup Error:', error);
         
         // User-friendly error messages
         let errorMessage = 'An error occurred during signup. Please try again.';
         
         if (error.message.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please sign in instead.';
+        } else if (error.message.includes('already exists')) {
           errorMessage = 'This email is already registered. Please use a different email or try signing in.';
         } else if (error.message.includes('Password should be at least')) {
           errorMessage = 'Password is too weak. Please choose a stronger password.';
@@ -1057,16 +1090,45 @@
           errorMessage = 'Invalid email address. Please check your email and try again.';
         } else if (error.message.includes('Email rate limit exceeded')) {
           errorMessage = 'Too many signup attempts. Please try again in a few minutes.';
-        } else if (error.message.includes('already exists')) {
-          errorMessage = 'An account with this email already exists. Please sign in instead.';
+        } else if (error.message.includes('auth.weak-password')) {
+          errorMessage = 'Password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.';
         }
         
         showNotification('Error', errorMessage, 'error');
         
-      } finally {
         // Reset button state
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
+      }
+    });
+    
+    // Resend verification email
+    resendEmailBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      
+      const email = localStorage.getItem('lastSignupEmail');
+      if (!email) {
+        showNotification('Error', 'No email found. Please sign up again.', 'error');
+        return;
+      }
+      
+      try {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/login.html?verified=true`
+          }
+        });
+        
+        if (error) throw error;
+        
+        showNotification('Success', 'Verification email resent! Check your inbox.', 'success');
+      } catch (error) {
+        console.error('Resend Error:', error);
+        showNotification('Error', 'Failed to resend verification email. Please try again later.', 'error');
       }
     });
     
@@ -1125,7 +1187,6 @@
     
     // Initialize form validation
     function initializeFormValidation() {
-      // Add real-time validation
       const inputs = signupForm.querySelectorAll('input[required]');
       inputs.forEach(input => {
         input.addEventListener('blur', function() {
@@ -1141,6 +1202,16 @@
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
       initializeFormValidation();
+      
+      // Check if user is already logged in
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          showNotification('Info', 'You are already logged in. Redirecting to dashboard...', 'info');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 2000);
+        }
+      });
     });
   </script>
 </body>
