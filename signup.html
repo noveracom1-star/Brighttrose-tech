@@ -13,11 +13,12 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   
   <style>
+    /* [All your existing CSS styles remain the same] */
     :root {
-      --primary: #2563eb; /* Blue */
+      --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --primary-light: #3b82f6;
-      --secondary: #ec4899; /* Pink */
+      --secondary: #ec4899;
       --accent: #f59e0b;
       --success: #10B981;
       --warning: #F59E0B;
@@ -64,7 +65,6 @@
       padding: 16px;
     }
 
-    /* ========= Utility Classes ========= */
     .container { 
       max-width: 1280px; 
       margin: 0 auto; 
@@ -138,7 +138,6 @@
       transform: translateY(-2px);
     }
     
-    /* ========= Notification System ========= */
     .notification-container {
       position: fixed;
       top: 20px;
@@ -238,7 +237,6 @@
       opacity: 1;
     }
 
-    /* ========= Signup Container ========= */
     .signup-container {
       display: flex;
       flex-direction: column;
@@ -431,7 +429,6 @@
       color: var(--muted-2);
     }
     
-    /* Profile Picture Upload */
     .profile-upload {
       display: flex;
       flex-direction: column;
@@ -510,7 +507,6 @@
       text-align: left;
     }
     
-    /* Terms and Conditions */
     .terms-group {
       display: flex;
       align-items: flex-start;
@@ -566,7 +562,6 @@
       text-decoration: underline;
     }
     
-    /* Loading Spinner */
     .spinner {
       width: 20px;
       height: 20px;
@@ -581,7 +576,6 @@
       to { transform: rotate(360deg); }
     }
     
-    /* Password Strength Meter */
     .password-strength {
       margin-top: 8px;
       height: 6px;
@@ -619,7 +613,6 @@
       color: var(--muted);
     }
     
-    /* Success Message */
     .success-message {
       display: none;
       background: var(--success);
@@ -639,7 +632,6 @@
       margin-bottom: 15px;
     }
     
-    /* ========= Responsive Styles ========= */
     @media (min-width: 768px) {
       .signup-container {
         grid-template-columns: 1fr 1.2fr;
@@ -665,7 +657,7 @@
       }
       
       .signup-header h1 {
-        fontSize: 2.2rem;
+        font-size: 2.2rem;
       }
       
       .upload-preview {
@@ -695,11 +687,56 @@
         left: 16px;
       }
     }
+
+    /* Debug Panel */
+    .debug-panel {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      max-width: 300px;
+      max-height: 200px;
+      overflow: auto;
+      z-index: 9998;
+      display: none;
+    }
+    
+    .debug-panel.show {
+      display: block;
+    }
+    
+    .debug-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
   <!-- Notification Container -->
   <div class="notification-container" id="notificationContainer"></div>
+
+  <!-- Debug Panel (Hidden by default) -->
+  <div class="debug-panel" id="debugPanel"></div>
+  <button class="debug-toggle" id="debugToggle">
+    <i class="fa-solid fa-bug"></i>
+  </button>
 
   <div class="signup-container">
     <!-- Visual Section -->
@@ -845,6 +882,22 @@
     // Initialize Supabase
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // Debug logging
+    function debugLog(message) {
+      console.log('[DEBUG]', message);
+      const debugPanel = document.getElementById('debugPanel');
+      if (debugPanel) {
+        const timestamp = new Date().toLocaleTimeString();
+        debugPanel.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        debugPanel.scrollTop = debugPanel.scrollHeight;
+      }
+    }
+    
+    // Toggle debug panel
+    document.getElementById('debugToggle').addEventListener('click', function() {
+      document.getElementById('debugPanel').classList.toggle('show');
+    });
+    
     // DOM Elements
     const signupForm = document.getElementById('signupForm');
     const profilePhoto = document.getElementById('profilePhoto');
@@ -878,6 +931,7 @@
       }
       
       profileImageFile = file;
+      debugLog(`Profile image selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
       
       // Preview image
       const reader = new FileReader();
@@ -891,16 +945,40 @@
       profilePhoto.value = '';
       profilePreview.innerHTML = '<div class="placeholder"><i class="fa-solid fa-user fa-2x"></i></div>';
       profileImageFile = null;
+      debugLog('Profile image removed');
     });
     
-    // Upload image to Supabase Storage (AFTER user is created)
+    // Upload image to Supabase Storage
     async function uploadProfileImage(userId) {
-      if (!profileImageFile) return null;
+      if (!profileImageFile) {
+        debugLog('No profile image to upload');
+        return null;
+      }
       
       try {
+        debugLog('Starting profile image upload...');
+        
+        // Check if storage bucket exists
+        const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+        if (bucketError) {
+          debugLog(`Bucket check error: ${bucketError.message}`);
+          return null;
+        }
+        
+        const bucketExists = buckets.some(b => b.name === 'user-profiles');
+        if (!bucketExists) {
+          debugLog('Storage bucket "user-profiles" not found');
+          showNotification('Warning', 'Profile picture storage not configured', 'warning');
+          return null;
+        }
+        
+        debugLog('Storage bucket found');
+        
         // Create unique filename
         const fileExt = profileImageFile.name.split('.').pop();
         const fileName = `${userId}-${Date.now()}.${fileExt}`;
+        
+        debugLog(`Uploading file: ${fileName}`);
         
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
@@ -911,7 +989,7 @@
           });
         
         if (error) {
-          console.warn('Profile image upload failed:', error.message);
+          debugLog(`Upload failed: ${error.message}`);
           // Don't throw error - profile picture is optional
           return null;
         }
@@ -921,10 +999,11 @@
           .from('user-profiles')
           .getPublicUrl(fileName);
         
+        debugLog(`Upload successful: ${publicUrl}`);
         return publicUrl;
         
       } catch (error) {
-        console.warn('Error uploading image:', error);
+        debugLog(`Upload error: ${error.message}`);
         return null;
       }
     }
@@ -976,6 +1055,7 @@
     // Form submission
     signupForm.addEventListener('submit', async function(e) {
       e.preventDefault();
+      debugLog('Form submission started');
       
       // Basic validation
       if (passwordInput.value !== confirmPasswordInput.value) {
@@ -1018,8 +1098,13 @@
       submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
       submitBtn.disabled = true;
       
+      debugLog(`Attempting signup for: ${email}`);
+      debugLog(`Name: ${firstName} ${lastName}`);
+      debugLog(`Newsletter: ${subscribeToNewsletter}`);
+      
       try {
-        // Create user with Supabase Auth
+        // Step 1: Create user with Supabase Auth
+        debugLog('Step 1: Creating auth user...');
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -1030,51 +1115,87 @@
               newsletter: subscribeToNewsletter,
               full_name: `${firstName} ${lastName}`
             },
-            emailRedirectTo: `${window.location.origin}/login.html?verified=true`
+            emailRedirectTo: `${window.location.origin}/verify-success.html`
           }
         });
         
         if (authError) {
+          debugLog(`Auth error: ${authError.message}`);
           throw authError;
         }
+        
+        debugLog('Auth user created successfully');
+        debugLog(`User ID: ${authData.user?.id}`);
+        debugLog(`Email confirmed: ${authData.user?.email_confirmed_at ? 'Yes' : 'No'}`);
         
         // Check if user was created successfully
         if (!authData.user) {
           throw new Error('User creation failed - no user data returned');
         }
         
-        // Upload profile image AFTER user is created
+        // Step 2: Upload profile image (if any)
         let profileImageUrl = null;
         if (profileImageFile && authData.user.id) {
+          debugLog('Step 2: Uploading profile image...');
           profileImageUrl = await uploadProfileImage(authData.user.id);
+          debugLog(`Profile image URL: ${profileImageUrl || 'None'}`);
+        } else {
+          debugLog('Step 2: No profile image to upload');
         }
         
-        // Save user data to brightrose_users table
-        const { error: dbError } = await supabase
+        // Step 3: Save user data to brightrose_users table
+        debugLog('Step 3: Saving to database...');
+        
+        const userData = {
+          id: authData.user.id,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          profile_image: profileImageUrl,
+          newsletter: subscribeToNewsletter,
+          email_verified: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        debugLog('User data to insert:', JSON.stringify(userData));
+        
+        const { data: dbData, error: dbError } = await supabase
           .from('brightrose_users')
-          .insert({
-            id: authData.user.id,
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            profile_image: profileImageUrl,
-            newsletter: subscribeToNewsletter,
-            email_verified: false
-          });
+          .insert(userData)
+          .select();
         
         if (dbError) {
-          console.error('Database insert error:', dbError);
+          debugLog(`Database error: ${dbError.message}`);
+          debugLog(`Error code: ${dbError.code}`);
+          debugLog(`Error details: ${JSON.stringify(dbError.details)}`);
           
-          // If it's a duplicate key error, it's okay - user already exists in table
-          if (!dbError.message.includes('duplicate key')) {
+          // If it's a duplicate key error, try updating instead
+          if (dbError.code === '23505') {
+            debugLog('Duplicate key detected, updating existing record...');
+            const { error: updateError } = await supabase
+              .from('brightrose_users')
+              .update(userData)
+              .eq('id', authData.user.id);
+            
+            if (updateError) {
+              debugLog(`Update error: ${updateError.message}`);
+              throw updateError;
+            }
+            debugLog('Existing record updated successfully');
+          } else {
             throw new Error(`Database error: ${dbError.message}`);
           }
+        } else {
+          debugLog('Database insert successful');
+          debugLog('Inserted data:', JSON.stringify(dbData));
         }
         
         // SUCCESS: Show success message and hide form
         signupForm.style.display = 'none';
         successMessage.classList.add('show');
         
+        debugLog('Signup process completed successfully');
         showNotification('Success', 'Account created! Check your email for verification link.', 'success');
         
         // Store email for potential resend
@@ -1082,6 +1203,8 @@
         
       } catch (error) {
         console.error('Signup Error:', error);
+        debugLog(`Signup failed: ${error.message}`);
+        debugLog(`Full error: ${JSON.stringify(error)}`);
         
         // User-friendly error messages
         let errorMessage = 'An error occurred during signup. Please try again.';
@@ -1104,6 +1227,14 @@
           errorMessage = 'Profile picture upload is temporarily unavailable. Your account was created without a profile picture.';
         } else if (error.message.includes('JWT expired')) {
           errorMessage = 'Session expired. Please refresh the page and try again.';
+        } else if (error.message.includes('does not exist')) {
+          errorMessage = 'Database table not found. Please contact support.';
+        } else if (error.message.includes('permission denied')) {
+          errorMessage = 'Permission denied. Please check RLS policies.';
+        } else if (error.message.includes('23505')) {
+          errorMessage = 'This email is already registered. Please sign in instead.';
+        } else if (error.message.includes('new row violates row-level security policy')) {
+          errorMessage = 'Security policy error. Please contact support.';
         }
         
         showNotification('Error', errorMessage, 'error');
@@ -1117,6 +1248,7 @@
     // Resend verification email
     resendEmailBtn.addEventListener('click', async function(e) {
       e.preventDefault();
+      debugLog('Resending verification email...');
       
       const email = localStorage.getItem('lastSignupEmail');
       if (!email) {
@@ -1129,21 +1261,24 @@
           type: 'signup',
           email: email,
           options: {
-            emailRedirectTo: `${window.location.origin}/login.html?verified=true`
+            emailRedirectTo: `${window.location.origin}/verify-success.html`
           }
         });
         
         if (error) throw error;
         
+        debugLog('Verification email resent');
         showNotification('Success', 'Verification email resent! Check your inbox.', 'success');
       } catch (error) {
         console.error('Resend Error:', error);
+        debugLog(`Resend error: ${error.message}`);
         showNotification('Error', 'Failed to resend verification email. Please try again later.', 'error');
       }
     });
     
     // Return to form button
     returnToFormBtn.addEventListener('click', function() {
+      debugLog('Returning to form');
       successMessage.classList.remove('show');
       signupForm.style.display = 'grid';
       signupForm.reset();
@@ -1158,6 +1293,10 @@
       passwordStrength.className = 'password-strength';
       passwordStrengthText.textContent = 'Password strength';
       passwordStrengthText.style.color = '';
+      
+      // Reset button
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Create Account</span>';
     });
     
     // Notification system
@@ -1221,6 +1360,25 @@
       }, 5000);
     }
     
+    // Test Supabase connection
+    async function testSupabaseConnection() {
+      try {
+        debugLog('Testing Supabase connection...');
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          debugLog(`Connection test failed: ${error.message}`);
+          return false;
+        }
+        
+        debugLog('Supabase connection successful');
+        return true;
+      } catch (error) {
+        debugLog(`Connection test error: ${error.message}`);
+        return false;
+      }
+    }
+    
     // Initialize form validation
     function initializeFormValidation() {
       const inputs = signupForm.querySelectorAll('input[required]');
@@ -1242,12 +1400,20 @@
     }
     
     // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+      debugLog('Page loaded');
       initializeFormValidation();
+      
+      // Test connection
+      const connected = await testSupabaseConnection();
+      if (!connected) {
+        showNotification('Warning', 'Unable to connect to server. Some features may not work.', 'warning');
+      }
       
       // Check if user is already logged in
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
+          debugLog('User already logged in, redirecting...');
           showNotification('Info', 'You are already logged in. Redirecting to dashboard...', 'info');
           setTimeout(() => {
             window.location.href = 'dashboard.html';
@@ -1260,6 +1426,14 @@
       if (urlParams.has('verified') && urlParams.get('verified') === 'true') {
         showNotification('Success', 'Email verified successfully! You can now sign in.', 'success');
       }
+      
+      // Listen for auth state changes
+      supabase.auth.onAuthStateChange((event, session) => {
+        debugLog(`Auth state changed: ${event}`);
+        if (session) {
+          debugLog(`User: ${session.user.email}`);
+        }
+      });
     });
   </script>
 </body>
