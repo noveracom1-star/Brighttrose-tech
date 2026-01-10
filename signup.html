@@ -631,6 +631,39 @@
       margin-bottom: 15px;
     }
     
+    /* Test Button */
+    .test-button {
+      position: fixed;
+      bottom: 130px;
+      right: 20px;
+      background: #F59E0B;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      z-index: 9999;
+      font-weight: 500;
+    }
+    
+    /* Email Debug Panel */
+    .email-debug {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 10000;
+      display: none;
+      max-width: 300px;
+    }
+    
+    .email-debug.show {
+      display: block;
+    }
+    
     @media (min-width: 768px) {
       .signup-container {
         grid-template-columns: 1fr 1.2fr;
@@ -685,6 +718,20 @@
         right: 16px;
         left: 16px;
       }
+      
+      .test-button {
+        bottom: 100px;
+        right: 10px;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+      }
+      
+      .email-debug {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
     }
 
     /* Debug Panel */
@@ -733,9 +780,30 @@
 
   <!-- Debug Panel (Hidden by default) -->
   <div class="debug-panel" id="debugPanel"></div>
+  
+  <!-- Debug Toggle Button -->
   <button class="debug-toggle" id="debugToggle">
     <i class="fa-solid fa-bug"></i>
   </button>
+  
+  <!-- Test Button -->
+  <button class="test-button" id="testSignupBtn">
+    🧪 Test Signup
+  </button>
+  
+  <!-- Email Debug Panel -->
+  <div class="email-debug" id="emailDebug">
+    <h3>🔧 Email Debug</h3>
+    <p>Since email confirmation is enabled:</p>
+    <ol>
+      <li>Check your email inbox</li>
+      <li>Check spam folder</li>
+      <li>Wait 1-2 minutes</li>
+      <li><button onclick="window.location.href='login.html'" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">Try Login</button></li>
+    </ol>
+    <button onclick="testWithoutEmail()" style="margin-top: 10px; padding: 8px 16px; background: var(--danger); color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">Test without email confirmation</button>
+    <button onclick="document.getElementById('emailDebug').classList.remove('show')" style="margin-top: 10px; padding: 8px 16px; background: var(--muted); color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">Close</button>
+  </div>
 
   <div class="signup-container">
     <!-- Visual Section -->
@@ -862,9 +930,21 @@
           <i class="fa-solid fa-envelope-circle-check"></i>
         </div>
         <h3>Check Your Email!</h3>
-        <p>We've sent a verification link to your email address. Please click the link to confirm your account and complete the registration process.</p>
-        <p><small>Didn't receive the email? Check your spam folder or <a href="#" style="color: white; text-decoration: underline;" id="resendEmail">click here to resend</a>.</small></p>
+        <p>We've sent a verification link to <strong id="userEmail"></strong>.</p>
+        <p>Please click the link in the email to activate your account and complete the registration process.</p>
+        <div style="background: rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p style="margin: 0; font-size: 0.9rem;">📧 <strong>Can't find the email?</strong></p>
+          <ul style="margin: 10px 0; padding-left: 20px; font-size: 0.9rem;">
+            <li>Check your spam/junk folder</li>
+            <li>Wait 1-2 minutes</li>
+            <li>Make sure you entered the correct email</li>
+          </ul>
+        </div>
+        <p><small>Didn't receive the email? <a href="#" style="color: white; text-decoration: underline;" id="resendEmail">Click here to resend</a>.</small></p>
         <button class="btn outline" style="margin-top: 20px; color: white; border-color: white;" id="returnToForm">Back to Sign Up</button>
+        <button class="btn secondary" style="margin-top: 10px;" id="tryLogin">
+          Try Login Now
+        </button>
       </div>
       
       <div class="signin-redirect">
@@ -906,6 +986,32 @@
       document.getElementById('debugPanel').classList.toggle('show');
     });
     
+    // Test button functionality
+    document.getElementById('testSignupBtn').addEventListener('click', async function() {
+      const testEmail = `test-${Date.now()}@test.com`;
+      
+      debugLog(`Testing signup with: ${testEmail}`);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: testEmail,
+        password: 'TestPassword123!',
+        options: {
+          emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
+        }
+      });
+      
+      if (error) {
+        debugLog(`Test signup error: ${error.message}`, 'error');
+        showNotification('Test Failed', error.message, 'error');
+      } else {
+        debugLog(`Test signup success! User ID: ${data.user?.id}`, 'success');
+        showNotification('Test Success', `Test user created: ${testEmail}\nCheck console for details.`, 'success');
+        
+        // Show email debug panel
+        document.getElementById('emailDebug').classList.add('show');
+      }
+    });
+    
     // DOM Elements
     const signupForm = document.getElementById('signupForm');
     const profilePhoto = document.getElementById('profilePhoto');
@@ -920,6 +1026,8 @@
     const successMessage = document.getElementById('successMessage');
     const resendEmailBtn = document.getElementById('resendEmail');
     const returnToFormBtn = document.getElementById('returnToForm');
+    const userEmailSpan = document.getElementById('userEmail');
+    const tryLoginBtn = document.getElementById('tryLogin');
     
     // Profile picture handling
     let profileImageFile = null;
@@ -1043,12 +1151,12 @@
       }
     });
     
-    // SIMPLE SIGNUP FUNCTION - This is the key fix!
+    // UPDATED SIGNUP FUNCTION - Added emailRedirectTo
     async function signupUser(firstName, lastName, email, password, newsletter) {
-      debugLog('Starting SIMPLE signup process...');
+      debugLog('Starting signup process...');
       
       try {
-        // Step 1: Create auth user
+        // Step 1: Create auth user WITH emailRedirectTo
         debugLog('1. Creating auth user...');
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
@@ -1058,7 +1166,9 @@
               first_name: firstName,
               last_name: lastName,
               newsletter: newsletter
-            }
+            },
+            // CRITICAL: Add this line for email verification redirect
+            emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
           }
         });
         
@@ -1072,6 +1182,8 @@
         }
         
         debugLog(`✅ Auth user created: ${authData.user.id}`);
+        debugLog(`Email sent to: ${email}`);
+        debugLog(`User needs verification: ${!authData.user.email_confirmed_at}`);
         
         // Step 2: Upload profile image (optional)
         let profileImageUrl = null;
@@ -1091,8 +1203,7 @@
           email: email,
           profile_image: profileImageUrl,
           newsletter: newsletter,
-          email_verified: false
-          // created_at and updated_at will use DEFAULT values
+          email_verified: authData.user.email_confirmed_at ? true : false
         };
         
         debugLog('Inserting data:', JSON.stringify(userData));
@@ -1128,7 +1239,8 @@
         return {
           success: true,
           userId: authData.user.id,
-          email: email
+          email: email,
+          needsVerification: !authData.user.email_confirmed_at
         };
         
       } catch (error) {
@@ -1190,8 +1302,23 @@
           // SUCCESS: Show success message and hide form
           signupForm.style.display = 'none';
           successMessage.classList.add('show');
+          userEmailSpan.textContent = email;
           
-          debugLog('✅ Account created successfully!', 'success');
+          if (result.needsVerification) {
+            debugLog('✅ Account created! Verification email sent.', 'success');
+            showNotification(
+              'Check Your Email', 
+              `We sent a verification link to ${email}. Please check your inbox (and spam folder).`,
+              'success'
+            );
+          } else {
+            debugLog('✅ Account created and verified!', 'success');
+            showNotification(
+              'Account Created', 
+              'Your account has been created successfully!',
+              'success'
+            );
+          }
           
           // Store email for potential resend
           localStorage.setItem('lastSignupEmail', email);
@@ -1219,9 +1346,12 @@
           errorMessage = 'Permission denied. Please check RLS policies.';
         } else if (error.message.includes('23505')) {
           errorMessage = 'This email is already registered. Please sign in instead.';
+        } else if (error.message.includes('emailRedirectTo')) {
+          errorMessage = 'Email configuration issue. Please check Site URL in Supabase settings.';
         }
         
         debugLog(errorMessage, 'error');
+        showNotification('Signup Failed', errorMessage, 'error');
         
         // Reset button state
         submitBtn.innerHTML = originalText;
@@ -1242,15 +1372,20 @@
       try {
         const { error } = await supabase.auth.resend({
           type: 'signup',
-          email: email
+          email: email,
+          options: {
+            emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
+          }
         });
         
         if (error) throw error;
         
         debugLog('Verification email resent! Check your inbox.', 'success');
+        showNotification('Email Resent', 'Verification email has been resent. Please check your inbox.', 'success');
       } catch (error) {
         console.error('Resend Error:', error);
         debugLog('Failed to resend verification email. Please try again later.', 'error');
+        showNotification('Error', 'Failed to resend email. Please try again.', 'error');
       }
     });
     
@@ -1275,6 +1410,48 @@
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<span>Create Account</span>';
     });
+    
+    // Try login button
+    tryLoginBtn.addEventListener('click', async function() {
+      const email = localStorage.getItem('lastSignupEmail');
+      const password = prompt('Enter your password to test login:');
+      
+      if (email && password) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+        
+        if (error) {
+          alert(`Login failed: ${error.message}\n\nThis is normal if email isn't verified yet.`);
+        } else {
+          alert('Login successful! User is verified.');
+          window.location.href = 'dashboard.html';
+        }
+      }
+    });
+    
+    // Temporary bypass for testing ONLY
+    async function testWithoutEmail() {
+      // Create a test user with a disposable email
+      const testEmail = `test${Date.now()}@example.com`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: testEmail,
+        password: 'Test123!',
+        options: {
+          data: { skip_confirmation: true }
+        }
+      });
+      
+      if (error) {
+        console.error('Test error:', error);
+        alert('Error: ' + error.message);
+      } else {
+        console.log('Test user created:', data);
+        alert(`Test user created: ${testEmail}\nPassword: Test123!`);
+      }
+    }
     
     // Notification system
     function showNotification(title, message, type = 'info') {
@@ -1373,6 +1550,39 @@
       }
     }
     
+    // Test email configuration
+    async function testEmailConfiguration() {
+      debugLog('Testing email configuration...');
+      
+      try {
+        // Check auth settings
+        const { data: settings } = await supabase.auth.getSettings();
+        debugLog('Auth settings:', JSON.stringify(settings));
+        
+        // Test if SMTP is configured
+        const testEmail = `test-${Date.now()}@example.com`;
+        const { error } = await supabase.auth.resetPasswordForEmail(testEmail, {
+          redirectTo: 'https://brighttrose-tech.pages.dev/reset-password'
+        });
+        
+        if (error && error.message.includes('email provider')) {
+          debugLog('❌ SMTP not configured. Emails may not send.', 'warning');
+          showNotification(
+            'SMTP Not Configured',
+            'Email provider not configured. Verification emails may not send. Configure SMTP in Supabase Dashboard.',
+            'warning'
+          );
+          return false;
+        }
+        
+        debugLog('✅ Email configuration looks good');
+        return true;
+      } catch (error) {
+        debugLog(`Email test error: ${error.message}`);
+        return false;
+      }
+    }
+    
     // Initialize form validation
     function initializeFormValidation() {
       const inputs = signupForm.querySelectorAll('input[required]');
@@ -1396,10 +1606,16 @@
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', async function() {
       debugLog('Page loaded');
+      debugLog('Site URL: https://brighttrose-tech.pages.dev');
+      debugLog('Make sure this matches Supabase Auth → URL Configuration');
+      
       initializeFormValidation();
       
       // Test database connection
       const dbConnected = await testDatabaseConnection();
+      
+      // Test email configuration
+      await testEmailConfiguration();
       
       if (!dbConnected) {
         debugLog('Signup will not work until database is set up.', 'error');
@@ -1417,10 +1633,15 @@
         }
       });
       
-      // Check for URL parameters
+      // Check for URL parameters (email verification success)
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('verified') && urlParams.get('verified') === 'true') {
         debugLog('Email verified successfully! You can now sign in.', 'success');
+        showNotification(
+          'Email Verified', 
+          'Your email has been verified successfully! You can now sign in.',
+          'success'
+        );
       }
     });
   </script>
