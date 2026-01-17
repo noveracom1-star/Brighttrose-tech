@@ -954,7 +954,7 @@
   </div>
 
   <script>
-    // Supabase configuration
+    // Supabase configuration - UPDATED with correct URLs
     const SUPABASE_URL = 'https://ekhanvqqylomkatamfqs.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraGFudnFxeWxvbWthdGFtZnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQyMTQzNzMsImV4cCI6MjAzOTc5MDM3M30.Sb-ozUBDdM8j7Q31x36zGSHqHAnQpxil_NGcW_AdlHo';
     
@@ -986,7 +986,7 @@
       document.getElementById('debugPanel').classList.toggle('show');
     });
     
-    // Test button functionality
+    // Test button functionality - UPDATED with correct redirect
     document.getElementById('testSignupBtn').addEventListener('click', async function() {
       const testEmail = `test-${Date.now()}@test.com`;
       
@@ -996,7 +996,8 @@
         email: testEmail,
         password: 'TestPassword123!',
         options: {
-          emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
+          // UPDATED: Correct email redirect URL
+          emailRedirectTo: 'https://brighttrose-tech.pages.dev/'
         }
       });
       
@@ -1005,7 +1006,8 @@
         showNotification('Test Failed', error.message, 'error');
       } else {
         debugLog(`Test signup success! User ID: ${data.user?.id}`, 'success');
-        showNotification('Test Success', `Test user created: ${testEmail}\nCheck console for details.`, 'success');
+        debugLog(`Email sent: ${data.user ? 'Yes' : 'No'}`, 'success');
+        showNotification('Test Success', `Test user created: ${testEmail}\nCheck email for verification link.`, 'success');
         
         // Show email debug panel
         document.getElementById('emailDebug').classList.add('show');
@@ -1151,12 +1153,12 @@
       }
     });
     
-    // UPDATED SIGNUP FUNCTION - Added emailRedirectTo
+    // UPDATED SIGNUP FUNCTION with CORRECT emailRedirectTo
     async function signupUser(firstName, lastName, email, password, newsletter) {
       debugLog('Starting signup process...');
       
       try {
-        // Step 1: Create auth user WITH emailRedirectTo
+        // Step 1: Create auth user WITH CORRECT emailRedirectTo
         debugLog('1. Creating auth user...');
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
@@ -1167,8 +1169,8 @@
               last_name: lastName,
               newsletter: newsletter
             },
-            // CRITICAL: Add this line for email verification redirect
-            emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
+            // CRITICAL FIX: Use the correct redirect URL
+            emailRedirectTo: 'https://brighttrose-tech.pages.dev/'
           }
         });
         
@@ -1359,7 +1361,7 @@
       }
     });
     
-    // Resend verification email
+    // Resend verification email - UPDATED with correct redirect
     resendEmailBtn.addEventListener('click', async function(e) {
       e.preventDefault();
       
@@ -1374,7 +1376,8 @@
           type: 'signup',
           email: email,
           options: {
-            emailRedirectTo: 'https://brighttrose-tech.pages.dev/login.html'
+            // UPDATED: Correct redirect URL
+            emailRedirectTo: 'https://brighttrose-tech.pages.dev/'
           }
         });
         
@@ -1608,6 +1611,7 @@
       debugLog('Page loaded');
       debugLog('Site URL: https://brighttrose-tech.pages.dev');
       debugLog('Make sure this matches Supabase Auth → URL Configuration');
+      debugLog('emailRedirectTo set to: https://brighttrose-tech.pages.dev/');
       
       initializeFormValidation();
       
